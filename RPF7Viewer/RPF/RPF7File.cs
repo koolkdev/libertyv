@@ -90,6 +90,14 @@ namespace RPF7Viewer.RPF
             }
         }
 
+        public byte[] Decompress(byte[] data, int uncompressedSize)
+        {
+            // The compression algorithm is pltaform specified, so it should be here
+
+            // Right now I support the xbox compression only
+            return XCompress.Decompress(data, uncompressedSize);
+        }
+
         public byte[] Read(long offset, int length)
         {
             this.Stream.Seek(offset);

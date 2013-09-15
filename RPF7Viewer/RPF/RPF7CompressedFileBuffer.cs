@@ -38,7 +38,7 @@ namespace RPF7Viewer.RPF
 
         public override byte[] GetData()
         {
-            return XCompress.Decompress(this.File.Decrypt(base.GetData()), this.UncompressedSize);
+            return this.File.Decompress(this.File.Decrypt(base.GetData()), this.UncompressedSize);
         }
 
         public override int GetSize()
