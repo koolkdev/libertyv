@@ -50,7 +50,7 @@ namespace RPF7Viewer.RPF.Entries
 
             BitsStream stream = new BitsStream(new MemoryStream(data));
 
-            bool isSpecial = stream.ReadBool();
+            bool isResource = stream.ReadBool();
             int offset = (int)stream.ReadBits(23);
             int compressedSize = (int)stream.ReadBits(24);
             int filenameOffset = (int)stream.ReadBits(16);
@@ -61,7 +61,7 @@ namespace RPF7Viewer.RPF.Entries
             if (offset == 0x7FFFFF)
             {
                 // Is a Directory
-                if (isSpecial)
+                if (isResource)
                 {
                     throw new Exception("Invalid type");
                 }
@@ -77,9 +77,9 @@ namespace RPF7Viewer.RPF.Entries
 
             offset <<= 9;
 
-            if (isSpecial)
+            if (isResource)
             {
-                return new RPF7SpecialEntry(filename, new RPF7FileBuffer(file, offset, compressedSize), stream.ReadBits(64));
+                return new RPF7ResourceEntry(filename, new RPF7FileBuffer(file, offset, compressedSize), (ulong)stream.ReadBits(64));
             }
 
             // Regular file

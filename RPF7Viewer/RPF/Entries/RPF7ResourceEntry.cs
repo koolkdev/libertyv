@@ -25,14 +25,16 @@ using System.Text;
 
 namespace RPF7Viewer.RPF.Entries
 {
-    public class RPF7SpecialEntry : RPF7FileEntry
+    public class RPF7ResourceEntry : RPF7FileEntry
     {
-        public long Parameter;
+        public ulong Parameter;
+        public int Type;
 
-        public RPF7SpecialEntry(String filename, IRPFBuffer data, long parameter)
+        public RPF7ResourceEntry(String filename, IRPFBuffer data, ulong parameter)
             : base(filename, data)
         {
-            Parameter = parameter;
+            this.Parameter = parameter;
+            this.Type = (int)(((this.Parameter >> 28) & 0xf) | ((this.Parameter >> 56) & 0xf0));
         }
         
     }

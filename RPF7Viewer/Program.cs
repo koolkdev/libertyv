@@ -45,6 +45,15 @@ namespace RPF7Viewer
 
             AESDecryptor.Key = File.ReadAllBytes("key.dat");
 
+            string keyMD5 = BitConverter.ToString(new System.Security.Cryptography.MD5CryptoServiceProvider().ComputeHash(AESDecryptor.Key)).Replace("-", "");
+
+            // check if md5 of key is one of the known keys
+            if (keyMD5 != "ead1ea1a3870557b424bc8cf73f51018".ToUpper())
+            {
+                MessageBox.Show("Invalid key");
+                return;
+            }
+
             Application.Run(new RPF7Viewer());
         }
     }

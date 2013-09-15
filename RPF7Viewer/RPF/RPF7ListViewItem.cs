@@ -36,9 +36,10 @@ namespace RPF7Viewer.RPF
             this.Entry = entry;
             this.SubItems.Add(String.Format("{0:n0}", Entry.Data.GetSize()));
 
-            if (this.Entry is RPF7SpecialEntry)
+            if (this.Entry is RPF7ResourceEntry)
             {
                 this.Text += "*";
+                this.SubItems.Add((this.Entry as RPF7ResourceEntry).Type.ToString());
             }
         }
     }

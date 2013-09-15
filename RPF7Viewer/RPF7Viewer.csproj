@@ -58,7 +58,7 @@
     <Compile Include="RPF\Entries\RPF7RegularFileEntry.cs" />
     <Compile Include="RPF\Entries\RPF7DirectoryEntry.cs" />
     <Compile Include="RPF\Entries\RPF7FileEntry.cs" />
-    <Compile Include="RPF\Entries\RPF7SpecialEntry.cs" />
+    <Compile Include="RPF\Entries\RPF7ResourceEntry.cs" />
     <Compile Include="RPF\RPF7CompressedFileBuffer.cs" />
     <Compile Include="RPF\RPF7FileBuffer.cs" />
     <Compile Include="RPF\IRPFBuffer.cs" />

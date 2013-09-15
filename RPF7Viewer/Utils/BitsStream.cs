@@ -79,21 +79,21 @@ namespace RPF7Viewer.Utils
                 {
                     if (i == StartByte)
                     {
-                        result = ((int)bytes[i - StartByte] & ((1 << (8 - BitPosition)) - 1)) >> (int)(RoundUp(EndBit, 8) - EndBit);
+                        result = ((long)bytes[i - StartByte] & ((1 << (8 - BitPosition)) - 1)) >> (int)(RoundUp(EndBit, 8) - EndBit);
                     }
                     else
                     {
-                        result = (int)bytes[i - StartByte] >> (int)(RoundUp(EndBit, 8) - EndBit);
+                        result = (long)bytes[i - StartByte] >> (int)(RoundUp(EndBit, 8) - EndBit);
                         shift_by = 8 - (int)(RoundUp(EndBit, 8) - EndBit);
                     }
                 }
                 else if (i == StartByte)
                 {
-                    result += ((int)bytes[i - StartByte] & ((1 << (8 - BitPosition)) - 1)) << shift_by;
+                    result += ((long)bytes[i - StartByte] & ((1 << (8 - BitPosition)) - 1)) << shift_by;
                 }
                 else
                 {
-                    result += bytes[i - StartByte] << shift_by;
+                    result += (long)bytes[i - StartByte] << shift_by;
                     shift_by += 8;
                 }
             }

@@ -40,6 +40,7 @@ namespace RPF7Viewer
             InitializeComponent();
             filesList.Columns.Add("Name", 300);
             filesList.Columns.Add("Size", 100);
+            filesList.Columns.Add("Resource Type", 100);
         }
 
         private void LoadRPF(RPF7File rpf)
