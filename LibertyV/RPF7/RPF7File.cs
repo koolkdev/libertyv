@@ -24,9 +24,9 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using RPF7Viewer.Utils;
-using RPF7Viewer.RPF.Entries;
+using RPF7Viewer.RPF7.Entries;
 
-namespace RPF7Viewer.RPF
+namespace RPF7Viewer.RPF7
 {
     public class RPF7File
     {
@@ -36,7 +36,7 @@ namespace RPF7Viewer.RPF
         public int shiftNameAccessBy;
         private bool sixteenRoundsDecrypt;
         
-        public RPF7Entry Root;
+        public Entry Root;
         public String Filename;
 
         public RPF7File(Stream inputStream, String filname = "")
@@ -66,9 +66,9 @@ namespace RPF7Viewer.RPF
 
             // Go back to header
             this.Stream.Seek(0x10);
-            this.Root = RPF7Entry.CreateFromHeader(this.Decrypt(Stream.ReadBytes(0x10)), this, filenames);
+            this.Root = Entry.CreateFromHeader(this.Decrypt(Stream.ReadBytes(0x10)), this, filenames);
 
-            if (!(this.Root is RPF7DirectoryEntry))
+            if (!(this.Root is DirectoryEntry))
             {
                 throw new Exception("Expected root to be directory");
             }

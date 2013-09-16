@@ -24,9 +24,9 @@ using System.Linq;
 using System.Text;
 using System.IO;
 
-namespace RPF7Viewer.RPF.Entries
+namespace RPF7Viewer.RPF7.Entries
 {
-    public class RPF7ResourceEntry : RPF7FileEntry
+    public class ResourceEntry : FileEntry
     {
         public uint SystemFlag;
         public uint GraphicsFlag;
@@ -52,7 +52,7 @@ namespace RPF7Viewer.RPF.Entries
             }
         }
 
-        public RPF7ResourceEntry(String filename, IRPFBuffer data, uint systemFlag, uint graphicsFlag)
+        public ResourceEntry(String filename, IBuffer data, uint systemFlag, uint graphicsFlag)
             : base(filename, data)
         {
             this.SystemFlag = systemFlag;

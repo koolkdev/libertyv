@@ -22,18 +22,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Windows.Forms;
-using RPF7Viewer.RPF.Entries;
+using RPF7Viewer.Utils;
+using RPF7Viewer.RPF7.Entries;
 
-namespace RPF7Viewer.RPF
+namespace RPF7Viewer.RPF7
 {
-    public class RPF7TreeNode : TreeNode
+    public class ResourceFileBuffer : CompressedFileBuffer
     {
-        public RPF7DirectoryEntry Entry;
-        public RPF7TreeNode(RPF7DirectoryEntry entry, RPF7TreeNode[] children)
-            : base(entry.Filename, children)
+
+        // Ignore first 0x10, it is supposed to be the header, but is it junk since we got all the information that we need about the resource from the flags?
+        public ResourceFileBuffer(RPF7File file, long offset, int compressedSize, uint systemFlag, uint graphicsFlag)
+            : base(file, offset + 0x10, compressedSize - 0x10, (int)(ResourceEntry.GetSizeFromFlag(systemFlag) + ResourceEntry.GetSizeFromFlag(graphicsFlag)), ResourceEntry.IsResourceEncrypted(ResourceEntry.GetResourceTypeFromFlags(systemFlag, graphicsFlag)))
         {
-            this.Entry = entry;
         }
+
     }
 }

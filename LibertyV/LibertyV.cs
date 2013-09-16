@@ -26,16 +26,16 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using RPF7Viewer.RPF;
-using RPF7Viewer.RPF.Entries;
+using RPF7Viewer.RPF7;
+using RPF7Viewer.RPF7.Entries;
 using System.IO;
 
 namespace RPF7Viewer
 {
-    public partial class RPF7Viewer : Form
+    public partial class LibertyV : Form
     {
         public RPF7File File = null;
-        public RPF7Viewer()
+        public LibertyV()
         {
             InitializeComponent();
             filesList.Columns.Add("Name", 300);
@@ -51,7 +51,7 @@ namespace RPF7Viewer
             exportFileButton.Enabled = false;
             filesTree.Nodes.Clear();
             filesList.Items.Clear();
-            TreeNode root = (rpf.Root as RPF7DirectoryEntry).GetTreeNodes();
+            TreeNode root = (rpf.Root as DirectoryEntry).GetTreeNodes();
             root.Text = rpf.Filename;
             filesTree.Nodes.Add(root);
         }
@@ -72,7 +72,7 @@ namespace RPF7Viewer
             exportFileButton.Enabled = false;
             filesList.Items.Clear();
 
-            foreach (RPF7ListViewItem item in (e.Node as RPF7TreeNode).Entry.GetListViewItems())
+            foreach (ListViewItem item in (e.Node as EntryTreeNode).Entry.GetListViewItems())
             {
                 filesList.Items.Add(item);
             }
@@ -83,7 +83,7 @@ namespace RPF7Viewer
             FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog();
             if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
             {
-                (File.Root as RPF7DirectoryEntry).Export(folderBrowserDialog.SelectedPath);
+                (File.Root as DirectoryEntry).Export(folderBrowserDialog.SelectedPath);
             }
 
         }
@@ -93,7 +93,7 @@ namespace RPF7Viewer
             FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog();
             if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
             {
-                (filesList.SelectedItems[0] as RPF7ListViewItem).Entry.Export(folderBrowserDialog.SelectedPath);
+                (filesList.SelectedItems[0] as EntryListViewItem).Entry.Export(folderBrowserDialog.SelectedPath);
             }
         }
         

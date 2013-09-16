@@ -25,40 +25,40 @@ using System.Text;
 using System.IO;
 using RPF7Viewer.Utils;
 
-namespace RPF7Viewer.RPF.Entries
+namespace RPF7Viewer.RPF7.Entries
 {
-    public class RPF7DirectoryEntry : RPF7Entry
+    public class DirectoryEntry : Entry
     {
-        public List<RPF7Entry> Entries;
+        public List<Entry> Entries;
 
-        public RPF7DirectoryEntry(String filename, List<RPF7Entry> entries) : base(filename)
+        public DirectoryEntry(String filename, List<Entry> entries) : base(filename)
         {
             this.Entries = entries;
-            foreach (RPF7Entry entry in this.Entries) {
+            foreach (Entry entry in this.Entries) {
                 entry.Parent = this;
             }
         }
 
-        public RPF7TreeNode GetTreeNodes() {
-            List<RPF7TreeNode> children = new List<RPF7TreeNode>();
-            foreach (RPF7Entry entry in this.Entries)
+        public EntryTreeNode GetTreeNodes() {
+            List<EntryTreeNode> children = new List<EntryTreeNode>();
+            foreach (Entry entry in this.Entries)
             {
-                if (entry is RPF7DirectoryEntry)
+                if (entry is DirectoryEntry)
                 {
-                    children.Add((entry as RPF7DirectoryEntry).GetTreeNodes());
+                    children.Add((entry as DirectoryEntry).GetTreeNodes());
                 }
             }
-            return new RPF7TreeNode(this, children.ToArray());
+            return new EntryTreeNode(this, children.ToArray());
         }
 
-        public List<RPF7ListViewItem> GetListViewItems()
+        public List<EntryListViewItem> GetListViewItems()
         {
-            List<RPF7ListViewItem> children = new List<RPF7ListViewItem>();
-            foreach (RPF7Entry entry in this.Entries)
+            List<EntryListViewItem> children = new List<EntryListViewItem>();
+            foreach (Entry entry in this.Entries)
             {
-                if (entry is RPF7FileEntry)
+                if (entry is FileEntry)
                 {
-                    children.Add(new RPF7ListViewItem(entry as RPF7FileEntry));
+                    children.Add(new EntryListViewItem(entry as FileEntry));
                 }
             }
             return children;
@@ -68,7 +68,7 @@ namespace RPF7Viewer.RPF.Entries
         {
             String subfolder = Path.Combine(foldername, this.Filename);
             Directory.CreateDirectory(subfolder);
-            foreach (RPF7Entry entry in this.Entries)
+            foreach (Entry entry in this.Entries)
             {
                 entry.Export(subfolder);
             }

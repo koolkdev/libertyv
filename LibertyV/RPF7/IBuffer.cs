@@ -23,17 +23,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace RPF7Viewer.RPF.Entries
+namespace RPF7Viewer.RPF7
 {
-    public class RPF7RegularFileEntry : RPF7FileEntry
+    public interface IBuffer
     {
-        public bool Compressed;
-
-        public RPF7RegularFileEntry(String filename, IRPFBuffer data, bool compressed)
-            : base(filename, data)
-        {
-            this.Compressed = compressed;
-        }
-
+        byte[] GetData();
+        int GetSize();
     }
 }

@@ -22,30 +22,23 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 
-namespace RPF7Viewer.RPF
+namespace RPF7Viewer.RPF7.Entries
 {
-    public class RPF7FileBuffer : IRPFBuffer
+    public class FileEntry : Entry
     {
-        private long Offset;
-        private int Size;
-        protected RPF7File File;
+        public IBuffer Data;
 
-        public RPF7FileBuffer(RPF7File file, long offset, int size)
+        public FileEntry(String filename, IBuffer data)
+            : base(filename)
         {
-            this.File = file;
-            this.Offset = offset;
-            this.Size = size;
+            this.Data = data;
         }
 
-        public virtual byte[] GetData()
+        public override void Export(String foldername)
         {
-            return this.File.Read(this.Offset, this.Size);
-        }
-
-        public virtual int GetSize()
-        {
-            return this.Size;
+            System.IO.File.WriteAllBytes(Path.Combine(foldername, this.Filename), this.Data.GetData());
         }
     }
 }

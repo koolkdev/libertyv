@@ -46,31 +46,31 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="RPF7Viewer.cs">
+    <Compile Include="LibertyV.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="RPF7Viewer.Designer.cs">
-      <DependentUpon>RPF7Viewer.cs</DependentUpon>
+    <Compile Include="LibertyV.Designer.cs">
+      <DependentUpon>LibertyV.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RPF\RPF7ResourceFileBuffer.cs" />
-    <Compile Include="RPF\RPF7ListViewItem.cs" />
-    <Compile Include="RPF\Entries\RPF7RegularFileEntry.cs" />
-    <Compile Include="RPF\Entries\RPF7DirectoryEntry.cs" />
-    <Compile Include="RPF\Entries\RPF7FileEntry.cs" />
-    <Compile Include="RPF\Entries\RPF7ResourceEntry.cs" />
-    <Compile Include="RPF\RPF7CompressedFileBuffer.cs" />
-    <Compile Include="RPF\RPF7FileBuffer.cs" />
-    <Compile Include="RPF\IRPFBuffer.cs" />
-    <Compile Include="RPF\RPF7TreeNode.cs" />
+    <Compile Include="RPF7\ResourceFileBuffer.cs" />
+    <Compile Include="RPF7\EntryListViewItem.cs" />
+    <Compile Include="RPF7\Entries\RegularFileEntry.cs" />
+    <Compile Include="RPF7\Entries\DirectoryEntry.cs" />
+    <Compile Include="RPF7\Entries\FileEntry.cs" />
+    <Compile Include="RPF7\Entries\ResourceEntry.cs" />
+    <Compile Include="RPF7\CompressedFileBuffer.cs" />
+    <Compile Include="RPF7\FileBuffer.cs" />
+    <Compile Include="RPF7\IBuffer.cs" />
+    <Compile Include="RPF7\EntryTreeNode.cs" />
     <Compile Include="Utils\AESDecryptor.cs" />
-    <Compile Include="RPF\Entries\RPF7Entry.cs" />
-    <Compile Include="RPF\RPF7File.cs" />
+    <Compile Include="RPF7\Entries\Entry.cs" />
+    <Compile Include="RPF7\RPF7File.cs" />
     <Compile Include="Utils\BitsStream.cs" />
     <Compile Include="Utils\XCompress.cs" />
-    <EmbeddedResource Include="RPF7Viewer.resx">
-      <DependentUpon>RPF7Viewer.cs</DependentUpon>
+    <EmbeddedResource Include="LibertyV.resx">
+      <DependentUpon>LibertyV.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

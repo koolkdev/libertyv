@@ -23,23 +23,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using RPF7Viewer.RPF.Entries;
+using RPF7Viewer.RPF7.Entries;
 
-namespace RPF7Viewer.RPF
+namespace RPF7Viewer.RPF7
 {
-    public class RPF7ListViewItem : ListViewItem
+    public class EntryTreeNode : TreeNode
     {
-        public RPF7FileEntry Entry;
-        public RPF7ListViewItem(RPF7FileEntry entry)
-            : base(entry.Filename)
+        public DirectoryEntry Entry;
+        public EntryTreeNode(DirectoryEntry entry, EntryTreeNode[] children)
+            : base(entry.Filename, children)
         {
             this.Entry = entry;
-            this.SubItems.Add(String.Format("{0:n0}", Entry.Data.GetSize()));
-
-            if (this.Entry is RPF7ResourceEntry)
-            {
-                this.SubItems.Add((this.Entry as RPF7ResourceEntry).Type.ToString());
-            }
         }
     }
 }

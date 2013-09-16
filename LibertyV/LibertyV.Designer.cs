@@ -20,7 +20,7 @@
 
 namespace RPF7Viewer
 {
-    partial class RPF7Viewer
+    partial class LibertyV
     {
         /// <summary>
         /// Required designer variable.
@@ -48,11 +48,14 @@ namespace RPF7Viewer
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(RPF7Viewer));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(LibertyV));
             this.filesTree = new System.Windows.Forms.TreeView();
             this.filesList = new System.Windows.Forms.ListView();
             this.toolbar = new System.Windows.Forms.ToolStrip();
             this.fileOpenButton = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.exportAllButton = new System.Windows.Forms.ToolStripButton();
+            this.exportFileButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton3 = new System.Windows.Forms.ToolStripButton();
@@ -60,9 +63,6 @@ namespace RPF7Viewer
             this.toolStripButton5 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton6 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton7 = new System.Windows.Forms.ToolStripButton();
-            this.exportFileButton = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.exportAllButton = new System.Windows.Forms.ToolStripButton();
             this.toolbar.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -108,6 +108,33 @@ namespace RPF7Viewer
             this.fileOpenButton.Size = new System.Drawing.Size(36, 36);
             this.fileOpenButton.Text = "fileOpenButton";
             this.fileOpenButton.Click += new System.EventHandler(this.fileOpenButton_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 39);
+            // 
+            // exportAllButton
+            // 
+            this.exportAllButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.exportAllButton.Enabled = false;
+            this.exportAllButton.Image = ((System.Drawing.Image)(resources.GetObject("exportAllButton.Image")));
+            this.exportAllButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.exportAllButton.Name = "exportAllButton";
+            this.exportAllButton.Size = new System.Drawing.Size(61, 36);
+            this.exportAllButton.Text = "Export All";
+            this.exportAllButton.Click += new System.EventHandler(this.exportAllButton_Click);
+            // 
+            // exportFileButton
+            // 
+            this.exportFileButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.exportFileButton.Enabled = false;
+            this.exportFileButton.Image = ((System.Drawing.Image)(resources.GetObject("exportFileButton.Image")));
+            this.exportFileButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.exportFileButton.Name = "exportFileButton";
+            this.exportFileButton.Size = new System.Drawing.Size(65, 36);
+            this.exportFileButton.Text = "Export File";
+            this.exportFileButton.Click += new System.EventHandler(this.exportFileButton_Click);
             // 
             // toolStripButton1
             // 
@@ -169,34 +196,7 @@ namespace RPF7Viewer
             this.toolStripButton7.Size = new System.Drawing.Size(36, 36);
             this.toolStripButton7.Text = "toolStripButton7";
             // 
-            // exportFileButton
-            // 
-            this.exportFileButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.exportFileButton.Enabled = false;
-            this.exportFileButton.Image = ((System.Drawing.Image)(resources.GetObject("exportFileButton.Image")));
-            this.exportFileButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.exportFileButton.Name = "exportFileButton";
-            this.exportFileButton.Size = new System.Drawing.Size(65, 36);
-            this.exportFileButton.Text = "Export File";
-            this.exportFileButton.Click += new System.EventHandler(this.exportFileButton_Click);
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 39);
-            // 
-            // exportAllButton
-            // 
-            this.exportAllButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.exportAllButton.Enabled = false;
-            this.exportAllButton.Image = ((System.Drawing.Image)(resources.GetObject("exportAllButton.Image")));
-            this.exportAllButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.exportAllButton.Name = "exportAllButton";
-            this.exportAllButton.Size = new System.Drawing.Size(61, 36);
-            this.exportAllButton.Text = "Export All";
-            this.exportAllButton.Click += new System.EventHandler(this.exportAllButton_Click);
-            // 
-            // RPF7Viewer
+            // LibertyV
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -204,8 +204,8 @@ namespace RPF7Viewer
             this.Controls.Add(this.toolbar);
             this.Controls.Add(this.filesList);
             this.Controls.Add(this.filesTree);
-            this.Name = "RPF7Viewer";
-            this.Text = "RPF7Viewer";
+            this.Name = "LibertyV";
+            this.Text = "LibertyV - Grand Theft Auto V RPF Explorer";
             this.toolbar.ResumeLayout(false);
             this.toolbar.PerformLayout();
             this.ResumeLayout(false);

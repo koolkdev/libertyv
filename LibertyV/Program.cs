@@ -23,7 +23,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using System.IO;
-using RPF7Viewer.RPF;
+using RPF7Viewer.Utils;
 
 namespace RPF7Viewer
 {
@@ -54,7 +54,7 @@ namespace RPF7Viewer
                 return;
             }
 
-            Application.Run(new RPF7Viewer());
+            Application.Run(new LibertyV());
         }
     }
 }

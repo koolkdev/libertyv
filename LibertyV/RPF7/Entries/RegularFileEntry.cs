@@ -22,23 +22,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.IO;
 
-namespace RPF7Viewer.RPF.Entries
+namespace RPF7Viewer.RPF7.Entries
 {
-    public class RPF7FileEntry : RPF7Entry
+    public class RegularFileEntry : FileEntry
     {
-        public IRPFBuffer Data;
+        public bool Compressed;
 
-        public RPF7FileEntry(String filename, IRPFBuffer data)
-            : base(filename)
+        public RegularFileEntry(String filename, IBuffer data, bool compressed)
+            : base(filename, data)
         {
-            this.Data = data;
+            this.Compressed = compressed;
         }
 
-        public override void Export(String foldername)
-        {
-            File.WriteAllBytes(Path.Combine(foldername, this.Filename), this.Data.GetData());
-        }
     }
 }

@@ -25,14 +25,14 @@ using System.Text;
 using System.IO;
 using RPF7Viewer.Utils;
 
-namespace RPF7Viewer.RPF.Entries
+namespace RPF7Viewer.RPF7.Entries
 {
-    public class RPF7Entry
+    public class Entry
     {
         public String Filename;
-        public RPF7Entry Parent = null;
+        public Entry Parent = null;
 
-        public RPF7Entry(String filename) {
+        public Entry(String filename) {
             this.Filename = filename;
         }
 
@@ -41,7 +41,7 @@ namespace RPF7Viewer.RPF.Entries
             throw new Exception("Not implemented"); 
         }
      
-        public static RPF7Entry CreateFromHeader(byte[] data, RPF7File file, BitsStream filenames)
+        public static Entry CreateFromHeader(byte[] data, RPF7File file, BitsStream filenames)
         {
             if (data.Length != 0x10)
             {
@@ -67,12 +67,12 @@ namespace RPF7Viewer.RPF.Entries
                 }
                 int subentriesStartIndex = stream.ReadInt();
                 int subentriesCount = stream.ReadInt();
-                List<RPF7Entry> entries = new List<RPF7Entry>();
+                List<Entry> entries = new List<Entry>();
                 for (int i = 0; i < subentriesCount; ++i)
                 {
-                    entries.Add(RPF7Entry.CreateFromHeader(file.Decrypt(file.Read(0x10 * (i + subentriesStartIndex + 1), 0x10)), file, filenames));
+                    entries.Add(Entry.CreateFromHeader(file.Decrypt(file.Read(0x10 * (i + subentriesStartIndex + 1), 0x10)), file, filenames));
                 }
-                return new RPF7DirectoryEntry(filename, entries);
+                return new DirectoryEntry(filename, entries);
             }
 
             offset <<= 9;
@@ -85,7 +85,7 @@ namespace RPF7Viewer.RPF.Entries
                 }
                 uint systemFlag = (uint)stream.ReadInt();
                 uint graphicsFlag = (uint)stream.ReadInt();
-                return new RPF7ResourceEntry(filename, new RPF7ResourceFileBuffer(file, offset, compressedSize, systemFlag, graphicsFlag), systemFlag, graphicsFlag);
+                return new ResourceEntry(filename, new ResourceFileBuffer(file, offset, compressedSize, systemFlag, graphicsFlag), systemFlag, graphicsFlag);
             }
 
             // Regular file
@@ -99,12 +99,12 @@ namespace RPF7Viewer.RPF.Entries
                 {
                     throw new Exception("Unexcepted value");
                 }
-                return new RPF7RegularFileEntry(filename, new RPF7FileBuffer(file, offset, uncompressedSize), false);
+                return new RegularFileEntry(filename, new FileBuffer(file, offset, uncompressedSize), false);
             }
             else
             {
                 // Compressed file
-                return new RPF7RegularFileEntry(filename, new RPF7CompressedFileBuffer(file, offset, compressedSize, uncompressedSize, isEncrypted != 0), true);
+                return new RegularFileEntry(filename, new CompressedFileBuffer(file, offset, compressedSize, uncompressedSize, isEncrypted != 0), true);
             }
         }
     }

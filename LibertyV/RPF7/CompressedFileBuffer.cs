@@ -22,31 +22,34 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Security.Cryptography;
+using RPF7Viewer.Utils;
 
-namespace RPF7Viewer.RPF
+namespace RPF7Viewer.RPF7
 {
-    public static class AESDecryptor
+    public class CompressedFileBuffer : FileBuffer
     {
-        private static RijndaelManaged aes = null;
-        private static ICryptoTransform decryptor;
+        private int UncompressedSize;
+        private bool Encrypted;
 
-        public static byte[] Key = null;
-
-        public static byte[] Decrypt(byte[] data)
+        public CompressedFileBuffer(RPF7File file, long offset, int compressedSize, int uncompressedSize, bool encrypted = true)
+            : base(file, offset, compressedSize)
         {
-            if (aes == null)
-            {
-                aes = new RijndaelManaged();
-                aes.KeySize = 256;
-                aes.Key = AESDecryptor.Key;
-                aes.Mode = CipherMode.ECB;
-                aes.Padding = PaddingMode.Zeros;
-                decryptor = aes.CreateDecryptor();
-            }
-            decryptor.TransformBlock(data, 0, (data.Length / 0x10) * 0x10, data, 0);
-            return data;
+            this.UncompressedSize = uncompressedSize;
+            this.Encrypted = encrypted;
         }
 
+        public override byte[] GetData()
+        {
+            if (this.Encrypted) {
+                return this.File.Decompress(this.File.Decrypt(base.GetData()), this.UncompressedSize);
+            } else {
+                return this.File.Decompress(base.GetData(), this.UncompressedSize);
+            }
+        }
+
+        public override int GetSize()
+        {
+            return this.UncompressedSize;
+        }
     }
 }

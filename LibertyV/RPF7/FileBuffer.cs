@@ -22,19 +22,30 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using RPF7Viewer.Utils;
-using RPF7Viewer.RPF.Entries;
 
-namespace RPF7Viewer.RPF
+namespace RPF7Viewer.RPF7
 {
-    public class RPF7ResourceFileBuffer : RPF7CompressedFileBuffer
+    public class FileBuffer : IBuffer
     {
+        private long Offset;
+        private int Size;
+        protected RPF7File File;
 
-        // Ignore first 0x10, it is supposed to be the header, but is it junk since we got all the information that we need about the resource from the flags?
-        public RPF7ResourceFileBuffer(RPF7File file, long offset, int compressedSize, uint systemFlag, uint graphicsFlag)
-            : base(file, offset + 0x10, compressedSize - 0x10, (int)(RPF7ResourceEntry.GetSizeFromFlag(systemFlag) + RPF7ResourceEntry.GetSizeFromFlag(graphicsFlag)), RPF7ResourceEntry.IsResourceEncrypted(RPF7ResourceEntry.GetResourceTypeFromFlags(systemFlag, graphicsFlag)))
+        public FileBuffer(RPF7File file, long offset, int size)
         {
+            this.File = file;
+            this.Offset = offset;
+            this.Size = size;
         }
 
+        public virtual byte[] GetData()
+        {
+            return this.File.Read(this.Offset, this.Size);
+        }
+
+        public virtual int GetSize()
+        {
+            return this.Size;
+        }
     }
 }

@@ -22,12 +22,24 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
+using RPF7Viewer.RPF7.Entries;
 
-namespace RPF7Viewer.RPF
+namespace RPF7Viewer.RPF7
 {
-    public interface IRPFBuffer
+    public class EntryListViewItem : ListViewItem
     {
-        byte[] GetData();
-        int GetSize();
+        public FileEntry Entry;
+        public EntryListViewItem(FileEntry entry)
+            : base(entry.Filename)
+        {
+            this.Entry = entry;
+            this.SubItems.Add(String.Format("{0:n0}", Entry.Data.GetSize()));
+
+            if (this.Entry is ResourceEntry)
+            {
+                this.SubItems.Add((this.Entry as ResourceEntry).Type.ToString());
+            }
+        }
     }
 }
