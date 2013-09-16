@@ -22,24 +22,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Windows.Forms;
+using RPF7Viewer.Utils;
 using RPF7Viewer.RPF.Entries;
 
 namespace RPF7Viewer.RPF
 {
-    public class RPF7ListViewItem : ListViewItem
+    public class RPF7ResourceFileBuffer : RPF7CompressedFileBuffer
     {
-        public RPF7FileEntry Entry;
-        public RPF7ListViewItem(RPF7FileEntry entry)
-            : base(entry.Filename)
-        {
-            this.Entry = entry;
-            this.SubItems.Add(String.Format("{0:n0}", Entry.Data.GetSize()));
 
-            if (this.Entry is RPF7ResourceEntry)
-            {
-                this.SubItems.Add((this.Entry as RPF7ResourceEntry).Type.ToString());
-            }
+        // Ignore first 0x10, it is supposed to be the header, but is it junk since we got all the information that we need about the resource from the flags?
+        public RPF7ResourceFileBuffer(RPF7File file, long offset, int compressedSize, uint systemFlag, uint graphicsFlag)
+            : base(file, offset + 0x10, compressedSize - 0x10, (int)(RPF7ResourceEntry.GetSizeFromFlag(systemFlag) + RPF7ResourceEntry.GetSizeFromFlag(graphicsFlag)), RPF7ResourceEntry.IsResourceEncrypted(RPF7ResourceEntry.GetResourceTypeFromFlags(systemFlag, graphicsFlag)))
+        {
         }
+
     }
 }

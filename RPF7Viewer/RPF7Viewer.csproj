@@ -54,6 +54,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RPF\RPF7ResourceFileBuffer.cs" />
     <Compile Include="RPF\RPF7ListViewItem.cs" />
     <Compile Include="RPF\Entries\RPF7RegularFileEntry.cs" />
     <Compile Include="RPF\Entries\RPF7DirectoryEntry.cs" />

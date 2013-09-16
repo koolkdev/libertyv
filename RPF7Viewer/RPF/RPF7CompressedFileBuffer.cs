@@ -29,16 +29,22 @@ namespace RPF7Viewer.RPF
     public class RPF7CompressedFileBuffer : RPF7FileBuffer
     {
         private int UncompressedSize;
+        private bool Encrypted;
 
-        public RPF7CompressedFileBuffer(RPF7File file, long offset, int compressedSize, int uncompressedSize)
+        public RPF7CompressedFileBuffer(RPF7File file, long offset, int compressedSize, int uncompressedSize, bool encrypted = true)
             : base(file, offset, compressedSize)
         {
             this.UncompressedSize = uncompressedSize;
+            this.Encrypted = encrypted;
         }
 
         public override byte[] GetData()
         {
-            return this.File.Decompress(this.File.Decrypt(base.GetData()), this.UncompressedSize);
+            if (this.Encrypted) {
+                return this.File.Decompress(this.File.Decrypt(base.GetData()), this.UncompressedSize);
+            } else {
+                return this.File.Decompress(base.GetData(), this.UncompressedSize);
+            }
         }
 
         public override int GetSize()

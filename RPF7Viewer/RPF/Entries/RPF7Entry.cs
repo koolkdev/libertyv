@@ -79,18 +79,23 @@ namespace RPF7Viewer.RPF.Entries
 
             if (isResource)
             {
-                return new RPF7ResourceEntry(filename, new RPF7FileBuffer(file, offset, compressedSize), (ulong)stream.ReadBits(64));
+                if (compressedSize == 0xFFFFFF)
+                {
+                    throw new Exception("Resource with size -1, not supported");
+                }
+                uint systemFlag = (uint)stream.ReadInt();
+                uint graphicsFlag = (uint)stream.ReadInt();
+                return new RPF7ResourceEntry(filename, new RPF7ResourceFileBuffer(file, offset, compressedSize, systemFlag, graphicsFlag), systemFlag, graphicsFlag);
             }
 
             // Regular file
             int uncompressedSize = stream.ReadInt();
-            int isCompressed = stream.ReadInt();
+            int isEncrypted = stream.ReadInt();
 
             if (compressedSize == 0)
             {
                 // Uncompressed file
-                // I assume this value
-                if (isCompressed != 0)
+                if (isEncrypted != 0)
                 {
                     throw new Exception("Unexcepted value");
                 }
@@ -99,12 +104,7 @@ namespace RPF7Viewer.RPF.Entries
             else
             {
                 // Compressed file
-                // I assume this value
-                if (isCompressed != 1)
-                {
-                    throw new Exception("Unexcepted value");
-                }
-                return new RPF7RegularFileEntry(filename, new RPF7CompressedFileBuffer(file, offset, compressedSize, uncompressedSize), true);
+                return new RPF7RegularFileEntry(filename, new RPF7CompressedFileBuffer(file, offset, compressedSize, uncompressedSize, isEncrypted != 0), true);
             }
         }
     }
