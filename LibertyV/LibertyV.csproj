@@ -68,6 +68,8 @@
     <Compile Include="RPF7\Entries\Entry.cs" />
     <Compile Include="RPF7\RPF7File.cs" />
     <Compile Include="Utils\BitsStream.cs" />
+    <Compile Include="Utils\FolderSelectDialog.cs" />
+    <Compile Include="Utils\Reflector.cs" />
     <Compile Include="Utils\XCompress.cs" />
     <EmbeddedResource Include="LibertyV.resx">
       <DependentUpon>LibertyV.cs</DependentUpon>

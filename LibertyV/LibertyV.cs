@@ -29,6 +29,7 @@ using System.Windows.Forms;
 using RPF7Viewer.RPF7;
 using RPF7Viewer.RPF7.Entries;
 using System.IO;
+using LibertyV.Utils;
 
 namespace RPF7Viewer
 {
@@ -80,20 +81,20 @@ namespace RPF7Viewer
 
         private void exportAllButton_Click(object sender, EventArgs e)
         {
-            FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog();
-            if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
+            FolderSelectDialog folderBrowserDialog = new FolderSelectDialog();
+            if (folderBrowserDialog.ShowDialog())
             {
-                (File.Root as DirectoryEntry).Export(folderBrowserDialog.SelectedPath);
+                (File.Root as DirectoryEntry).Export(folderBrowserDialog.FileName);
             }
 
         }
 
         private void exportFileButton_Click(object sender, EventArgs e)
         {
-            FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog();
-            if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
+            FolderSelectDialog folderBrowserDialog = new FolderSelectDialog();
+            if (folderBrowserDialog.ShowDialog())
             {
-                (filesList.SelectedItems[0] as EntryListViewItem).Entry.Export(folderBrowserDialog.SelectedPath);
+                (filesList.SelectedItems[0] as EntryListViewItem).Entry.Export(folderBrowserDialog.FileName);
             }
         }
         
