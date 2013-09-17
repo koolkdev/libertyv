@@ -49,7 +49,7 @@ namespace RPF7Viewer
             this.File = rpf;
 
             exportAllButton.Enabled = true;
-            exportFileButton.Enabled = false;
+            UpdateExportSelectButton();
             filesTree.Nodes.Clear();
             filesList.Items.Clear();
             TreeNode root = (rpf.Root as DirectoryEntry).GetTreeNodes();
@@ -70,7 +70,7 @@ namespace RPF7Viewer
 
         private void filesTree_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            exportFileButton.Enabled = false;
+            UpdateExportSelectButton();
             filesList.Items.Clear();
 
             foreach (ListViewItem item in (e.Node as EntryTreeNode).Entry.GetListViewItems())
@@ -89,18 +89,79 @@ namespace RPF7Viewer
 
         }
 
-        private void exportFileButton_Click(object sender, EventArgs e)
+        private void ExtractSelected()
         {
-            FolderSelectDialog folderBrowserDialog = new FolderSelectDialog();
-            if (folderBrowserDialog.ShowDialog())
+            string selectedFolder = GUI.FolderSelection();
+            if (selectedFolder != null)
             {
-                (filesList.SelectedItems[0] as EntryListViewItem).Entry.Export(folderBrowserDialog.FileName);
+                if (!filesTree.Focused)
+                {
+                    foreach (EntryListViewItem entry in filesList.SelectedItems)
+                    {
+                        entry.Entry.Export(selectedFolder);
+                    }
+                }
+                if (filesTree.SelectedNode != null && filesTree.Focused)
+                {
+                    (filesTree.SelectedNode as EntryTreeNode).Entry.Export(selectedFolder);
+
+                }
             }
+        }
+
+        private void exportSelectedButton_Click(object sender, EventArgs e)
+        {
+            ExtractSelected();
+        }
+
+        private void UpdateExportSelectButton()
+        {
+            exportSelectedButton.Enabled = (filesList.SelectedItems.Count > 0 && !filesTree.Focused) || (filesTree.SelectedNode != null && filesTree.Focused);
         }
         
         private void filesList_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
         {
-            exportFileButton.Enabled = filesList.SelectedItems.Count > 0;
+            UpdateExportSelectButton();
         }
+
+        private void filesTree_Leave(object sender, EventArgs e)
+        {
+            UpdateExportSelectButton();
+        }
+
+        private void filesTree_Enter(object sender, EventArgs e)
+        {
+            UpdateExportSelectButton();
+        }
+
+        private void filesTreeContextMenuStrip_Opening(object sender, CancelEventArgs e)
+        {
+            extractButtonFilesTreeMenu.Enabled = filesTree.SelectedNode != null;
+            deleteButtonFilesTreeMenu.Enabled = false;
+        }
+
+        private void filesTree_MouseDown(object sender, MouseEventArgs e)
+        {
+            filesTree.SelectedNode = filesTree.GetNodeAt(e.X, e.Y);
+            UpdateExportSelectButton();
+        }
+
+        private void extractButtonFilesTreeMenu_Click(object sender, EventArgs e)
+        {
+            ExtractSelected();
+        }
+
+        private void filesListContextMenuStrip_Opening(object sender, CancelEventArgs e)
+        {
+            extractButtonFilesListMenu.Enabled = filesList.SelectedItems.Count > 0;
+            deleteButtonFilesListMenu.Enabled = false;
+        }
+
+        private void extractButtonFilesListMenu_Click(object sender, EventArgs e)
+        {
+            ExtractSelected();
+        }
+
+
     }
 }
