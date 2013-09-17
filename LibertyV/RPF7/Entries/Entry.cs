@@ -51,7 +51,7 @@ namespace LibertyV.RPF7.Entries
             BitsStream stream = new BitsStream(new MemoryStream(data));
 
             bool isResource = stream.ReadBool();
-            int offset = (int)stream.ReadBits(23);
+            long offset = (long)stream.ReadBits(23);
             int compressedSize = (int)stream.ReadBits(24);
             int filenameOffset = (int)stream.ReadBits(16);
 
