@@ -24,7 +24,7 @@ using System.Linq;
 using System.Text;
 using System.Security.Cryptography;
 
-namespace RPF7Viewer.Utils
+namespace LibertyV.Utils
 {
     public static class AESDecryptor
     {

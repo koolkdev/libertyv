@@ -46,6 +46,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GlobalOptions.cs" />
+    <Compile Include="PlatformSelection.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PlatformSelection.Designer.cs">
+      <DependentUpon>PlatformSelection.cs</DependentUpon>
+    </Compile>
     <Compile Include="LibertyV.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -72,6 +79,9 @@
     <Compile Include="Utils\GUI.cs" />
     <Compile Include="Utils\Reflector.cs" />
     <Compile Include="Utils\XCompress.cs" />
+    <EmbeddedResource Include="PlatformSelection.resx">
+      <DependentUpon>PlatformSelection.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="LibertyV.resx">
       <DependentUpon>LibertyV.cs</DependentUpon>
     </EmbeddedResource>

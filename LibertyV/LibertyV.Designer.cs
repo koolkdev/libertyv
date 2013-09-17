@@ -18,7 +18,7 @@
  
  */
 
-namespace RPF7Viewer
+namespace LibertyV
 {
     partial class LibertyV
     {

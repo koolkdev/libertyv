@@ -23,9 +23,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
-using RPF7Viewer.Utils;
+using LibertyV.Utils;
 
-namespace RPF7Viewer.RPF7.Entries
+namespace LibertyV.RPF7.Entries
 {
     public class DirectoryEntry : Entry
     {

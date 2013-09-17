@@ -23,7 +23,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace RPF7Viewer.RPF7.Entries
+namespace LibertyV.RPF7.Entries
 {
     public class RegularFileEntry : FileEntry
     {

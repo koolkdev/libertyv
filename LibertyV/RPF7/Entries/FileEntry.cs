@@ -24,7 +24,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 
-namespace RPF7Viewer.RPF7.Entries
+namespace LibertyV.RPF7.Entries
 {
     public class FileEntry : Entry
     {

@@ -23,10 +23,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
-using RPF7Viewer.Utils;
-using RPF7Viewer.RPF7.Entries;
+using LibertyV.Utils;
+using LibertyV.RPF7.Entries;
+using System.IO.Compression;
 
-namespace RPF7Viewer.RPF7
+namespace LibertyV.RPF7
 {
     public class RPF7File
     {
@@ -49,9 +50,9 @@ namespace RPF7Viewer.RPF7
             }
 
             int entriesCount = Stream.ReadInt();
-            if (Stream.ReadBits(1) != 1) { // unknown flag, always 1
-                throw new Exception("Expected flag to be 1, check this");
-            }
+            
+            // Unknown flag, ignored for now, 0 in ps3, and 1 in xbox360
+            Stream.ReadBits(1);
 
             shiftNameAccessBy = (int)Stream.ReadBits(3);
 
@@ -93,9 +94,24 @@ namespace RPF7Viewer.RPF7
         public byte[] Decompress(byte[] data, int uncompressedSize)
         {
             // The compression algorithm is pltaform specified, so it should be here
+            if (GlobalOptions.Platform == GlobalOptions.PlatformType.PLAYSTATION3)
+            {
+                byte[] outputData = new byte[uncompressedSize];
+                // Right now I support the xbox compression only
+                using (DeflateStream stream = new DeflateStream(new MemoryStream(data), CompressionMode.Decompress))
+                {
+                    if (uncompressedSize != stream.Read(outputData, 0, uncompressedSize))
+                    {
+                        throw new Exception("Failed to decompress");
+                    }
+                }
 
-            // Right now I support the xbox compression only
-            return XCompress.Decompress(data, uncompressedSize);
+                return outputData;
+            }
+            else
+            {
+                return XCompress.Decompress(data, uncompressedSize);
+            }
         }
 
         public byte[] Read(long offset, int length)

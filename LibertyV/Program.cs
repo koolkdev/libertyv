@@ -23,9 +23,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using System.IO;
-using RPF7Viewer.Utils;
+using LibertyV.Utils;
 
-namespace RPF7Viewer
+namespace LibertyV
 {
     static class Program
     {
@@ -38,7 +38,14 @@ namespace RPF7Viewer
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            if (!File.Exists("key.dat")) {
+            new PlatformSelection().ShowDialog();
+
+            if (GlobalOptions.Platform == GlobalOptions.PlatformType.NONE) {
+                return;
+            }
+
+            if (!File.Exists("key.dat"))
+            {
                 MessageBox.Show("Couldn't find key.dat");
                 return;
             }
@@ -48,12 +55,23 @@ namespace RPF7Viewer
             string keyMD5 = BitConverter.ToString(new System.Security.Cryptography.MD5CryptoServiceProvider().ComputeHash(AESDecryptor.Key)).Replace("-", "");
 
             // check if md5 of key is one of the known keys
-            if (keyMD5 != "ead1ea1a3870557b424bc8cf73f51018".ToUpper())
+            if (GlobalOptions.Platform == GlobalOptions.PlatformType.XBOX360)
             {
-                MessageBox.Show("Invalid key");
-                return;
+                if (keyMD5 != "ead1ea1a3870557b424bc8cf73f51018".ToUpper())
+                {
+                    MessageBox.Show("Invalid key for Xbox 360.");
+                    return;
+                }
             }
 
+            if (GlobalOptions.Platform == GlobalOptions.PlatformType.PLAYSTATION3)
+            {
+                if (keyMD5 != "1df41d237d8056ec87a5bc71925c4cde".ToUpper())
+                {
+                    MessageBox.Show("Invalid key for Playstation 3.");
+                    return;
+                }
+            }
             Application.Run(new LibertyV());
         }
     }

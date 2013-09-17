@@ -24,7 +24,7 @@ using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 
-namespace RPF7Viewer.Utils
+namespace LibertyV.Utils
 {
     public static class XCompress
     {

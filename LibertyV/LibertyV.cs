@@ -26,18 +26,19 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using RPF7Viewer.RPF7;
-using RPF7Viewer.RPF7.Entries;
+using LibertyV.RPF7;
+using LibertyV.RPF7.Entries;
 using System.IO;
 using LibertyV.Utils;
 
-namespace RPF7Viewer
+namespace LibertyV
 {
     public partial class LibertyV : Form
     {
         public RPF7File File = null;
         public LibertyV()
         {
+
             InitializeComponent();
             filesList.Columns.Add("Name", 300);
             filesList.Columns.Add("Size", 100);

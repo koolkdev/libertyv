@@ -24,7 +24,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 
-namespace RPF7Viewer.Utils
+namespace LibertyV.Utils
 {
     public class BitsStream
     {

@@ -24,7 +24,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 
-namespace RPF7Viewer.RPF7.Entries
+namespace LibertyV.RPF7.Entries
 {
     public class ResourceEntry : FileEntry
     {
@@ -41,14 +41,14 @@ namespace RPF7Viewer.RPF7.Entries
         {
             get
             {
-                return GetSizeFromFlag(this.SystemFlag);
+                return GetSizeFromSystemFlag(this.SystemFlag);
             }
         }
         public int GraphicSize
         {
             get
             {
-                return GetSizeFromFlag(this.GraphicsFlag);
+                return GetSizeFromGraphicsFlag(this.GraphicsFlag);
             }
         }
 
@@ -83,9 +83,38 @@ namespace RPF7Viewer.RPF7.Entries
             return (num >> 3) | ((num >> 1) & 2) | ((num & 2) << 1) | ((num & 1) << 3);
         }
 
-        static public int GetSizeFromFlag(uint flag) 
+        static public int GetSizeFromFlag(uint flag, int baseSize) 
         {
-            return (int)((((flag >> 17) & 0x7f) + (((flag >> 11) & 0x3f) << 1) + (((flag >> 7) & 0xf) << 2) + (((flag >> 5) & 0x3) << 3) + (((flag >> 4) & 0x1) << 4)) << (13 + ((int)(flag & 0xf)))) + (((Reverse4Bits((int)((flag >> 24) & 0xf))) << (9 + (int)(flag & 0xf))));
+            baseSize <<= (int)(flag & 0xf);
+            int size = (int)((((flag >> 17) & 0x7f) + (((flag >> 11) & 0x3f) << 1) + (((flag >> 7) & 0xf) << 2) + (((flag >> 5) & 0x3) << 3) + (((flag >> 4) & 0x1) << 4)) * baseSize);
+            for (int i = 0; i < 4; ++i) {
+                size += (((flag >> (24 + i)) & 1) == 1) ? (baseSize >> (1 + i)) : 0;
+            }
+            return  size;
+        }
+
+        static public int GetSizeFromSystemFlag(uint flag)
+        {
+            if (GlobalOptions.Platform == GlobalOptions.PlatformType.PLAYSTATION3)
+            {
+                return GetSizeFromFlag(flag, 0x1000);
+            }
+            else
+            { // XBOX 360
+                return GetSizeFromFlag(flag, 0x2000);
+            }
+        }
+
+        static public int GetSizeFromGraphicsFlag(uint flag)
+        {
+            if (GlobalOptions.Platform == GlobalOptions.PlatformType.PLAYSTATION3)
+            {
+                return GetSizeFromFlag(flag, 0x1580);
+            }
+            else
+            { // XBOX 360
+                return GetSizeFromFlag(flag, 0x2000);
+            }
         }
         
         static public uint GetResourceTypeFromFlags(uint systemFlag, uint graphicsFlag) 
