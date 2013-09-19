@@ -82,11 +82,6 @@ namespace LibertyV
             // toolbar
             // 
             this.toolbar.ImageScalingSize = new System.Drawing.Size(32, 32);
-            this.toolbar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileOpenButton,
-            this.toolStripSeparator1,
-            this.exportAllButton,
-            this.exportSelectedButton});
             this.toolbar.Location = new System.Drawing.Point(0, 0);
             this.toolbar.Name = "toolbar";
             this.toolbar.Size = new System.Drawing.Size(776, 39);

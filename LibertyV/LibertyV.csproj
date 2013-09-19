@@ -136,7 +136,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\liberty_v_logo.ico" />
     <None Include="Resources\save.bmp" />
     <None Include="Resources\open.bmp" />
     <Content Include="liberty_v_logo.ico" />

@@ -60,13 +60,6 @@ namespace LibertyV.Properties {
             }
         }
         
-        internal static System.Drawing.Icon liberty_v_logo {
-            get {
-                object obj = ResourceManager.GetObject("liberty_v_logo", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
         internal static System.Drawing.Bitmap open {
             get {
                 object obj = ResourceManager.GetObject("open", resourceCulture);
