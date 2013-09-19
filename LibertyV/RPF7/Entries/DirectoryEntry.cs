@@ -30,7 +30,8 @@ namespace LibertyV.RPF7.Entries
     public class DirectoryEntry : Entry
     {
         public List<Entry> Entries;
-        public EntryTreeNode Node = null; 
+        public EntryTreeNode Node = null;
+        public System.Windows.Forms.ListView FilesListView = null; 
 
         public DirectoryEntry(String filename, List<Entry> entries) : base(filename)
         {

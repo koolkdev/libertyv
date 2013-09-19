@@ -81,8 +81,22 @@ namespace LibertyV
             return new EntryTreeNode(entry, children.ToArray());
         }
 
+        private DirectoryEntry LastSelectedEntry = null;
         private void UpdateFilesList(bool clear = true)
         {
+            DirectoryEntry dirEntry = (filesTree.SelectedNode == null) ? null : (filesTree.SelectedNode as EntryTreeNode).Entry;
+            if (LastSelectedEntry != dirEntry)
+            {
+                if (LastSelectedEntry != null)
+                {
+                    LastSelectedEntry.FilesListView = filesList;
+                }
+                if (dirEntry != null)
+                {
+                    dirEntry.FilesListView = filesList;
+                }
+                LastSelectedEntry = dirEntry;
+            }
             if (clear)
             {
                 filesList.Items.Clear();
@@ -196,6 +210,11 @@ namespace LibertyV
 
         #region Files tree
 
+        private void filesTree_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            UpdateFilesList();
+        }
+
         private void filesTree_Leave(object sender, EventArgs e)
         {
             UpdateExportSelectButton();
@@ -241,7 +260,7 @@ namespace LibertyV
 
         private void filesTree_AfterLabelEdit(object sender, NodeLabelEditEventArgs e)
         {
-            filesList.LabelEdit = false;
+            filesTree.LabelEdit = false;
             EntryTreeNode entryItem = e.Node as EntryTreeNode;
             // copy-paste sadly
             if (e.Label == null || e.Label == "")
@@ -274,6 +293,12 @@ namespace LibertyV
             this.filesListContextMenuStrip.Items.Clear();
             if (filesList.SelectedItems.Count == 0)
             {
+                if (filesTree.SelectedNode == null)
+                {
+                    e.Cancel = true;
+                    return;
+                }
+                Operations.Operations.PopulateContextMenu(Operations.Operations.FilesListOperations, this.filesListContextMenuStrip, (filesTree.SelectedNode as EntryTreeNode).Entry);
             }
             else if (filesList.SelectedItems.Count == 1)
             {
@@ -293,8 +318,14 @@ namespace LibertyV
 
         private void filesList_KeyDown(object sender, KeyEventArgs e)
         {
-            
-            if (filesList.SelectedItems.Count == 1)
+            if (filesList.SelectedItems.Count == 0)
+            {
+                if (filesTree.SelectedNode != null)
+                {
+                    Operations.Operations.PerformActionByKey(Operations.Operations.FilesListOperations, Operations.Operations.ShortcutsFilesListOperations, e.KeyData, (filesTree.SelectedNode as EntryTreeNode).Entry);
+                }
+            }
+            else if (filesList.SelectedItems.Count == 1)
             {
                 FileEntry entry = (filesList.SelectedItems[0] as EntryListViewItem).Entry;
                 if (e.KeyData == Keys.Enter)
@@ -306,7 +337,7 @@ namespace LibertyV
                     Operations.Operations.PerformActionByKey(Operations.Operations.FileOperations, Operations.Operations.ShortcutsFileOperations, e.KeyData, entry);
                 }
             }
-            else if (filesList.SelectedItems.Count > 1)
+            else
             {
                 List<FileEntry> entries = new List<FileEntry>();
                 foreach (EntryListViewItem entry in filesList.SelectedItems)

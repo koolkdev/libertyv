@@ -70,7 +70,7 @@ namespace LibertyV
             // filesTreeContextMenuStrip
             // 
             this.filesTreeContextMenuStrip.Name = "filesTreeContextMenuStrip";
-            this.filesTreeContextMenuStrip.Size = new System.Drawing.Size(61, 4);
+            this.filesTreeContextMenuStrip.Size = new System.Drawing.Size(153, 26);
             this.filesTreeContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.filesTreeContextMenuStrip_Opening);
             // 
             // filesListContextMenuStrip
@@ -82,6 +82,11 @@ namespace LibertyV
             // toolbar
             // 
             this.toolbar.ImageScalingSize = new System.Drawing.Size(32, 32);
+            this.toolbar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.fileOpenButton,
+            this.toolStripSeparator1,
+            this.exportAllButton,
+            this.exportSelectedButton});
             this.toolbar.Location = new System.Drawing.Point(0, 0);
             this.toolbar.Name = "toolbar";
             this.toolbar.Size = new System.Drawing.Size(776, 39);
@@ -121,6 +126,7 @@ namespace LibertyV
             this.exportSelectedButton.Name = "exportSelectedButton";
             this.exportSelectedButton.Size = new System.Drawing.Size(91, 36);
             this.exportSelectedButton.Text = "Export Selected";
+            this.exportSelectedButton.Visible = false;
             this.exportSelectedButton.Click += new System.EventHandler(this.exportSelectedButton_Click);
             // 
             // splitContainer1
@@ -149,6 +155,7 @@ namespace LibertyV
             this.filesTree.Size = new System.Drawing.Size(200, 452);
             this.filesTree.TabIndex = 1;
             this.filesTree.AfterLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.filesTree_AfterLabelEdit);
+            this.filesTree.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.filesTree_AfterSelect);
             this.filesTree.Enter += new System.EventHandler(this.filesTree_Enter);
             this.filesTree.KeyDown += new System.Windows.Forms.KeyEventHandler(this.filesTree_KeyDown);
             this.filesTree.Leave += new System.EventHandler(this.filesTree_Leave);

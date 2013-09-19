@@ -22,10 +22,47 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using LibertyV.RPF7.Entries;
+using System.Windows.Forms;
+using LibertyV.Utils;
+using System.IO;
+using LibertyV.RPF7;
 
 namespace LibertyV.Operations
 {
     static class Import
     {
+        public static void ImportFiles(DirectoryEntry entry)
+        {
+            OpenFileDialog fileDialog = new OpenFileDialog();
+            fileDialog.Multiselect = true;
+            if (fileDialog.ShowDialog() == DialogResult.OK) {
+                foreach (String file in fileDialog.FileNames)
+                {
+                    if (entry.Entries.Any(e => e.Name == Path.GetFileName(file)))
+                    {
+                        // TODO: Ask for overwrite
+                        MessageBox.Show(String.Format("Error: file {0} already exists.", Path.GetFileName(file)));
+                        return;
+                    }
+                }
+                foreach (String file in fileDialog.FileNames)
+                {
+                    // TODO: add resources, decide if to compress or not, all by extentions.
+                    // Right now all regular files compressed by default
+                    RegularFileEntry addedFile = new RegularFileEntry(Path.GetFileName(file), new ExternalFileBuffer(File.Open(file, FileMode.Open, FileAccess.Read, FileShare.Read)), true);
+                    entry.Entries.Add(addedFile);
+                    addedFile.Parent = entry;
+                    if (entry.FilesListView != null)
+                    {
+                        entry.FilesListView.Items.Add(new EntryListViewItem(addedFile));
+                    }
+                }
+            }
+        }
+        public static void ImportFolder(DirectoryEntry entry)
+        {
+            string folder = GUI.FolderSelection();
+        }
     }
 }

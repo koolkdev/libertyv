@@ -39,7 +39,8 @@ namespace LibertyV.Operations
         };
 
         public static OperationsList<FileEntry> ShortcutsFileOperations = new OperationsList<FileEntry>(){
-            {"Force Delete", Delete.ForceDeleteFile, Keys.Shift | Keys.Delete}
+            {"Force Delete", Delete.ForceDeleteFile, Keys.Shift | Keys.Delete},
+            {"Select All", Helper.SelectAll, Keys.Control | Keys.A}
         };
 
         public static OperationsList<List<FileEntry>> MultipleFilesOperations = new OperationsList<List<FileEntry>>(){
@@ -48,17 +49,28 @@ namespace LibertyV.Operations
         };
 
         public static OperationsList<List<FileEntry>> ShortcutsMultipleFilesOperations = new OperationsList<List<FileEntry>>(){
-            {"Force Delete", Delete.ForceDeleteFiles, Keys.Shift | Keys.Delete}
+            {"Force Delete", Delete.ForceDeleteFiles, Keys.Shift | Keys.Delete},
+            {"Select All", Helper.SelectAll, Keys.Control | Keys.A}
         };
 
         public static OperationsList<DirectoryEntry> FolderOperations = new OperationsList<DirectoryEntry>(){
             {"Export folder...", Export.ExportFolder},
+            {"New Folder", New.NewFolder },
             {"Delete", Delete.AskDeleteFolder, Keys.Delete, false, delegate(DirectoryEntry entry) { return !entry.IsRoot(); }},
             {"Rename", Rename.RenameFolder, Keys.F2, false, delegate(DirectoryEntry entry) { return !entry.IsRoot(); }},
         };
 
         public static OperationsList<DirectoryEntry> ShortcutsFolderOperations = new OperationsList<DirectoryEntry>(){
             {"Force Delete", Delete.ForceDeleteFolder, Keys.Shift | Keys.Delete, false, delegate(DirectoryEntry entry) { return !entry.IsRoot(); }},
+        };
+
+        public static OperationsList<DirectoryEntry> FilesListOperations = new OperationsList<DirectoryEntry>(){
+            {"Import files...", Import.ImportFiles }
+        };
+
+        public static OperationsList<DirectoryEntry> ShortcutsFilesListOperations = new OperationsList<DirectoryEntry>()
+        {
+            {"Select All", Helper.SelectAll, Keys.Control | Keys.A}
         };
 
         public static void PerformDefaultAction<T>(OperationsList<T> operations, T obj)
