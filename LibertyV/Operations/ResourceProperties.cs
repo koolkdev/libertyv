@@ -20,50 +20,44 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.IO;
+using System.Windows.Forms;
+using LibertyV.RPF7.Entries;
 
-namespace LibertyV.RPF7.Entries
+namespace LibertyV.Operations
 {
-    public abstract class FileEntry : Entry
+    public partial class ResourceProporties : Form
     {
-        public IBuffer Data;
-        public EntryListViewItem ViewItem;
+        private ResourceEntry Entry;
 
-        public FileEntry(String filename, IBuffer data)
-            : base(filename)
+        public ResourceProporties(ResourceEntry entry)
         {
-            this.Data = data;
+            InitializeComponent();
+
+            this.Entry = entry;
+            this.typeTextBox.Text = entry.Type.ToString();
         }
 
-        public override void Export(String path)
+        public new void Close()
         {
-            string filename;
-            if (Directory.Exists(path))
+            int newType;
+            if (!int.TryParse(this.typeTextBox.Text, out newType) || newType >= 0x100)
             {
-                filename = Path.Combine(path, this.Name);
+                MessageBox.Show("Invalid type (must be 0-256)");
+                return;
             }
-            else
-            {
-                filename = path;
-            }
-            System.IO.File.WriteAllBytes(filename, this.Data.GetData());
+            Entry.Type = newType;
+
+            base.Close();
         }
 
-        public string GetExtension()
+        private void button1_Click(object sender, EventArgs e)
         {
-            return Path.GetExtension(Name);
-        }
-
-        public bool IsRegularFile()
-        {
-            return this is RegularFileEntry;
-        }
-
-        public bool IsResource()
-        {
-            return this is ResourceEntry;
+            Close();
         }
     }
 }

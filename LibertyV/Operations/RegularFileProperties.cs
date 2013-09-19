@@ -20,50 +20,37 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.IO;
+using System.Windows.Forms;
+using LibertyV.RPF7.Entries;
 
-namespace LibertyV.RPF7.Entries
+namespace LibertyV.Operations
 {
-    public abstract class FileEntry : Entry
+    public partial class RegularFileProporties : Form
     {
-        public IBuffer Data;
-        public EntryListViewItem ViewItem;
-
-        public FileEntry(String filename, IBuffer data)
-            : base(filename)
+        RegularFileEntry Entry;
+        public RegularFileProporties(RegularFileEntry entry)
         {
-            this.Data = data;
+            InitializeComponent();
+
+            this.Entry = entry;
+            this.isCompressedCheckBox.Checked = this.Entry.Compressed;
         }
 
-        public override void Export(String path)
+        public new void Close()
         {
-            string filename;
-            if (Directory.Exists(path))
-            {
-                filename = Path.Combine(path, this.Name);
-            }
-            else
-            {
-                filename = path;
-            }
-            System.IO.File.WriteAllBytes(filename, this.Data.GetData());
+            this.Entry.Compressed = this.isCompressedCheckBox.Checked;
+
+            base.Close();
         }
 
-        public string GetExtension()
+        private void button1_Click(object sender, EventArgs e)
         {
-            return Path.GetExtension(Name);
-        }
-
-        public bool IsRegularFile()
-        {
-            return this is RegularFileEntry;
-        }
-
-        public bool IsResource()
-        {
-            return this is ResourceEntry;
+            Close();
         }
     }
 }

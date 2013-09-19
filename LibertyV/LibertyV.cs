@@ -36,13 +36,18 @@ namespace LibertyV
     public partial class LibertyV : Form
     {
         public RPF7File File = null;
-        public LibertyV()
+        public LibertyV(RPF7File rpf = null)
         {
-
             InitializeComponent();
+
             filesList.Columns.Add("Name", 300);
             filesList.Columns.Add("Size", 100);
             filesList.Columns.Add("Resource Type", 100);
+
+            if (rpf != null)
+            {
+                this.LoadRPF(rpf);
+            }
         }
 
         private void LoadRPF(RPF7File rpf)
@@ -53,41 +58,76 @@ namespace LibertyV
             UpdateExportSelectButton();
             filesTree.Nodes.Clear();
             filesList.Items.Clear();
-            TreeNode root = (rpf.Root as DirectoryEntry).GetTreeNodes();
+
+            TreeNode root = GetTreeNodes(this.File.Root as DirectoryEntry);
             root.Text = rpf.Filename;
             filesTree.Nodes.Add(root);
-        }
 
-        private void fileOpenButton_Click(object sender, EventArgs e)
-        {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "RAGE Package Format|*.rpf";
-            openFileDialog.Title = "Select a file";
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                LoadRPF(new RPF7File(openFileDialog.OpenFile(), Path.GetFileName(openFileDialog.FileName)));
-            }
-        }
-
-        private void filesTree_AfterSelect(object sender, TreeViewEventArgs e)
-        {
+            filesTree.SelectedNode = root;
             UpdateExportSelectButton();
-            filesList.Items.Clear();
-
-            foreach (ListViewItem item in (e.Node as EntryTreeNode).Entry.GetListViewItems())
-            {
-                filesList.Items.Add(item);
-            }
+            UpdateFilesList();
         }
 
-        private void exportAllButton_Click(object sender, EventArgs e)
+        public static EntryTreeNode GetTreeNodes(DirectoryEntry entry)
         {
-            FolderSelectDialog folderBrowserDialog = new FolderSelectDialog();
-            if (folderBrowserDialog.ShowDialog())
+            List<EntryTreeNode> children = new List<EntryTreeNode>();
+            foreach (Entry childEntry in entry.Entries)
             {
-                (File.Root as DirectoryEntry).Export(folderBrowserDialog.FileName);
+                if (childEntry is DirectoryEntry)
+                {
+                    children.Add(GetTreeNodes(childEntry as DirectoryEntry));
+                }
             }
+            return new EntryTreeNode(entry, children.ToArray());
+        }
 
+        private void UpdateFilesList(bool clear = true)
+        {
+            if (clear)
+            {
+                filesList.Items.Clear();
+
+                if (filesTree.SelectedNode != null)
+                {
+                    foreach (Entry entry in (filesTree.SelectedNode as EntryTreeNode).Entry.Entries)
+                    {
+                        if (entry is FileEntry) {
+                            filesList.Items.Add(new EntryListViewItem(entry as FileEntry));
+                        }
+                    }
+                }
+            }
+            else if (filesTree.SelectedNode == null)
+            {
+                filesList.Items.Clear();
+            }
+            else
+            {
+                HashSet<string> seenItems = new HashSet<string>();
+                // find the changes
+                foreach (EntryListViewItem item in filesList.Items) 
+                {
+                    if (!(filesTree.SelectedNode as EntryTreeNode).Entry.Entries.Any(entry => entry == item.Entry))
+                    {
+                        filesList.Items.Remove(item);
+                    }
+                    else
+                    {
+                        item.Update();
+                        seenItems.Add(item.Entry.Name);
+                    }
+                }
+                foreach (Entry entry in (filesTree.SelectedNode as EntryTreeNode).Entry.Entries)
+                {
+                    if (entry is FileEntry)
+                    {
+                        if (!seenItems.Any(name => name == entry.Name))
+                        {
+                            filesList.Items.Add(new EntryListViewItem(entry as FileEntry));
+                        }
+                    }
+                }
+            }
         }
 
         private void ExtractSelected()
@@ -110,20 +150,51 @@ namespace LibertyV
             }
         }
 
+        private void UpdateExportSelectButton()
+        {
+            exportSelectedButton.Enabled = (filesList.SelectedItems.Count > 0 && !filesTree.Focused) || (filesTree.SelectedNode != null && filesTree.Focused);
+        }
+
+
+        #region Menu buttons
+
+        private void fileOpenButton_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "RAGE Package Format|*.rpf";
+            openFileDialog.Title = "Select a file";
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                LoadRPF(new RPF7File(openFileDialog.OpenFile(), Path.GetFileName(openFileDialog.FileName)));
+            }
+        }
+
+        private void exportAllButton_Click(object sender, EventArgs e)
+        {
+            FolderSelectDialog folderBrowserDialog = new FolderSelectDialog();
+            if (folderBrowserDialog.ShowDialog())
+            {
+                (File.Root as DirectoryEntry).Export(folderBrowserDialog.FileName);
+            }
+        }
+
         private void exportSelectedButton_Click(object sender, EventArgs e)
         {
             ExtractSelected();
         }
 
-        private void UpdateExportSelectButton()
-        {
-            exportSelectedButton.Enabled = (filesList.SelectedItems.Count > 0 && !filesTree.Focused) || (filesTree.SelectedNode != null && filesTree.Focused);
-        }
-        
+        #endregion
+
+        #region Files list
+
         private void filesList_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
         {
             UpdateExportSelectButton();
         }
+
+        #endregion
+
+        #region Files tree
 
         private void filesTree_Leave(object sender, EventArgs e)
         {
@@ -135,34 +206,155 @@ namespace LibertyV
             UpdateExportSelectButton();
         }
 
-        private void filesTreeContextMenuStrip_Opening(object sender, CancelEventArgs e)
-        {
-            extractButtonFilesTreeMenu.Enabled = filesTree.SelectedNode != null;
-            deleteButtonFilesTreeMenu.Enabled = false;
-        }
-
         private void filesTree_MouseDown(object sender, MouseEventArgs e)
         {
             filesTree.SelectedNode = filesTree.GetNodeAt(e.X, e.Y);
             UpdateExportSelectButton();
+            UpdateFilesList();
         }
 
-        private void extractButtonFilesTreeMenu_Click(object sender, EventArgs e)
+        #endregion
+
+        #region Files tree context menu
+
+        private void filesTreeContextMenuStrip_Opening(object sender, CancelEventArgs e)
         {
-            ExtractSelected();
+            this.filesTreeContextMenuStrip.Items.Clear();
+            if (filesTree.SelectedNode != null)
+            {
+                Operations.Operations.PopulateContextMenu(Operations.Operations.FolderOperations, this.filesTreeContextMenuStrip, (filesTree.SelectedNode as EntryTreeNode).Entry);
+                e.Cancel = false;
+            }
+            else
+            {
+                e.Cancel = true;
+            }
         }
+
+        private void filesTree_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (filesTree.SelectedNode != null)
+            {
+                Operations.Operations.PerformActionByKey(Operations.Operations.FolderOperations, Operations.Operations.ShortcutsFolderOperations, e.KeyData, (filesTree.SelectedNode as EntryTreeNode).Entry);
+            }
+        }
+
+        private void filesTree_AfterLabelEdit(object sender, NodeLabelEditEventArgs e)
+        {
+            filesList.LabelEdit = false;
+            EntryTreeNode entryItem = e.Node as EntryTreeNode;
+            // copy-paste sadly
+            if (e.Label == null || e.Label == "")
+            {
+                // invalid name, don't create message box
+                e.CancelEdit = true;
+                //entryItem.Update();
+            }
+            else if (e.Label == entryItem.Entry.Name)
+            {
+                // do nothing
+            }
+            else if (entryItem.Entry.Parent.Entries.Any(entry => entry.Name == e.Label))
+            {
+                MessageBox.Show("Name already used.");
+                e.CancelEdit = true;
+            }
+            else
+            {
+                entryItem.Entry.Name = e.Label;
+            }
+        }
+
+        #endregion
+
+        #region Files list context menu
 
         private void filesListContextMenuStrip_Opening(object sender, CancelEventArgs e)
         {
-            extractButtonFilesListMenu.Enabled = filesList.SelectedItems.Count > 0;
-            deleteButtonFilesListMenu.Enabled = false;
+            this.filesListContextMenuStrip.Items.Clear();
+            if (filesList.SelectedItems.Count == 0)
+            {
+            }
+            else if (filesList.SelectedItems.Count == 1)
+            {
+                Operations.Operations.PopulateContextMenu(Operations.Operations.FileOperations, this.filesListContextMenuStrip, (filesList.SelectedItems[0] as EntryListViewItem).Entry);
+            }
+            else
+            {
+                List<FileEntry> entries = new List<FileEntry>();
+                foreach (EntryListViewItem entry in filesList.SelectedItems)
+                {
+                    entries.Add(entry.Entry);
+                }
+                Operations.Operations.PopulateContextMenu(Operations.Operations.MultipleFilesOperations, this.filesListContextMenuStrip, entries);
+            }
+            e.Cancel = false;
         }
 
-        private void extractButtonFilesListMenu_Click(object sender, EventArgs e)
+        private void filesList_KeyDown(object sender, KeyEventArgs e)
         {
-            ExtractSelected();
+            
+            if (filesList.SelectedItems.Count == 1)
+            {
+                FileEntry entry = (filesList.SelectedItems[0] as EntryListViewItem).Entry;
+                if (e.KeyData == Keys.Enter)
+                {
+                    Operations.Operations.PerformDefaultAction(Operations.Operations.FileOperations, entry);
+                }
+                else
+                {
+                    Operations.Operations.PerformActionByKey(Operations.Operations.FileOperations, Operations.Operations.ShortcutsFileOperations, e.KeyData, entry);
+                }
+            }
+            else if (filesList.SelectedItems.Count > 1)
+            {
+                List<FileEntry> entries = new List<FileEntry>();
+                foreach (EntryListViewItem entry in filesList.SelectedItems)
+                {
+                    entries.Add(entry.Entry);
+                }
+
+                Operations.Operations.PerformActionByKey(Operations.Operations.MultipleFilesOperations, Operations.Operations.ShortcutsMultipleFilesOperations, e.KeyData, entries);
+            }
         }
 
+        private void filesList_DoubleClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button == System.Windows.Forms.MouseButtons.Left)
+            {
+                ListViewItem item = filesList.GetItemAt(e.X, e.Y);
+                if (item != null)
+                {
+                    Operations.Operations.PerformDefaultAction(Operations.Operations.FileOperations, (item as EntryListViewItem).Entry);
+                }
+            }
+        }
 
+        private void filesList_AfterLabelEdit(object sender, LabelEditEventArgs e)
+        {
+            filesList.LabelEdit = false;
+            EntryListViewItem entryItem = (filesList.Items[e.Item] as EntryListViewItem);
+            if (e.Label == null || e.Label == "")
+            {
+                // invalid name, don't create message box
+                e.CancelEdit = true;
+                //entryItem.Update();
+            }
+            else if (e.Label == entryItem.Entry.Name)
+            {
+                // do nothing
+            }
+            else if (entryItem.Entry.Parent.Entries.Any(entry => entry.Name == e.Label))
+            {
+                MessageBox.Show("Name already used.");
+                e.CancelEdit = true;
+            }
+            else
+            {
+                entryItem.Entry.Name = e.Label;
+            }
+        }
+
+        #endregion
     }
 }

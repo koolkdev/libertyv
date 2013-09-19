@@ -22,37 +22,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.IO;
-using LibertyV.Utils;
 
-namespace LibertyV.RPF7.Entries
+namespace LibertyV.Operations
 {
-    public class DirectoryEntry : Entry
+    static class Import
     {
-        public List<Entry> Entries;
-        public EntryTreeNode Node = null; 
-
-        public DirectoryEntry(String filename, List<Entry> entries) : base(filename)
-        {
-            this.Entries = entries;
-            foreach (Entry entry in this.Entries) {
-                entry.Parent = this;
-            }
-        }
-
-        public bool IsRoot()
-        {
-            return Parent == null;
-        }
-
-        public override void Export(String foldername)
-        {
-            String subfolder = Path.Combine(foldername, this.Name);
-            Directory.CreateDirectory(subfolder);
-            foreach (Entry entry in this.Entries)
-            {
-                entry.Export(subfolder);
-            }
-        }
     }
 }

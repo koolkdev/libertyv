@@ -22,37 +22,22 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.IO;
-using LibertyV.Utils;
+using LibertyV.RPF7.Entries;
 
-namespace LibertyV.RPF7.Entries
+namespace LibertyV.Operations
 {
-    public class DirectoryEntry : Entry
+    static class Rename
     {
-        public List<Entry> Entries;
-        public EntryTreeNode Node = null; 
-
-        public DirectoryEntry(String filename, List<Entry> entries) : base(filename)
+        public static void RenameFile(FileEntry entry)
         {
-            this.Entries = entries;
-            foreach (Entry entry in this.Entries) {
-                entry.Parent = this;
-            }
+            entry.ViewItem.ListView.LabelEdit = true;
+            entry.ViewItem.BeginEdit();
         }
 
-        public bool IsRoot()
+        public static void RenameFolder(DirectoryEntry entry)
         {
-            return Parent == null;
-        }
-
-        public override void Export(String foldername)
-        {
-            String subfolder = Path.Combine(foldername, this.Name);
-            Directory.CreateDirectory(subfolder);
-            foreach (Entry entry in this.Entries)
-            {
-                entry.Export(subfolder);
-            }
+            entry.Node.TreeView.LabelEdit = true;
+            entry.Node.BeginEdit();
         }
     }
 }

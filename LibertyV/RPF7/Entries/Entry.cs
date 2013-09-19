@@ -27,13 +27,13 @@ using LibertyV.Utils;
 
 namespace LibertyV.RPF7.Entries
 {
-    public class Entry
+    public abstract class Entry
     {
-        public String Filename;
-        public Entry Parent = null;
+        public String Name;
+        public DirectoryEntry Parent = null;
 
         public Entry(String filename) {
-            this.Filename = filename;
+            this.Name = filename;
         }
 
         public virtual void Export(String foldername)

@@ -22,37 +22,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.IO;
-using LibertyV.Utils;
+using System.Windows.Forms;
+using LibertyV.RPF7.Entries;
 
-namespace LibertyV.RPF7.Entries
+namespace LibertyV
 {
-    public class DirectoryEntry : Entry
+    public class EntryTreeNode : TreeNode
     {
-        public List<Entry> Entries;
-        public EntryTreeNode Node = null; 
-
-        public DirectoryEntry(String filename, List<Entry> entries) : base(filename)
+        public DirectoryEntry Entry;
+        public EntryTreeNode(DirectoryEntry entry, EntryTreeNode[] children)
+            : base(entry.Name, children)
         {
-            this.Entries = entries;
-            foreach (Entry entry in this.Entries) {
-                entry.Parent = this;
-            }
-        }
-
-        public bool IsRoot()
-        {
-            return Parent == null;
-        }
-
-        public override void Export(String foldername)
-        {
-            String subfolder = Path.Combine(foldername, this.Name);
-            Directory.CreateDirectory(subfolder);
-            foreach (Entry entry in this.Entries)
-            {
-                entry.Export(subfolder);
-            }
+            this.Entry = entry;
+            entry.Node = this;
         }
     }
 }

@@ -33,6 +33,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>liberty_v_logo.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -47,6 +50,23 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GlobalOptions.cs" />
+    <Compile Include="Operations\ResourceProperties.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Operations\ResourceProperties.Designer.cs">
+      <DependentUpon>ResourceProperties.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Operations\Import.cs" />
+    <Compile Include="Operations\OperationsList.cs" />
+    <Compile Include="Operations\Delete.cs" />
+    <Compile Include="Operations\FileProporties.cs" />
+    <Compile Include="Operations\RegularFileProperties.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Operations\RegularFileProperties.Designer.cs">
+      <DependentUpon>RegularFileProperties.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Operations\Rename.cs" />
     <Compile Include="PlatformSelection.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -61,8 +81,11 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Operations\Export.cs" />
+    <Compile Include="Operations\RPFOperations.cs" />
+    <Compile Include="Operations\Operations.cs" />
     <Compile Include="RPF7\ResourceFileBuffer.cs" />
-    <Compile Include="RPF7\EntryListViewItem.cs" />
+    <Compile Include="EntryListViewItem.cs" />
     <Compile Include="RPF7\Entries\RegularFileEntry.cs" />
     <Compile Include="RPF7\Entries\DirectoryEntry.cs" />
     <Compile Include="RPF7\Entries\FileEntry.cs" />
@@ -70,7 +93,7 @@
     <Compile Include="RPF7\CompressedFileBuffer.cs" />
     <Compile Include="RPF7\FileBuffer.cs" />
     <Compile Include="RPF7\IBuffer.cs" />
-    <Compile Include="RPF7\EntryTreeNode.cs" />
+    <Compile Include="EntryTreeNode.cs" />
     <Compile Include="Utils\AESDecryptor.cs" />
     <Compile Include="RPF7\Entries\Entry.cs" />
     <Compile Include="RPF7\RPF7File.cs" />
@@ -79,11 +102,18 @@
     <Compile Include="Utils\GUI.cs" />
     <Compile Include="Utils\Reflector.cs" />
     <Compile Include="Utils\XCompress.cs" />
+    <EmbeddedResource Include="Operations\ResourceProperties.resx">
+      <DependentUpon>ResourceProperties.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Operations\RegularFileProperties.resx">
+      <DependentUpon>RegularFileProperties.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="PlatformSelection.resx">
       <DependentUpon>PlatformSelection.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="LibertyV.resx">
       <DependentUpon>LibertyV.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -106,13 +136,15 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\liberty_v_logo.ico" />
+    <None Include="Resources\save.bmp" />
+    <None Include="Resources\open.bmp" />
+    <Content Include="liberty_v_logo.ico" />
     <Content Include="xcompress.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\open.bmp" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

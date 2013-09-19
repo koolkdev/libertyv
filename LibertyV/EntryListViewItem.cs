@@ -22,48 +22,32 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.IO;
+using System.Windows.Forms;
+using LibertyV.RPF7.Entries;
 
-namespace LibertyV.RPF7.Entries
+namespace LibertyV
 {
-    public abstract class FileEntry : Entry
+    public class EntryListViewItem : ListViewItem
     {
-        public IBuffer Data;
-        public EntryListViewItem ViewItem;
-
-        public FileEntry(String filename, IBuffer data)
-            : base(filename)
+        public FileEntry Entry;
+        public EntryListViewItem(FileEntry entry)
+            : base(entry.Name)
         {
-            this.Data = data;
+            this.Entry = entry;
+            this.Entry.ViewItem = this;
+            Update();
         }
 
-        public override void Export(String path)
+        public void Update()
         {
-            string filename;
-            if (Directory.Exists(path))
+            this.SubItems.Clear();
+            base.Text = this.Entry.Name;
+            this.SubItems.Add(String.Format("{0:n0}", Entry.Data.GetSize()));
+
+            if (this.Entry is ResourceEntry)
             {
-                filename = Path.Combine(path, this.Name);
+                this.SubItems.Add((this.Entry as ResourceEntry).Type.ToString());
             }
-            else
-            {
-                filename = path;
-            }
-            System.IO.File.WriteAllBytes(filename, this.Data.GetData());
-        }
-
-        public string GetExtension()
-        {
-            return Path.GetExtension(Name);
-        }
-
-        public bool IsRegularFile()
-        {
-            return this is RegularFileEntry;
-        }
-
-        public bool IsResource()
-        {
-            return this is ResourceEntry;
         }
     }
 }

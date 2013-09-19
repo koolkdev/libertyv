@@ -30,8 +30,15 @@ namespace LibertyV.RPF7.Entries
     {
         public uint SystemFlag;
         public uint GraphicsFlag;
-        public ulong Type 
-        {   
+        public int Type 
+        {
+            set
+            {
+                SystemFlag &= 0x0fffffff;
+                SystemFlag |= ((uint)value & 0xf0) << 24;
+                GraphicsFlag &= 0x0fffffff;
+                GraphicsFlag |= ((uint)value & 0xf) << 28;
+            }
             get {
                 return GetResourceTypeFromFlags(this.SystemFlag, this.GraphicsFlag);
             }
@@ -61,20 +68,21 @@ namespace LibertyV.RPF7.Entries
 
         public override void Export(String foldername)
         {
+            // TODO: Multiplie option on how to extract
             byte [] data = this.Data.GetData();
 
             if (this.SystemSize != 0)
             {
                 byte[] sysData = new byte[this.SystemSize];
                 Buffer.BlockCopy(data, 0, sysData, 0, this.SystemSize);
-                File.WriteAllBytes(Path.Combine(foldername, this.Filename + ".sys"), sysData);
+                File.WriteAllBytes(Path.Combine(foldername, this.Name + ".sys"), sysData);
             }
 
             if (this.GraphicSize != 0)
             {
                 byte[] gfxData = new byte[this.GraphicSize];
                 Buffer.BlockCopy(data, this.SystemSize, gfxData, 0, this.GraphicSize);
-                File.WriteAllBytes(Path.Combine(foldername, this.Filename + ".gfx"), gfxData);
+                File.WriteAllBytes(Path.Combine(foldername, this.Name + ".gfx"), gfxData);
             }
         }
 
@@ -117,12 +125,12 @@ namespace LibertyV.RPF7.Entries
             }
         }
         
-        static public uint GetResourceTypeFromFlags(uint systemFlag, uint graphicsFlag) 
+        static public int GetResourceTypeFromFlags(uint systemFlag, uint graphicsFlag) 
         {
-            return ((graphicsFlag >> 28) & 0xF) | (((systemFlag >> 28) & 0xF) << 4);
+            return (int)(((graphicsFlag >> 28) & 0xF) | (((systemFlag >> 28) & 0xF) << 4));
         }
 
-        static public bool IsResourceEncrypted(uint resourceType)
+        static public bool IsResourceEncrypted(int resourceType)
         {
             // Is xsc is the only encryped resource? Is there a better way to deremine whether it is encrypted or not?
             return resourceType == 0x9;

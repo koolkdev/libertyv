@@ -22,48 +22,24 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using LibertyV.RPF7.Entries;
 using System.IO;
+using System.Diagnostics;
+using LibertyV.RPF7;
 
-namespace LibertyV.RPF7.Entries
+namespace LibertyV.Operations
 {
-    public abstract class FileEntry : Entry
+    static class RPFOperations
     {
-        public IBuffer Data;
-        public EntryListViewItem ViewItem;
-
-        public FileEntry(String filename, IBuffer data)
-            : base(filename)
+        public static bool IsRPF(FileEntry entry)
         {
-            this.Data = data;
+            return entry.GetExtension() == ".rpf";
         }
-
-        public override void Export(String path)
+        
+        public static void OpenRPF(FileEntry entry)
         {
-            string filename;
-            if (Directory.Exists(path))
-            {
-                filename = Path.Combine(path, this.Name);
-            }
-            else
-            {
-                filename = path;
-            }
-            System.IO.File.WriteAllBytes(filename, this.Data.GetData());
-        }
-
-        public string GetExtension()
-        {
-            return Path.GetExtension(Name);
-        }
-
-        public bool IsRegularFile()
-        {
-            return this is RegularFileEntry;
-        }
-
-        public bool IsResource()
-        {
-            return this is ResourceEntry;
+            LibertyV window = new LibertyV(new RPF7File(new MemoryStream(entry.Data.GetData()), entry.Name));
+            window.ShowDialog();
         }
     }
 }
