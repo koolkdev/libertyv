@@ -92,10 +92,11 @@ namespace LibertyV.Operations
                 if (operation.CheckCondition(obj))
                 {
                     var currentOperation = operation;
-                    contextMenu.Items.Add(currentOperation.Text, null, new EventHandler(delegate(Object o, EventArgs a)
+                    ToolStripMenuItem item = new ToolStripMenuItem(currentOperation.Text, null, new EventHandler(delegate(Object o, EventArgs a)
                     {
                         currentOperation.Operation(obj);
-                    }));
+                    }), operation.KeyboardShortcut);
+                    contextMenu.Items.Add(item);
                 }
             }
         }

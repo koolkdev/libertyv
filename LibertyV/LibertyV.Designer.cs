@@ -71,12 +71,14 @@ namespace LibertyV
             // 
             this.filesTreeContextMenuStrip.Name = "filesTreeContextMenuStrip";
             this.filesTreeContextMenuStrip.Size = new System.Drawing.Size(153, 26);
+            this.filesTreeContextMenuStrip.Closed += new System.Windows.Forms.ToolStripDropDownClosedEventHandler(this.filesTreeContextMenuStrip_Closed);
             this.filesTreeContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.filesTreeContextMenuStrip_Opening);
             // 
             // filesListContextMenuStrip
             // 
             this.filesListContextMenuStrip.Name = "filesListContextMenuStrip";
             this.filesListContextMenuStrip.Size = new System.Drawing.Size(61, 4);
+            this.filesListContextMenuStrip.Closed += new System.Windows.Forms.ToolStripDropDownClosedEventHandler(this.filesListContextMenuStrip_Closed);
             this.filesListContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.filesListContextMenuStrip_Opening);
             // 
             // toolbar

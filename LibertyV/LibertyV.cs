@@ -236,6 +236,11 @@ namespace LibertyV
 
         #region Files tree context menu
 
+        private void filesTreeContextMenuStrip_Closed(object sender, ToolStripDropDownClosedEventArgs e)
+        {
+            this.filesTreeContextMenuStrip.Items.Clear();
+        }
+
         private void filesTreeContextMenuStrip_Opening(object sender, CancelEventArgs e)
         {
             this.filesTreeContextMenuStrip.Items.Clear();
@@ -287,6 +292,12 @@ namespace LibertyV
         #endregion
 
         #region Files list context menu
+
+
+        private void filesListContextMenuStrip_Closed(object sender, ToolStripDropDownClosedEventArgs e)
+        {
+            this.filesListContextMenuStrip.Items.Clear();
+        }
 
         private void filesListContextMenuStrip_Opening(object sender, CancelEventArgs e)
         {
