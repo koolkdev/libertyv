@@ -1,6 +1,6 @@
 ﻿/*
  
-    RPF7Viewer - Viewer for RAGE Package File version 7
+    LibertyV - Viewer/Editor for RAGE Package File version 7
     Copyright (C) 2013  koolk <koolkdev at gmail.com>
    
     This program is free software: you can redistribute it and/or modify
@@ -38,7 +38,7 @@ namespace LibertyV.Operations
         
         public static void OpenRPF(FileEntry entry)
         {
-            LibertyV window = new LibertyV(new RPF7File(new MemoryStream(entry.Data.GetData()), entry.Name));
+            LibertyV window = new LibertyV(new RPF7File(entry.Data.GetStream(), entry.Name));
             window.ShowDialog();
         }
     }

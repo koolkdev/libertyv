@@ -20,37 +20,37 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Windows.Forms;
-using LibertyV.RPF7.Entries;
+using LibertyV.Utils;
+using System.IO;
 
-namespace LibertyV.Operations
+namespace LibertyV.RPF7
 {
-    public partial class RegularFileProporties : Form
+    public class CompressedFileStreamCreator : FileStreamCreator
     {
-        RegularFileEntry Entry;
-        public RegularFileProporties(RegularFileEntry entry)
-        {
-            InitializeComponent();
+        private int UncompressedSize;
+        private bool Encrypted;
 
-            this.Entry = entry;
-            this.isCompressedCheckBox.Checked = this.Entry.Compressed;
+        public CompressedFileStreamCreator(RPF7File file, long offset, int compressedSize, int uncompressedSize, bool encrypted = true)
+            : base(file, offset, compressedSize)
+        {
+            this.UncompressedSize = uncompressedSize;
+            this.Encrypted = encrypted;
         }
 
-        public new void Close()
+        public override Stream GetStream()
         {
-            this.Entry.Compressed = this.isCompressedCheckBox.Checked;
-
-            base.Close();
+            if (this.Encrypted) {
+                return this.File.GetDecompressStream(this.File.GetDecryptStream(base.GetStream()));
+            } else {
+                return this.File.GetDecompressStream(base.GetStream());
+            }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        public override int GetSize()
         {
-            Close();
+            return this.UncompressedSize;
         }
     }
 }

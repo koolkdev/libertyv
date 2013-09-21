@@ -1,6 +1,6 @@
 ﻿/*
  
-    RPF7Viewer - Viewer for RAGE Package File version 7
+    LibertyV - Viewer/Editor for RAGE Package File version 7
     Copyright (C) 2013  koolk <koolkdev at gmail.com>
    
     This program is free software: you can redistribute it and/or modify
@@ -22,31 +22,29 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Security.Cryptography;
+using System.IO;
+using LibertyV.Utils;
 
-namespace LibertyV.Utils
+namespace LibertyV.RPF7
 {
-    public static class AESDecryptor
+    public class ExternalFileStreamCreator : IStreamCreator
     {
-        private static RijndaelManaged aes = null;
-        private static ICryptoTransform decryptor;
+        private Stream Stream;
 
-        public static byte[] Key = null;
-
-        public static byte[] Decrypt(byte[] data)
+        public ExternalFileStreamCreator(Stream stream)
         {
-            if (aes == null)
-            {
-                aes = new RijndaelManaged();
-                aes.KeySize = 256;
-                aes.Key = AESDecryptor.Key;
-                aes.Mode = CipherMode.ECB;
-                aes.Padding = PaddingMode.Zeros;
-                decryptor = aes.CreateDecryptor();
-            }
-            decryptor.TransformBlock(data, 0, (data.Length / 0x10) * 0x10, data, 0);
-            return data;
+            this.Stream = stream;
         }
 
+        public virtual Stream GetStream()
+        {
+            // just a way to reset and duplicate the stream
+            return new PartialStream(this.Stream, 0, this.GetSize());
+        }
+
+        public virtual int GetSize()
+        {
+            return (int)this.Stream.Length;
+        }
     }
 }

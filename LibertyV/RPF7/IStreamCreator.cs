@@ -20,37 +20,15 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Windows.Forms;
-using LibertyV.RPF7.Entries;
+using System.IO;
 
-namespace LibertyV.Operations
+namespace LibertyV.RPF7
 {
-    public partial class RegularFileProporties : Form
+    public interface IStreamCreator
     {
-        RegularFileEntry Entry;
-        public RegularFileProporties(RegularFileEntry entry)
-        {
-            InitializeComponent();
-
-            this.Entry = entry;
-            this.isCompressedCheckBox.Checked = this.Entry.Compressed;
-        }
-
-        public new void Close()
-        {
-            this.Entry.Compressed = this.isCompressedCheckBox.Checked;
-
-            base.Close();
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            Close();
-        }
+        Stream GetStream();
+        int GetSize();
     }
 }

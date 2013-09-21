@@ -1,6 +1,6 @@
 ﻿/*
  
-    RPF7Viewer - Viewer for RAGE Package File version 7
+    LibertyV - Viewer/Editor for RAGE Package File version 7
     Copyright (C) 2013  koolk <koolkdev at gmail.com>
    
     This program is free software: you can redistribute it and/or modify
@@ -22,6 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 
 namespace LibertyV.RPF7.Entries
 {
@@ -29,7 +30,7 @@ namespace LibertyV.RPF7.Entries
     {
         public bool Compressed;
 
-        public RegularFileEntry(String filename, IBuffer data, bool compressed)
+        public RegularFileEntry(String filename, IStreamCreator data, bool compressed)
             : base(filename, data)
         {
             this.Compressed = compressed;

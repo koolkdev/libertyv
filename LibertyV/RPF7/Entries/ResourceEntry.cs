@@ -1,6 +1,6 @@
 ﻿/*
  
-    RPF7Viewer - Viewer for RAGE Package File version 7
+    LibertyV - Viewer/Editor for RAGE Package File version 7
     Copyright (C) 2013  koolk <koolkdev at gmail.com>
    
     This program is free software: you can redistribute it and/or modify
@@ -59,7 +59,7 @@ namespace LibertyV.RPF7.Entries
             }
         }
 
-        public ResourceEntry(String filename, IBuffer data, uint systemFlag, uint graphicsFlag)
+        public ResourceEntry(String filename, IStreamCreator data, uint systemFlag, uint graphicsFlag)
             : base(filename, data)
         {
             this.SystemFlag = systemFlag;
@@ -69,20 +69,21 @@ namespace LibertyV.RPF7.Entries
         public override void Export(String foldername)
         {
             // TODO: Multiplie option on how to extract
-            byte [] data = this.Data.GetData();
-
+            Stream stream = this.Data.GetStream();
             if (this.SystemSize != 0)
             {
-                byte[] sysData = new byte[this.SystemSize];
-                Buffer.BlockCopy(data, 0, sysData, 0, this.SystemSize);
-                File.WriteAllBytes(Path.Combine(foldername, this.Name + ".sys"), sysData);
+                using (FileStream file = File.OpenWrite(Path.Combine(foldername, this.Name + ".sys")))
+                {
+                    stream.CopyTo(file, this.SystemSize);
+                }
             }
 
             if (this.GraphicSize != 0)
             {
-                byte[] gfxData = new byte[this.GraphicSize];
-                Buffer.BlockCopy(data, this.SystemSize, gfxData, 0, this.GraphicSize);
-                File.WriteAllBytes(Path.Combine(foldername, this.Name + ".gfx"), gfxData);
+                using (FileStream file = File.OpenWrite(Path.Combine(foldername, this.Name + ".gfx")))
+                {
+                    stream.CopyTo(file, this.GraphicSize);
+                }
             }
         }
 

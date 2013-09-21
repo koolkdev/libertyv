@@ -1,6 +1,6 @@
 ﻿/*
  
-    RPF7Viewer - Viewer for RAGE Package File version 7
+    LibertyV - Viewer/Editor for RAGE Package File version 7
     Copyright (C) 2013  koolk <koolkdev at gmail.com>
    
     This program is free software: you can redistribute it and/or modify
@@ -31,10 +31,9 @@ namespace LibertyV.RPF7
 {
     public class RPF7File
     {
-        private BitsStream Stream;
+        public Stream Stream;
 
-        private int flags;
-        public int shiftNameAccessBy;
+        public Structs.RPF7Header Info;
         private bool sixteenRoundsDecrypt;
         
         public Entry Root;
@@ -43,31 +42,27 @@ namespace LibertyV.RPF7
         public RPF7File(Stream inputStream, String filname = "")
         {
             this.Filename = filname;
-            Stream = new BitsStream(inputStream);
-            if (Stream.ReadString(4) != "RPF7")
+            Stream = inputStream;
+
+            Info = new Structs.RPF7Header(Stream);
+
+            if (new string(Info.Magic) != "RPF7")
             {
                 throw new Exception("Invalid RPF Magic");
             }
 
-            int entriesCount = Stream.ReadInt();
-            
-            // Unknown flag, ignored for now, 0 in ps3, and 1 in xbox360
-            Stream.ReadBits(1);
+            sixteenRoundsDecrypt = (Info.Flag >> 28) == 0xf;
 
-            shiftNameAccessBy = (int)Stream.ReadBits(3);
+            using (Stream decryptStream = this.GetDecryptStream(new StreamKeeper(this.Stream)))
+            {
+                using (BinaryReader binaryStream = new BinaryReader(decryptStream))
+                {
+                    MemoryStream entriesInfo = new MemoryStream(binaryStream.ReadBytes(0x10 * Info.EntriesCount));
+                    MemoryStream filenames = new MemoryStream(binaryStream.ReadBytes(Info.EntriesNamesLength));
+                    this.Root = Entry.CreateFromHeader(new Structs.RPF7EntryInfoTemplate(entriesInfo), this, entriesInfo, filenames);
+                }
+            }
 
-            int entriesNamesLength = (int)Stream.ReadBits(28);
-
-            // unknwon flags
-            flags = Stream.ReadInt();
-            sixteenRoundsDecrypt = (flags >> 28) == 0xf;
-
-            this.Stream.Seek(0x10 * (entriesCount + 1));
-            BitsStream filenames = new BitsStream(new MemoryStream(this.Decrypt(this.Stream.ReadBytes(entriesNamesLength))));
-
-            // Go back to header
-            this.Stream.Seek(0x10);
-            this.Root = Entry.CreateFromHeader(this.Decrypt(Stream.ReadBytes(0x10)), this, filenames);
 
             if (!(this.Root is DirectoryEntry))
             {
@@ -75,49 +70,22 @@ namespace LibertyV.RPF7
             }
         }
 
-        public byte[] Decrypt(byte[] data)
+        public Stream GetDecryptStream(Stream stream)
         {
-            if (sixteenRoundsDecrypt)
-            {
-                for (int i = 0; i < 16; ++i)
-                {
-                    AESDecryptor.Decrypt(data);
-                }
-                return data;
-            }
-            else
-            {
-                return AESDecryptor.Decrypt(data); ;
-            }
+            return AES.DecryptStream(stream, sixteenRoundsDecrypt);
         }
 
-        public byte[] Decompress(byte[] data, int uncompressedSize)
+        public Stream GetDecompressStream(Stream stream)
         {
             // The compression algorithm is pltaform specified, so it should be here
             if (GlobalOptions.Platform == GlobalOptions.PlatformType.PLAYSTATION3)
             {
-                byte[] outputData = new byte[uncompressedSize];
-                // Right now I support the xbox compression only
-                using (DeflateStream stream = new DeflateStream(new MemoryStream(data), CompressionMode.Decompress))
-                {
-                    if (uncompressedSize != stream.Read(outputData, 0, uncompressedSize))
-                    {
-                        throw new Exception("Failed to decompress");
-                    }
-                }
-
-                return outputData;
+                return new DeflateStream(stream, CompressionMode.Decompress);
             }
             else
             {
-                return XCompress.Decompress(data, uncompressedSize);
+                return new XMemDecompressStream(stream);
             }
-        }
-
-        public byte[] Read(long offset, int length)
-        {
-            this.Stream.Seek(offset);
-            return this.Stream.ReadBytes(length);
         }
     }
 }

@@ -86,25 +86,28 @@
     <Compile Include="Operations\Export.cs" />
     <Compile Include="Operations\RPFOperations.cs" />
     <Compile Include="Operations\Operations.cs" />
-    <Compile Include="RPF7\ExternalFileBuffer.cs" />
-    <Compile Include="RPF7\ResourceFileBuffer.cs" />
+    <Compile Include="RPF7\ExternalFileStreamCreator.cs" />
+    <Compile Include="RPF7\ResourceStreamCreator.cs" />
     <Compile Include="EntryListViewItem.cs" />
     <Compile Include="RPF7\Entries\RegularFileEntry.cs" />
     <Compile Include="RPF7\Entries\DirectoryEntry.cs" />
     <Compile Include="RPF7\Entries\FileEntry.cs" />
     <Compile Include="RPF7\Entries\ResourceEntry.cs" />
-    <Compile Include="RPF7\CompressedFileBuffer.cs" />
-    <Compile Include="RPF7\FileBuffer.cs" />
-    <Compile Include="RPF7\IBuffer.cs" />
+    <Compile Include="RPF7\CompressedFileStreamCreator.cs" />
+    <Compile Include="RPF7\FileStreamCreator.cs" />
+    <Compile Include="RPF7\IStreamCreator.cs" />
     <Compile Include="EntryTreeNode.cs" />
-    <Compile Include="Utils\AESDecryptor.cs" />
+    <Compile Include="RPF7\Structs.cs" />
+    <Compile Include="Utils\AES.cs" />
     <Compile Include="RPF7\Entries\Entry.cs" />
     <Compile Include="RPF7\RPF7File.cs" />
-    <Compile Include="Utils\BitsStream.cs" />
+    <Compile Include="Utils\PartialStream.cs" />
+    <Compile Include="Utils\StreamKeeper.cs" />
+    <Compile Include="Utils\XMemCompressStream.cs" />
     <Compile Include="Utils\FolderSelectDialog.cs" />
     <Compile Include="Utils\GUI.cs" />
     <Compile Include="Utils\Reflector.cs" />
-    <Compile Include="Utils\XCompress.cs" />
+    <Compile Include="Utils\XMemDecompressStream.cs" />
     <EmbeddedResource Include="Operations\ResourceProperties.resx">
       <DependentUpon>ResourceProperties.cs</DependentUpon>
     </EmbeddedResource>

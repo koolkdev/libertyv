@@ -1,6 +1,6 @@
 ﻿/*
  
-    RPF7Viewer - Viewer for RAGE Package File version 7
+    LibertyV - Viewer/Editor for RAGE Package File version 7
     Copyright (C) 2013  koolk <koolkdev at gmail.com>
    
     This program is free software: you can redistribute it and/or modify
@@ -50,9 +50,9 @@ namespace LibertyV
                 return;
             }
 
-            AESDecryptor.Key = File.ReadAllBytes("key.dat");
+            AES.Key = File.ReadAllBytes("key.dat");
 
-            string keyMD5 = BitConverter.ToString(new System.Security.Cryptography.MD5CryptoServiceProvider().ComputeHash(AESDecryptor.Key)).Replace("-", "");
+            string keyMD5 = BitConverter.ToString(new System.Security.Cryptography.MD5CryptoServiceProvider().ComputeHash(AES.Key)).Replace("-", "");
 
             // check if md5 of key is one of the known keys
             if (GlobalOptions.Platform == GlobalOptions.PlatformType.XBOX360)

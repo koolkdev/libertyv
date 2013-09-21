@@ -1,0 +1,267 @@
+﻿/*
+ 
+    LibertyV - Viewer/Editor for RAGE Package File version 7
+    Copyright (C) 2013  koolk <koolkdev at gmail.com>
+   
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+   
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ 
+ */
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Runtime.InteropServices;
+using System.IO;
+
+namespace LibertyV.Utils
+{
+    public class XMemCompressStream : Stream
+    {
+        private Stream _stream;
+        private MemoryStream tempStream;
+        private IntPtr _context;
+        /*
+        private byte[] _InputBuffer = null;
+        private int _InputBufferIndex = 0;
+        private int _WrittenBlocks = 0;
+         */
+
+        private enum XMEMCODEC_TYPE
+        {
+            XMEMCODEC_DEFAULT = 0,
+            XMEMCODEC_LZX = 1
+        };
+
+        [StructLayout(LayoutKind.Explicit)]
+        public struct XMEMCODEC_PARAMETERS_LZX
+        {
+            [FieldOffset(0)]
+            public int Flags;
+            [FieldOffset(4)]
+            public int WindowSize;
+            [FieldOffset(8)]
+            public int CompressionPartitionSize;
+        }
+
+        [DllImport(@"xcompress.dll")]
+        private static extern int XMemCreateCompressionContext(XMEMCODEC_TYPE CodecType, ref XMEMCODEC_PARAMETERS_LZX pCodecParams, int Flags, ref IntPtr pContext);
+
+        [DllImport(@"xcompress.dll", EntryPoint = "XMemCompressStream")]
+        private static extern int _XMemCompressStream(IntPtr Context, byte[] pDestination, ref int pDestSize, byte[] pSource, ref int SrcSize);
+
+        [DllImport(@"xcompress.dll")]
+        private static extern int XMemCompress(IntPtr Context, byte[] pDestination, ref int pDestSize, byte[] pSource, int SrcSize);
+
+        [DllImport(@"xcompress.dll")]
+        private static extern int XMemDestroyCompressionContext(IntPtr pContext);
+
+        public XMemCompressStream(Stream stream)
+        {
+            _stream = stream;
+            if (!(_stream.CanWrite)) throw new ArgumentException("Stream not writable", "stream");
+
+
+            XMEMCODEC_PARAMETERS_LZX codecParams;
+            codecParams.Flags = 0;
+            codecParams.WindowSize = 64 * 1024;
+            codecParams.CompressionPartitionSize = 256 * 1024;
+
+            if (XMemCreateCompressionContext(XMEMCODEC_TYPE.XMEMCODEC_LZX, ref codecParams, 1, ref _context) != 0)
+            {
+                throw new Exception("XMemCreateCompressionContext failed");
+            }
+
+            if (stream.CanSeek)
+            {
+                tempStream = new MemoryStream((int)stream.Length);
+            }
+            else
+            {
+                tempStream = new MemoryStream();
+            }
+        }
+
+        public override bool CanRead
+        {
+            get { return false; }
+        }
+
+        public override bool CanSeek
+        {
+            get { return false; }
+        }
+
+        public override bool CanWrite
+        {
+            get { return true; }
+        }
+
+        public override long Length
+        {
+            get { throw new NotSupportedException("Unseekable Stream"); }
+        }
+
+        public override long Position
+        {
+            get { throw new NotSupportedException("Unseekable Stream"); }
+            set { throw new NotSupportedException("Unseekable Stream"); }
+        }
+
+        public override void Flush()
+        {
+            this._stream.Flush();
+        }
+
+        public override long Seek(long offset, SeekOrigin origin)
+        {
+            throw new NotSupportedException("Unseekable Stream");
+        }
+
+        public override void SetLength(long value)
+        {
+            throw new NotSupportedException("Unseekable Stream");
+        }
+
+        public override int Read(byte[] buffer, int offset, int count)
+        {
+            throw new NotSupportedException("Unreadable stream");
+        }
+
+
+        public override void Write(byte[] buffer, int offset, int count)
+        {
+            if (offset < 0)
+                throw new ArgumentOutOfRangeException("offset", "Need non-negitive number");
+            if (count < 0)
+                throw new ArgumentOutOfRangeException("count", "Need non-negitive number");
+            if (buffer.Length - offset < count)
+                throw new ArgumentException("Invalid offset and length");
+            tempStream.Write(buffer, 0, count);
+            // TO FIX
+            /*
+            // we compress 0x8000 bytes each time, so I don't except that the 
+            byte[] outputBuffer = new byte[0x8100];
+
+            while (count > 0)
+            {
+                if (_InputBuffer == null)
+                {
+                    _InputBuffer = new byte[0x8000];
+                    _InputBufferIndex = 0;
+                }
+
+                // Fill the buffer
+                int toWrite = (count < (_InputBuffer.Length - _InputBufferIndex)) ? count : (_InputBuffer.Length - _InputBufferIndex);
+                Buffer.BlockCopy(buffer, offset, _InputBuffer, _InputBufferIndex, toWrite);
+                count -= toWrite;
+                offset += toWrite;
+                _InputBufferIndex += toWrite;
+
+                // The buffer got full, compress the block
+                if (_InputBufferIndex == _InputBuffer.Length)
+                {
+                    _WrittenBlocks += 1;
+                    int outputBufferLength = outputBuffer.Length;
+                    if (XMemCompress(_context, outputBuffer, ref outputBufferLength, _InputBuffer, _InputBufferIndex) != 0)
+                    {
+                        throw new Exception("_XMemCompressStream failed");
+                    }
+                    _InputBufferIndex = 0;
+                    // Skip the first part of the header, and the 5 nulls in the end
+                    _stream.Write(outputBuffer, 3, outputBufferLength - 8);
+                }
+            }
+            if (_InputBufferIndex == 0)
+            {
+                // not waste memory if we may finished to read
+                _InputBuffer = null;
+            }*/
+        }
+
+        public void FlushStream()
+        {
+            if (tempStream != null)
+            {
+                byte[] outputBuffer = new byte[tempStream.Length + 0x100];
+                int outputBufferLength = outputBuffer.Length;
+                if (XMemCompress(_context, outputBuffer, ref outputBufferLength, tempStream.GetBuffer(), (int)tempStream.Length) != 0)
+                {
+                    throw new Exception("_XMemCompressStream failed");
+                }
+                _stream.Write(outputBuffer, 0, outputBufferLength);
+                tempStream.Close();
+                tempStream = null;
+            }
+            // TO FIX
+            /*
+            // Write the remeaning of the data to the stream
+            // Should be called only when finished writng
+            if (_InputBufferIndex != 0)
+            {
+                byte[] outputBuffer = new byte[_InputBufferIndex + 0x100];
+                int outputBufferLength = outputBuffer.Length;
+                if (XMemCompress(_context, outputBuffer, ref outputBufferLength, _InputBuffer, _InputBufferIndex) != 0)
+                {
+                    throw new Exception("_XMemCompressStream failed");
+                }
+                _InputBufferIndex = 0;
+                _InputBuffer = null;
+                _stream.Write(outputBuffer, 0, outputBufferLength);
+            }
+            else
+            {
+                if (_WrittenBlocks == 0)
+                {
+                    // compress empty block
+                    byte[] outputBuffer = new byte[0x100];
+                    int outputBufferLength = outputBuffer.Length;
+                    if (XMemCompress(_context, outputBuffer, ref outputBufferLength, new byte[] { }, 0) != 0)
+                    {
+                        throw new Exception("_XMemCompressStream failed");
+                    }
+                    _InputBufferIndex = 0;
+                    _InputBuffer = null;
+                    _stream.Write(outputBuffer, 0, outputBufferLength);
+                }
+                else
+                {
+                    // Just write nulls to indicate end of stream
+                    _stream.Write(new byte[] { 0, 0, 0, 0, 0 }, 0, 5);
+                }
+            }*/
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _stream.Close();
+            }
+            FlushStream();
+            if (_context != IntPtr.Zero)
+            {
+                XMemDestroyCompressionContext(_context);
+                _context = IntPtr.Zero;
+            }
+            /*_InputBuffer = null;*/
+            _stream = null;
+            if (tempStream != null)
+            {
+                tempStream.Close();
+                tempStream = null;
+            }
+        }
+    }
+}

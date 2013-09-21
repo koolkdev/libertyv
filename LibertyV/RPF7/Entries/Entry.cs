@@ -1,6 +1,6 @@
 ﻿/*
  
-    RPF7Viewer - Viewer for RAGE Package File version 7
+    LibertyV - Viewer/Editor for RAGE Package File version 7
     Copyright (C) 2013  koolk <koolkdev at gmail.com>
    
     This program is free software: you can redistribute it and/or modify
@@ -41,22 +41,21 @@ namespace LibertyV.RPF7.Entries
             throw new Exception("Not implemented"); 
         }
      
-        public static Entry CreateFromHeader(byte[] data, RPF7File file, BitsStream filenames)
+        public static Entry CreateFromHeader(Structs.RPF7EntryInfoTemplate info, RPF7File file, MemoryStream entriesInfo, MemoryStream filenames)
         {
-            if (data.Length != 0x10)
+            bool isResource = info.Field1 == 1;
+            long offset = (long)info.Field2;
+            int compressedSize = (int)info.Field3;
+            int filenameOffset = (int)info.Field4;
+
+            filenames.Seek(filenameOffset << file.Info.ShiftNameAccessBy, SeekOrigin.Begin);
+            String filename = "";
+            // Read null-terminated filename
+            char currentChar;
+            while ((currentChar = (char)filenames.ReadByte()) != 0)
             {
-                throw new Exception("Invalid header length.");
+                filename += currentChar;
             }
-
-            BitsStream stream = new BitsStream(new MemoryStream(data));
-
-            bool isResource = stream.ReadBool();
-            long offset = (long)stream.ReadBits(23);
-            int compressedSize = (int)stream.ReadBits(24);
-            int filenameOffset = (int)stream.ReadBits(16);
-
-            filenames.Seek(filenameOffset << file.shiftNameAccessBy);
-            String filename = filenames.ReadCString();
 
             if (offset == 0x7FFFFF)
             {
@@ -65,12 +64,13 @@ namespace LibertyV.RPF7.Entries
                 {
                     throw new Exception("Invalid type");
                 }
-                int subentriesStartIndex = stream.ReadInt();
-                int subentriesCount = stream.ReadInt();
+                int subentriesStartIndex = (int)info.Field5;
+                int subentriesCount = (int)info.Field6;
                 List<Entry> entries = new List<Entry>();
                 for (int i = 0; i < subentriesCount; ++i)
                 {
-                    entries.Add(Entry.CreateFromHeader(file.Decrypt(file.Read(0x10 * (i + subentriesStartIndex + 1), 0x10)), file, filenames));
+                    entriesInfo.Seek(0x10 * (i + subentriesStartIndex), SeekOrigin.Begin);
+                    entries.Add(Entry.CreateFromHeader(new Structs.RPF7EntryInfoTemplate(entriesInfo), file, entriesInfo, filenames));
                 }
                 return new DirectoryEntry(filename, entries);
             }
@@ -83,14 +83,14 @@ namespace LibertyV.RPF7.Entries
                 {
                     throw new Exception("Resource with size -1, not supported");
                 }
-                uint systemFlag = (uint)stream.ReadInt();
-                uint graphicsFlag = (uint)stream.ReadInt();
-                return new ResourceEntry(filename, new ResourceFileBuffer(file, offset, compressedSize, systemFlag, graphicsFlag), systemFlag, graphicsFlag);
+                uint systemFlag = info.Field5;
+                uint graphicsFlag = info.Field6;
+                return new ResourceEntry(filename, new ResourceStreamCreator(file, offset, compressedSize, systemFlag, graphicsFlag), systemFlag, graphicsFlag);
             }
 
             // Regular file
-            int uncompressedSize = stream.ReadInt();
-            int isEncrypted = stream.ReadInt();
+            int uncompressedSize = (int)info.Field5;
+            int isEncrypted = (int)info.Field6;
 
             if (compressedSize == 0)
             {
@@ -99,12 +99,12 @@ namespace LibertyV.RPF7.Entries
                 {
                     throw new Exception("Unexcepted value");
                 }
-                return new RegularFileEntry(filename, new FileBuffer(file, offset, uncompressedSize), false);
+                return new RegularFileEntry(filename, new FileStreamCreator(file, offset, uncompressedSize), false);
             }
             else
             {
                 // Compressed file
-                return new RegularFileEntry(filename, new CompressedFileBuffer(file, offset, compressedSize, uncompressedSize, isEncrypted != 0), true);
+                return new RegularFileEntry(filename, new CompressedFileStreamCreator(file, offset, compressedSize, uncompressedSize, isEncrypted != 0), true);
             }
         }
     }

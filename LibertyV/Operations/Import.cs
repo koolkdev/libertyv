@@ -1,6 +1,6 @@
 ﻿/*
  
-    RPF7Viewer - Viewer for RAGE Package File version 7
+    LibertyV - Viewer/Editor for RAGE Package File version 7
     Copyright (C) 2013  koolk <koolkdev at gmail.com>
    
     This program is free software: you can redistribute it and/or modify
@@ -50,7 +50,7 @@ namespace LibertyV.Operations
                 {
                     // TODO: add resources, decide if to compress or not, all by extentions.
                     // Right now all regular files compressed by default
-                    RegularFileEntry addedFile = new RegularFileEntry(Path.GetFileName(file), new ExternalFileBuffer(File.Open(file, FileMode.Open, FileAccess.Read, FileShare.Read)), true);
+                    RegularFileEntry addedFile = new RegularFileEntry(Path.GetFileName(file), new ExternalFileStreamCreator(File.Open(file, FileMode.Open, FileAccess.Read, FileShare.Read)), true);
                     entry.Entries.Add(addedFile);
                     addedFile.Parent = entry;
                     if (entry.FilesListView != null)

@@ -20,37 +20,21 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Windows.Forms;
+using LibertyV.Utils;
 using LibertyV.RPF7.Entries;
 
-namespace LibertyV.Operations
+namespace LibertyV.RPF7
 {
-    public partial class RegularFileProporties : Form
+    public class ResourceStreamCreator : CompressedFileStreamCreator
     {
-        RegularFileEntry Entry;
-        public RegularFileProporties(RegularFileEntry entry)
-        {
-            InitializeComponent();
 
-            this.Entry = entry;
-            this.isCompressedCheckBox.Checked = this.Entry.Compressed;
+        // Ignore first 0x10, it is supposed to be the header, but is it junk since we got all the information that we need about the resource from the flags?
+        public ResourceStreamCreator(RPF7File file, long offset, int compressedSize, uint systemFlag, uint graphicsFlag)
+            : base(file, offset + 0x10, compressedSize - 0x10, (int)(ResourceEntry.GetSizeFromSystemFlag(systemFlag) + ResourceEntry.GetSizeFromGraphicsFlag(graphicsFlag)), ResourceEntry.IsResourceEncrypted(ResourceEntry.GetResourceTypeFromFlags(systemFlag, graphicsFlag)))
+        {
         }
 
-        public new void Close()
-        {
-            this.Entry.Compressed = this.isCompressedCheckBox.Checked;
-
-            base.Close();
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            Close();
-        }
     }
 }
