@@ -30,10 +30,10 @@ using LibertyV.RPF7.Entries;
 
 namespace LibertyV.Operations
 {
-    public partial class RegularFileProporties : Form
+    public partial class RegularFileProperties : Form
     {
         RegularFileEntry Entry;
-        public RegularFileProporties(RegularFileEntry entry)
+        public RegularFileProperties(RegularFileEntry entry)
         {
             InitializeComponent();
 

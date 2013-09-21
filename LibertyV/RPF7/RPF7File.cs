@@ -99,6 +99,7 @@ namespace LibertyV.RPF7
             for (int i = 0; i < 8; ++i)
             {
                 // the multipcation is the maximum number of nulls, TODO: it can be done better, because it is not always the worst case
+                // does the offset should be signed or unsigned? 
                 if (namesLength + entriesNames.Count() * (i + 1) < (1 << (16 + i)))
                 {
                     shiftNameAccessBy = i;

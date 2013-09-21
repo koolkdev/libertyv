@@ -26,17 +26,17 @@ using LibertyV.RPF7.Entries;
 
 namespace LibertyV.Operations
 {
-    static class FileProporties
+    static class FileProperties
     {
-        public static void ShowFileProporties(FileEntry entry)
+        public static void ShowFileProperties(FileEntry entry)
         {
             if (entry.IsRegularFile())
             {
-                new RegularFileProporties(entry as RegularFileEntry).ShowDialog();
+                new RegularFileProperties(entry as RegularFileEntry).ShowDialog();
             }
             else if (entry.IsResource())
             {
-                new ResourceProporties(entry as ResourceEntry).ShowDialog();
+                new ResourceProperties(entry as ResourceEntry).ShowDialog();
             }
             entry.ViewItem.Update();
         }

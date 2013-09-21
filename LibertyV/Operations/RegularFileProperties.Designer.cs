@@ -20,7 +20,7 @@
 
 namespace LibertyV.Operations
 {
-    partial class RegularFileProporties
+    partial class RegularFileProperties
     {
         /// <summary>
         /// Required designer variable.
@@ -72,7 +72,7 @@ namespace LibertyV.Operations
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
-            // RegularFileProporties
+            // RegularFileProperties
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -80,11 +80,11 @@ namespace LibertyV.Operations
             this.ControlBox = false;
             this.Controls.Add(this.button1);
             this.Controls.Add(this.isCompressedCheckBox);
-            this.Name = "RegularFileProporties";
+            this.Name = "RegularFileProperties";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Proporties";
+            this.Text = "Properties";
             this.ResumeLayout(false);
             this.PerformLayout();
 

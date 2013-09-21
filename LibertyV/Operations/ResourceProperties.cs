@@ -30,11 +30,11 @@ using LibertyV.RPF7.Entries;
 
 namespace LibertyV.Operations
 {
-    public partial class ResourceProporties : Form
+    public partial class ResourceProperties : Form
     {
         private ResourceEntry Entry;
 
-        public ResourceProporties(ResourceEntry entry)
+        public ResourceProperties(ResourceEntry entry)
         {
             InitializeComponent();
 

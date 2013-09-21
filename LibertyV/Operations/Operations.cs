@@ -35,7 +35,7 @@ namespace LibertyV.Operations
             {"Export file...", Export.ExportFile},
             {"Rename", Rename.RenameFile, Keys.F2},
             {"Delete", Delete.AskDeleteFile, Keys.Delete},
-            {"Proporties", FileProporties.ShowFileProporties}
+            {"Properties", FileProperties.ShowFileProperties}
         };
 
         public static OperationsList<FileEntry> ShortcutsFileOperations = new OperationsList<FileEntry>(){

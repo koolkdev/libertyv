@@ -20,7 +20,7 @@
 
 namespace LibertyV.Operations
 {
-    partial class ResourceProporties
+    partial class ResourceProperties
     {
         /// <summary>
         /// Required designer variable.
@@ -79,7 +79,7 @@ namespace LibertyV.Operations
             this.typeTextBox.Size = new System.Drawing.Size(47, 20);
             this.typeTextBox.TabIndex = 4;
             // 
-            // ResourceProporties
+            // ResourceProperties
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -88,11 +88,11 @@ namespace LibertyV.Operations
             this.Controls.Add(this.typeTextBox);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.button1);
-            this.Name = "ResourceProporties";
+            this.Name = "ResourceProperties";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Proporties";
+            this.Text = "Properties";
             this.ResumeLayout(false);
             this.PerformLayout();
 
