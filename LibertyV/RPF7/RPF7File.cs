@@ -35,7 +35,7 @@ namespace LibertyV.RPF7
 
         public Structs.RPF7Header Info;
         private bool sixteenRoundsDecrypt;
-        
+
         public Entry Root;
         public String Filename;
 
@@ -53,14 +53,16 @@ namespace LibertyV.RPF7
 
             sixteenRoundsDecrypt = (Info.Flag >> 28) == 0xf;
 
-            using (Stream decryptStream = this.GetDecryptStream(new StreamKeeper(this.Stream)))
+            if (sixteenRoundsDecrypt)
             {
-                using (BinaryReader binaryStream = new BinaryReader(decryptStream))
-                {
-                    MemoryStream entriesInfo = new MemoryStream(binaryStream.ReadBytes(0x10 * Info.EntriesCount));
-                    MemoryStream filenames = new MemoryStream(binaryStream.ReadBytes(Info.EntriesNamesLength));
-                    this.Root = Entry.CreateFromHeader(new Structs.RPF7EntryInfoTemplate(entriesInfo), this, entriesInfo, filenames);
-                }
+                throw new Exception("Needed to be tested first");
+            }
+
+            using (BinaryReader binaryStream = new BinaryReader(AES.DecryptStream(new StreamKeeper(this.Stream), sixteenRoundsDecrypt)))
+            {
+                MemoryStream entriesInfo = new MemoryStream(binaryStream.ReadBytes(0x10 * Info.EntriesCount));
+                MemoryStream filenames = new MemoryStream(binaryStream.ReadBytes(Info.EntriesNamesLength));
+                this.Root = Entry.CreateFromHeader(new Structs.RPF7EntryInfoTemplate(entriesInfo), this, entriesInfo, filenames);
             }
 
 
@@ -70,22 +72,177 @@ namespace LibertyV.RPF7
             }
         }
 
-        public Stream GetDecryptStream(Stream stream)
+        public void Write(Stream stream)
         {
-            return AES.DecryptStream(stream, sixteenRoundsDecrypt);
-        }
+            if (this.Filename == "")
+            {
+                throw new Exception("Can't save");
+            }
+            // Get all the entries
+            List<Entry> entries = new List<Entry>();
+            this.Root.AddToList(entries);
 
-        public Stream GetDecompressStream(Stream stream)
-        {
-            // The compression algorithm is pltaform specified, so it should be here
-            if (GlobalOptions.Platform == GlobalOptions.PlatformType.PLAYSTATION3)
+
+            Dictionary<Entry, Structs.RPF7EntryInfoTemplate> entriesInfo = new Dictionary<Entry, Structs.RPF7EntryInfoTemplate>();
+            foreach (Entry entry in entries)
             {
-                return new DeflateStream(stream, CompressionMode.Decompress);
+                Structs.RPF7EntryInfoTemplate entryInfo = new Structs.RPF7EntryInfoTemplate();
+                // update the is resource field
+                entryInfo.Field1 = (entry is ResourceEntry) ? 1U : 0U;
+                entriesInfo[entry] = entryInfo;
             }
-            else
+
+            IEnumerable<string> entriesNames = entries.Select(entry => entry.Name);
+
+            int namesLength = entriesNames.Sum(name => name.Length);
+            int shiftNameAccessBy = -1;
+            for (int i = 0; i < 8; ++i)
             {
-                return new XMemDecompressStream(stream);
+                // the multipcation is the maximum number of nulls, TODO: it can be done better, because it is not always the worst case
+                if (namesLength + entriesNames.Count() * (i + 1) < (1 << (16 + i)))
+                {
+                    shiftNameAccessBy = i;
+                    break;
+                }
             }
+
+            if (shiftNameAccessBy == -1)
+            {
+                throw new Exception("Too many entries!");
+            }
+
+            int currentPos = 0;
+            // Write the names
+            stream.Seek(currentPos + 0x10 * (entries.Count + 1), SeekOrigin.Begin);
+
+            using (BinaryWriter writer = new BinaryWriter(AES.EncryptStream(new StreamKeeper(stream), sixteenRoundsDecrypt)))
+            {
+                foreach (Entry entry in entries)
+                {
+                    // Update name offset in entry info
+                    Structs.RPF7EntryInfoTemplate entryInfo = entriesInfo[entry];
+                    entryInfo.Field4 = (uint)currentPos;
+                    entriesInfo[entry] = entryInfo;
+                    // write name and null, and keep the position
+                    writer.Write(entry.Name.ToArray<char>());
+                    writer.Write((byte)0);
+                    currentPos += entry.Name.Length + 1;
+                    // Make the next entry alligned
+                    while ((currentPos % (1 << shiftNameAccessBy)) != 0)
+                    {
+                        writer.Write((byte)0);
+                        currentPos += 1;
+                    }
+                }
+                // Align to 0x10 byte
+                while (currentPos % 0x10 != 0)
+                {
+                    writer.Write((byte)0);
+                    currentPos += 1;
+                }
+            }
+
+            // Fill the header
+            Info.EntriesCount = entries.Count;
+            Info.ShiftNameAccessBy = shiftNameAccessBy;
+            Info.EntriesNamesLength = currentPos;
+
+            long[] dataOffsets = new long[entries.Count];
+            long[] dataSizes = new long[entries.Count];
+            // align to 0x200
+            if (stream.Position % (1 << 9) != 0)
+            {
+                stream.Write(new byte[(1 << 9) - ((int)stream.Position % (1 << 9))], 0, (1 << 9) - ((int)stream.Position % (1 << 9)));
+            }
+            // Write data and fill entry info
+            // TODO: I don't like that the reading logic happens in Entry and the writing logic here
+            // I think that I should move the reading logic to here, and split things to functions
+            foreach (Entry entry in entries)
+            {
+                if (entry is FileEntry)
+                {
+                    long entryOffset = stream.Position;
+                    (entry as FileEntry).Write(stream);
+                    int entrySize = (int)(stream.Position - entryOffset);
+                    // align to 0x200
+                    if (stream.Position % (1 << 9) != 0)
+                    {
+                        stream.Write(new byte[(1 << 9) - ((int)stream.Position % (1 << 9))], 0, (1 << 9) - ((int)stream.Position % (1 << 9)));
+                    }
+
+                    // Update the entry offset and entry size
+                    Structs.RPF7EntryInfoTemplate entryInfo = entriesInfo[entry];
+                    entryInfo.Field2 = (uint)((entryOffset >> 9) & 0x7FFFFF);
+
+                    if (entry is ResourceEntry)
+                    {
+                        entryInfo.Field3 = (uint)entrySize & 0xFFFFFF;
+                        entryInfo.Field5 = (entry as ResourceEntry).SystemFlag;
+                        entryInfo.Field6 = (entry as ResourceEntry).GraphicsFlag;
+                    }
+                    else if (entry is RegularFileEntry)
+                    {
+                        if ((entry as RegularFileEntry).Compressed)
+                        {
+                            // The compressed size
+                            entryInfo.Field3 = (uint)entrySize & 0xFFFFFF;
+                            // The uncompress size
+                            entryInfo.Field5 = (uint)(entry as RegularFileEntry).Data.GetSize();
+                            // The is encrypted flag
+                            entryInfo.Field6 = 1;
+                        }
+                        else
+                        {
+                            entryInfo.Field3 = 0;
+                            entryInfo.Field5 = (uint)entrySize;
+                            // The is encrypted flag
+                            entryInfo.Field6 = 0;
+                        }
+                    }
+
+                    entriesInfo[entry] = entryInfo;
+
+                }
+                else
+                {
+                    Structs.RPF7EntryInfoTemplate entryInfo = entriesInfo[entry];
+                    // The offset is "-1" in case of file
+                    entryInfo.Field2 = 0x7FFFFF;
+                    entriesInfo[entry] = entryInfo;
+                }
+            }
+
+            using (Stream writer = AES.EncryptStream(new StreamKeeper(stream), sixteenRoundsDecrypt))
+            {
+                int currentFreeIndex = 1;
+                // Last finish to build and write the file
+                stream.Seek(0, SeekOrigin.Begin);
+                Info.Write(stream);
+                Queue<Entry> entriesToProcess = new Queue<Entry>();
+                entriesToProcess.Enqueue(this.Root);
+                while (entriesToProcess.Count > 0)
+                {
+                    Entry entry = entriesToProcess.Dequeue();
+                    if (entry is DirectoryEntry)
+                    {
+                        Structs.RPF7EntryInfoTemplate entryInfo = entriesInfo[entry];
+                        List<Entry> subentries = (entry as DirectoryEntry).Entries;
+                        // Update the info on the sub entries
+                        entryInfo.Field5 = (uint)currentFreeIndex;
+                        entryInfo.Field6 = (uint)subentries.Count;
+                        entriesInfo[entry] = entryInfo;
+                        // Process the sub entries
+                        foreach (Entry subentry in subentries)
+                        {
+                            entriesToProcess.Enqueue(subentry);
+                        }
+                        currentFreeIndex += subentries.Count;
+                    }
+                    // Write the entry info
+                    entriesInfo[entry].Write(writer);
+                }
+            }
+            // Done!
         }
     }
 }

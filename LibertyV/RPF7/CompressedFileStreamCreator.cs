@@ -30,7 +30,7 @@ namespace LibertyV.RPF7
     public class CompressedFileStreamCreator : FileStreamCreator
     {
         private int UncompressedSize;
-        private bool Encrypted;
+        public bool Encrypted;
 
         public CompressedFileStreamCreator(RPF7File file, long offset, int compressedSize, int uncompressedSize, bool encrypted = true)
             : base(file, offset, compressedSize)
@@ -42,9 +42,9 @@ namespace LibertyV.RPF7
         public override Stream GetStream()
         {
             if (this.Encrypted) {
-                return this.File.GetDecompressStream(this.File.GetDecryptStream(base.GetStream()));
+                return Platform.GetDecompressStream(AES.DecryptStream(base.GetStream()));
             } else {
-                return this.File.GetDecompressStream(base.GetStream());
+                return Platform.GetDecompressStream(base.GetStream());
             }
         }
 

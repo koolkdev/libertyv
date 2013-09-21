@@ -55,5 +55,14 @@ namespace LibertyV.RPF7.Entries
                 entry.Export(subfolder);
             }
         }
+
+        public override void AddToList(List<Entry> entryList)
+        {
+            base.AddToList(entryList);
+            foreach (Entry entry in this.Entries)
+            {
+                entry.AddToList(entryList);
+            }
+        }
     }
 }

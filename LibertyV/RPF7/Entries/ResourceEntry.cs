@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using LibertyV.Utils;
 
 namespace LibertyV.RPF7.Entries
 {
@@ -30,7 +31,7 @@ namespace LibertyV.RPF7.Entries
     {
         public uint SystemFlag;
         public uint GraphicsFlag;
-        public int Type 
+        public int Type
         {
             set
             {
@@ -39,7 +40,8 @@ namespace LibertyV.RPF7.Entries
                 GraphicsFlag &= 0x0fffffff;
                 GraphicsFlag |= ((uint)value & 0xf) << 28;
             }
-            get {
+            get
+            {
                 return GetResourceTypeFromFlags(this.SystemFlag, this.GraphicsFlag);
             }
         }
@@ -66,23 +68,48 @@ namespace LibertyV.RPF7.Entries
             this.GraphicsFlag = graphicsFlag;
         }
 
+        public override void Write(Stream stream)
+        {
+            // 0x10 ignored bytes
+            stream.Write(new byte[0x10], 0, 0x10);
+            // optimization: Check if we have the data from the original file, and we don't need to encrypt and compress it again
+            if (this.Data.GetType() == typeof(CompressedFileStreamCreator) && (this.Data as CompressedFileStreamCreator).Encrypted == IsResourceEncrypted(this.Type))
+            {
+                (this.Data as CompressedFileStreamCreator).WriteRaw(stream);
+            }
+            else
+            {
+                // we need to create it..
+                Stream baseStream = new StreamKeeper(stream);
+                using (Stream input = this.Data.GetStream())
+                {
+                    using (Stream output = IsResourceEncrypted(this.Type) ? Platform.GetCompressStream(AES.EncryptStream(baseStream)) : Platform.GetCompressStream(baseStream))
+                    {
+                        input.CopyTo(output);
+                    }
+                }
+            }
+        }
+
         public override void Export(String foldername)
         {
             // TODO: Multiplie option on how to extract
-            Stream stream = this.Data.GetStream();
-            if (this.SystemSize != 0)
+            using (Stream stream = this.Data.GetStream())
             {
-                using (FileStream file = File.OpenWrite(Path.Combine(foldername, this.Name + ".sys")))
+                if (this.SystemSize != 0)
                 {
-                    stream.CopyTo(file, this.SystemSize);
+                    using (FileStream file = File.Create(Path.Combine(foldername, this.Name + ".sys")))
+                    {
+                        stream.CopyToCount(file, this.SystemSize);
+                    }
                 }
-            }
 
-            if (this.GraphicSize != 0)
-            {
-                using (FileStream file = File.OpenWrite(Path.Combine(foldername, this.Name + ".gfx")))
+                if (this.GraphicSize != 0)
                 {
-                    stream.CopyTo(file, this.GraphicSize);
+                    using (FileStream file = File.Create(Path.Combine(foldername, this.Name + ".gfx")))
+                    {
+                        stream.CopyToCount(file, this.GraphicSize);
+                    }
                 }
             }
         }
@@ -92,19 +119,20 @@ namespace LibertyV.RPF7.Entries
             return (num >> 3) | ((num >> 1) & 2) | ((num & 2) << 1) | ((num & 1) << 3);
         }
 
-        static public int GetSizeFromFlag(uint flag, int baseSize) 
+        static public int GetSizeFromFlag(uint flag, int baseSize)
         {
             baseSize <<= (int)(flag & 0xf);
             int size = (int)((((flag >> 17) & 0x7f) + (((flag >> 11) & 0x3f) << 1) + (((flag >> 7) & 0xf) << 2) + (((flag >> 5) & 0x3) << 3) + (((flag >> 4) & 0x1) << 4)) * baseSize);
-            for (int i = 0; i < 4; ++i) {
+            for (int i = 0; i < 4; ++i)
+            {
                 size += (((flag >> (24 + i)) & 1) == 1) ? (baseSize >> (1 + i)) : 0;
             }
-            return  size;
+            return size;
         }
 
         static public int GetSizeFromSystemFlag(uint flag)
         {
-            if (GlobalOptions.Platform == GlobalOptions.PlatformType.PLAYSTATION3)
+            if (GlobalOptions.Platform == Platform.PlatformType.PLAYSTATION3)
             {
                 return GetSizeFromFlag(flag, 0x1000);
             }
@@ -116,7 +144,7 @@ namespace LibertyV.RPF7.Entries
 
         static public int GetSizeFromGraphicsFlag(uint flag)
         {
-            if (GlobalOptions.Platform == GlobalOptions.PlatformType.PLAYSTATION3)
+            if (GlobalOptions.Platform == Platform.PlatformType.PLAYSTATION3)
             {
                 return GetSizeFromFlag(flag, 0x1580);
             }
@@ -125,8 +153,8 @@ namespace LibertyV.RPF7.Entries
                 return GetSizeFromFlag(flag, 0x2000);
             }
         }
-        
-        static public int GetResourceTypeFromFlags(uint systemFlag, uint graphicsFlag) 
+
+        static public int GetResourceTypeFromFlags(uint systemFlag, uint graphicsFlag)
         {
             return (int)(((graphicsFlag >> 28) & 0xF) | (((systemFlag >> 28) & 0xF) << 4));
         }

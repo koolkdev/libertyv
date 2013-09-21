@@ -398,5 +398,31 @@ namespace LibertyV
         }
 
         #endregion
+
+        private void saveButton_Click(object sender, EventArgs e)
+        {
+            if (this.File == null)
+            {
+                MessageBox.Show("Please load an rpf first");
+            }
+        }
+
+        private void saveAsButton_Click(object sender, EventArgs e)
+        {
+            if (this.File == null)
+            {
+                MessageBox.Show("Please open a file first.");
+                return;
+            }
+            string result = GUI.FileSaveSelection(Path.GetFileName(this.File.Filename));
+            if (result == null)
+            {
+                return;
+            }
+            using (FileStream file = System.IO.File.Create(result))
+            {
+                this.File.Write(file);
+            }
+        }
     }
 }

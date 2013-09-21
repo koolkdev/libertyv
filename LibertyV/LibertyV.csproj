@@ -69,6 +69,7 @@
       <DependentUpon>RegularFileProperties.cs</DependentUpon>
     </Compile>
     <Compile Include="Operations\Rename.cs" />
+    <Compile Include="Platform.cs" />
     <Compile Include="PlatformSelection.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -98,6 +99,7 @@
     <Compile Include="RPF7\IStreamCreator.cs" />
     <Compile Include="EntryTreeNode.cs" />
     <Compile Include="RPF7\Structs.cs" />
+    <Compile Include="Utils\StreamExtension.cs" />
     <Compile Include="Utils\AES.cs" />
     <Compile Include="RPF7\Entries\Entry.cs" />
     <Compile Include="RPF7\RPF7File.cs" />
@@ -142,9 +144,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\save.bmp" />
     <None Include="Resources\open.bmp" />
     <Content Include="liberty_v_logo.ico" />
+    <None Include="Resources\save.bmp" />
+    <None Include="Resources\saveas.bmp" />
     <Content Include="xcompress.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

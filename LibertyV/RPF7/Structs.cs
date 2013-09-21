@@ -48,7 +48,7 @@ namespace LibertyV.RPF7
             {
                 Magic = new char[] { 'R', 'P', 'F', '7' };
                 EntriesCount = entriesCount;
-                if (GlobalOptions.Platform == GlobalOptions.PlatformType.PLAYSTATION3)
+                if (GlobalOptions.Platform == Platform.PlatformType.PLAYSTATION3)
                 {
                     PlatformBit = 0;
                 }

@@ -22,12 +22,30 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 
-namespace LibertyV
+namespace LibertyV.Utils
 {
-    static class GlobalOptions
+    static class StreamExtension
     {
-        static public Platform.PlatformType Platform = 0;
-
+        public static void CopyToCount(this Stream stream, Stream output, int count)
+        {
+            byte[] buffer = new byte[32768];
+            int read = buffer.Length;
+            if (read > count)
+            {
+                read = count;
+            }
+            while (read > 0 && (read = stream.Read(buffer, 0, read)) > 0)
+            {
+                output.Write(buffer, 0, read);
+                count -= read;
+                read = buffer.Length;
+                if (read > count)
+                {
+                    read = count;
+                }
+            }
+        }
     }
 }

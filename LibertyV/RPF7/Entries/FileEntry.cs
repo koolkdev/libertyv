@@ -37,6 +37,13 @@ namespace LibertyV.RPF7.Entries
             this.Data = data;
         }
 
+        public virtual void Write(Stream stream)
+        {
+            using (Stream s = this.Data.GetStream()) {
+                s.CopyTo(stream);
+            }
+        }
+
         public override void Export(String path)
         {
             string filename;
@@ -49,9 +56,12 @@ namespace LibertyV.RPF7.Entries
                 filename = path;
             }
 
-            using (FileStream file = File.OpenWrite(filename))
+            using (FileStream file = File.Create(filename))
             {
-                this.Data.GetStream().CopyTo(file);
+                using (Stream stream = this.Data.GetStream())
+                {
+                    stream.CopyTo(file);
+                }
             }
         }
 

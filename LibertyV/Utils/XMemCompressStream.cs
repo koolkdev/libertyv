@@ -83,14 +83,7 @@ namespace LibertyV.Utils
                 throw new Exception("XMemCreateCompressionContext failed");
             }
 
-            if (stream.CanSeek)
-            {
-                tempStream = new MemoryStream((int)stream.Length);
-            }
-            else
-            {
-                tempStream = new MemoryStream();
-            }
+            tempStream = new MemoryStream();
         }
 
         public override bool CanRead
@@ -245,11 +238,11 @@ namespace LibertyV.Utils
 
         protected override void Dispose(bool disposing)
         {
+            FlushStream();
             if (disposing)
             {
                 _stream.Close();
             }
-            FlushStream();
             if (_context != IntPtr.Zero)
             {
                 XMemDestroyCompressionContext(_context);

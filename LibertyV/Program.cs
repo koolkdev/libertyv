@@ -40,7 +40,8 @@ namespace LibertyV
 
             new PlatformSelection().ShowDialog();
 
-            if (GlobalOptions.Platform == GlobalOptions.PlatformType.NONE) {
+            if (GlobalOptions.Platform == Platform.PlatformType.NONE)
+            {
                 return;
             }
 
@@ -55,7 +56,7 @@ namespace LibertyV
             string keyMD5 = BitConverter.ToString(new System.Security.Cryptography.MD5CryptoServiceProvider().ComputeHash(AES.Key)).Replace("-", "");
 
             // check if md5 of key is one of the known keys
-            if (GlobalOptions.Platform == GlobalOptions.PlatformType.XBOX360)
+            if (GlobalOptions.Platform == Platform.PlatformType.XBOX360)
             {
                 if (keyMD5 != "ead1ea1a3870557b424bc8cf73f51018".ToUpper())
                 {
@@ -64,7 +65,7 @@ namespace LibertyV
                 }
             }
 
-            if (GlobalOptions.Platform == GlobalOptions.PlatformType.PLAYSTATION3)
+            if (GlobalOptions.Platform == Platform.PlatformType.PLAYSTATION3)
             {
                 if (keyMD5 != "1df41d237d8056ec87a5bc71925c4cde".ToUpper())
                 {

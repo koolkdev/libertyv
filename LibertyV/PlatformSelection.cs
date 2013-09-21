@@ -38,13 +38,13 @@ namespace LibertyV
 
         private void xboxSelect_Click(object sender, EventArgs e)
         {
-            GlobalOptions.Platform = GlobalOptions.PlatformType.XBOX360;
+            GlobalOptions.Platform = Platform.PlatformType.XBOX360;
             Close();
         }
 
         private void playstationSelect_Click(object sender, EventArgs e)
         {
-            GlobalOptions.Platform = GlobalOptions.PlatformType.PLAYSTATION3;
+            GlobalOptions.Platform = Platform.PlatformType.PLAYSTATION3;
             Close();
         }
 

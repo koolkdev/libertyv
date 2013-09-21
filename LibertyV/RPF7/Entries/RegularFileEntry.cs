@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using LibertyV.Utils;
 
 namespace LibertyV.RPF7.Entries
 {
@@ -36,5 +37,29 @@ namespace LibertyV.RPF7.Entries
             this.Compressed = compressed;
         }
 
+        public override void Write(Stream stream)
+        {
+            // optimization: Check if we have the data from the original file, and we don't need to encrypt and compress it again
+            if (this.Compressed && this.Data.GetType() == typeof(CompressedFileStreamCreator))
+            {
+                (this.Data as CompressedFileStreamCreator).WriteRaw(stream);
+            }
+            else if (!this.Compressed && this.Data.GetType() == typeof(FileStreamCreator))
+            {
+                (this.Data as FileStreamCreator).WriteRaw(stream);
+            }
+            else
+            {
+                // we need to create it..
+                Stream baseStream = new StreamKeeper(stream);
+                using (Stream input = this.Data.GetStream())
+                {
+                    using (Stream output = this.Compressed ? Platform.GetCompressStream(AES.EncryptStream(baseStream)) : baseStream)
+                    {
+                        input.CopyTo(output);
+                    }
+                }
+            }
+        }
     }
 }

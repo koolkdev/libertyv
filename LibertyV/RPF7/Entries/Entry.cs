@@ -40,6 +40,11 @@ namespace LibertyV.RPF7.Entries
         {
             throw new Exception("Not implemented"); 
         }
+
+        public virtual void AddToList(List<Entry> entryList)
+        {
+            entryList.Add(this);
+        }
      
         public static Entry CreateFromHeader(Structs.RPF7EntryInfoTemplate info, RPF7File file, MemoryStream entriesInfo, MemoryStream filenames)
         {
@@ -51,10 +56,14 @@ namespace LibertyV.RPF7.Entries
             filenames.Seek(filenameOffset << file.Info.ShiftNameAccessBy, SeekOrigin.Begin);
             String filename = "";
             // Read null-terminated filename
-            char currentChar;
-            while ((currentChar = (char)filenames.ReadByte()) != 0)
+            int currentChar;
+            while ((currentChar = filenames.ReadByte()) != 0)
             {
-                filename += currentChar;
+                if (currentChar == -1)
+                {
+                    throw new Exception("Unexpected EOF");
+                }
+                filename += (char)currentChar;
             }
 
             if (offset == 0x7FFFFF)

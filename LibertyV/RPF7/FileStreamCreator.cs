@@ -49,5 +49,14 @@ namespace LibertyV.RPF7
         {
             return this.Size;
         }
+
+        public void WriteRaw(Stream stream)
+        {
+            // Write the original data
+            using (Stream input = new PartialStream(this.File.Stream, this.Offset, this.Size))
+            {
+                input.CopyTo(stream);
+            }
+        }
     }
 }

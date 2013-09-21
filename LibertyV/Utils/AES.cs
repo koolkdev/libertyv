@@ -77,7 +77,9 @@ namespace LibertyV.Utils
                 {
                     throw new Exception("Unexpected value");
                 }
-                return inputBuffer;
+                byte[] result = new byte[inputCount];
+                Buffer.BlockCopy(inputBuffer, 0, result, 0, inputCount);
+                return result;
             }
 
             public override IMessage Invoke(IMessage msg)
@@ -129,7 +131,7 @@ namespace LibertyV.Utils
             aes.KeySize = 256;
             aes.Key = AES.Key;
             aes.Mode = CipherMode.ECB;
-            aes.Padding = PaddingMode.Zeros;
+            aes.Padding = PaddingMode.None;
             decryptor = CryptoTransformProxy.Create(aes.CreateDecryptor());
             decryptor16 = CryptoTransformProxy.Create(aes.CreateDecryptor(), true);
             encryptor = CryptoTransformProxy.Create(aes.CreateEncryptor());
