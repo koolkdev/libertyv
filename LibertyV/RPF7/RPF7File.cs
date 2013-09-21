@@ -226,7 +226,7 @@ namespace LibertyV.RPF7
                     if (entry is DirectoryEntry)
                     {
                         Structs.RPF7EntryInfoTemplate entryInfo = entriesInfo[entry];
-                        List<Entry> subentries = (entry as DirectoryEntry).Entries;
+                        IList<Entry> subentries = (entry as DirectoryEntry).GetEntries();
                         // Update the info on the sub entries
                         entryInfo.Field5 = (uint)currentFreeIndex;
                         entryInfo.Field6 = (uint)subentries.Count;

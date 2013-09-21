@@ -32,10 +32,9 @@ namespace LibertyV.Operations
         {
             string name = "New Folder";
             int i = 1;
-            for (; entry.Entries.Any(e => e.Name == name); ++i, name = String.Format("New Folder ({0})", i));
+            for (; entry.GetEntries().Any(e => e.Name == name); ++i, name = String.Format("New Folder ({0})", i)) ;
             DirectoryEntry addedFolder = new DirectoryEntry(name, new List<Entry>());
-            entry.Entries.Add(addedFolder);
-            addedFolder.Parent = entry;
+            entry.AddEntry(addedFolder);
             entry.Node.Nodes.Add(new EntryTreeNode(addedFolder, new EntryTreeNode[]{}));
             if (!entry.Node.IsExpanded)
             {

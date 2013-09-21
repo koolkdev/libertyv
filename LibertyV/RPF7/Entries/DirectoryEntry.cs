@@ -29,18 +29,34 @@ namespace LibertyV.RPF7.Entries
 {
     public class DirectoryEntry : Entry
     {
-        public List<Entry> Entries;
+        private SortedList<string, Entry> Entries;
         public EntryTreeNode Node = null;
         public System.Windows.Forms.ListView FilesListView = null; 
 
         public DirectoryEntry(String filename, List<Entry> entries) : base(filename)
         {
-            this.Entries = entries;
-            foreach (Entry entry in this.Entries) {
+            this.Entries = new SortedList<string, Entry>();
+            foreach (Entry entry in entries) {
+                this.Entries.Add(entry.Name, entry);
                 entry.Parent = this;
             }
         }
 
+        public IList<Entry> GetEntries()
+        {
+            return Entries.Values;
+        }
+
+        public void AddEntry(Entry entry)
+        {
+            Entries.Add(entry.Name, entry);
+            entry.Parent = this;
+        }
+
+        public void RemoveEntry(Entry entry)
+        {
+            Entries.Remove(entry.Name);
+        }
         public bool IsRoot()
         {
             return Parent == null;
@@ -50,7 +66,7 @@ namespace LibertyV.RPF7.Entries
         {
             String subfolder = Path.Combine(foldername, this.Name);
             Directory.CreateDirectory(subfolder);
-            foreach (Entry entry in this.Entries)
+            foreach (Entry entry in this.Entries.Values)
             {
                 entry.Export(subfolder);
             }
@@ -59,7 +75,7 @@ namespace LibertyV.RPF7.Entries
         public override void AddToList(List<Entry> entryList)
         {
             base.AddToList(entryList);
-            foreach (Entry entry in this.Entries)
+            foreach (Entry entry in this.Entries.Values)
             {
                 entry.AddToList(entryList);
             }

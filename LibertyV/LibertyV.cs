@@ -35,6 +35,14 @@ namespace LibertyV
 {
     public partial class LibertyV : Form
     {
+        private class NodeSorter : System.Collections.IComparer
+        {
+            public int Compare(object x, object y)
+            {
+                return (x as TreeNode).Text.CompareTo((y as TreeNode).Text);
+            }
+        }
+
         public RPF7File File = null;
         public LibertyV(RPF7File rpf = null)
         {
@@ -43,6 +51,9 @@ namespace LibertyV
             filesList.Columns.Add("Name", 300);
             filesList.Columns.Add("Size", 100);
             filesList.Columns.Add("Resource Type", 100);
+
+            Comparison<TreeNode> treeSorter = (x, y) => x.Name.CompareTo(y.Name);
+            filesTree.TreeViewNodeSorter = new NodeSorter();
 
             if (rpf != null)
             {
@@ -71,7 +82,7 @@ namespace LibertyV
         public static EntryTreeNode GetTreeNodes(DirectoryEntry entry)
         {
             List<EntryTreeNode> children = new List<EntryTreeNode>();
-            foreach (Entry childEntry in entry.Entries)
+            foreach (Entry childEntry in entry.GetEntries())
             {
                 if (childEntry is DirectoryEntry)
                 {
@@ -103,7 +114,7 @@ namespace LibertyV
 
                 if (filesTree.SelectedNode != null)
                 {
-                    foreach (Entry entry in (filesTree.SelectedNode as EntryTreeNode).Entry.Entries)
+                    foreach (Entry entry in (filesTree.SelectedNode as EntryTreeNode).Entry.GetEntries())
                     {
                         if (entry is FileEntry) {
                             filesList.Items.Add(new EntryListViewItem(entry as FileEntry));
@@ -121,7 +132,7 @@ namespace LibertyV
                 // find the changes
                 foreach (EntryListViewItem item in filesList.Items) 
                 {
-                    if (!(filesTree.SelectedNode as EntryTreeNode).Entry.Entries.Any(entry => entry == item.Entry))
+                    if (!(filesTree.SelectedNode as EntryTreeNode).Entry.GetEntries().Any(entry => entry == item.Entry))
                     {
                         filesList.Items.Remove(item);
                     }
@@ -131,7 +142,7 @@ namespace LibertyV
                         seenItems.Add(item.Entry.Name);
                     }
                 }
-                foreach (Entry entry in (filesTree.SelectedNode as EntryTreeNode).Entry.Entries)
+                foreach (Entry entry in (filesTree.SelectedNode as EntryTreeNode).Entry.GetEntries())
                 {
                     if (entry is FileEntry)
                     {
@@ -278,7 +289,7 @@ namespace LibertyV
             {
                 // do nothing
             }
-            else if (entryItem.Entry.Parent.Entries.Any(entry => entry.Name == e.Label))
+            else if (entryItem.Entry.Parent.GetEntries().Any(entry => entry.Name == e.Label))
             {
                 MessageBox.Show("Name already used.");
                 e.CancelEdit = true;
@@ -286,6 +297,12 @@ namespace LibertyV
             else
             {
                 entryItem.Entry.Name = e.Label;
+            }
+            if (!e.CancelEdit)
+            {
+                e.Node.Text = e.Label;
+                filesTree.Sort();
+                e.CancelEdit = true;
             }
         }
 
@@ -386,7 +403,7 @@ namespace LibertyV
             {
                 // do nothing
             }
-            else if (entryItem.Entry.Parent.Entries.Any(entry => entry.Name == e.Label))
+            else if (entryItem.Entry.Parent.GetEntries().Any(entry => entry.Name == e.Label))
             {
                 MessageBox.Show("Name already used.");
                 e.CancelEdit = true;
@@ -394,6 +411,12 @@ namespace LibertyV
             else
             {
                 entryItem.Entry.Name = e.Label;
+            }
+            if (!e.CancelEdit)
+            {
+                entryItem.Update();
+                filesList.Sort();
+                e.CancelEdit = true;
             }
         }
 
