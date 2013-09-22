@@ -22,22 +22,41 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using LibertyV.RPF.V7.Entries;
+using System.IO;
+using LibertyV.Utils;
 
-namespace LibertyV.Operations
+namespace LibertyV.RPF
 {
-    static class Rename
+    public class FileStreamCreator : IStreamCreator
     {
-        public static void RenameFile(FileEntry entry)
+        private long Offset;
+        private int Size;
+        protected Stream FileStream;
+
+        public FileStreamCreator(Stream fileStream, long offset, int size)
         {
-            entry.ViewItem.ListView.LabelEdit = true;
-            entry.ViewItem.BeginEdit();
+            this.FileStream = fileStream;
+            this.Offset = offset;
+            this.Size = size;
         }
 
-        public static void RenameFolder(DirectoryEntry entry)
+        public virtual Stream GetStream()
         {
-            entry.Node.TreeView.LabelEdit = true;
-            entry.Node.BeginEdit();
+            return new PartialStream(this.FileStream, this.Offset, this.Size);
+        }
+
+        public virtual int GetSize()
+        {
+            return this.Size;
+        }
+
+        public void WriteRaw(Stream stream)
+        {
+            // Write the original data
+            using (Stream input = new PartialStream(this.FileStream, this.Offset, this.Size))
+            {
+                input.CopyTo(stream);
+            }
         }
     }
 }

@@ -23,7 +23,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using LibertyV.RPF7.Entries;
+using LibertyV.RPF.V7.Entries;
 
 namespace LibertyV
 {

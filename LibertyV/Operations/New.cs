@@ -22,7 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using LibertyV.RPF7.Entries;
+using LibertyV.RPF.V7.Entries;
 
 namespace LibertyV.Operations
 {

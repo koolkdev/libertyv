@@ -27,6 +27,7 @@ namespace LibertyV
 {
     static class GlobalOptions
     {
+
         static public Platform.PlatformType Platform = 0;
 
     }

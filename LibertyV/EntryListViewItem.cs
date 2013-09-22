@@ -23,7 +23,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using LibertyV.RPF7.Entries;
+using LibertyV.RPF.V7.Entries;
 
 namespace LibertyV
 {
@@ -46,7 +46,7 @@ namespace LibertyV
 
             if (this.Entry is ResourceEntry)
             {
-                this.SubItems.Add((this.Entry as ResourceEntry).Type.ToString());
+                this.SubItems.Add((this.Entry as ResourceEntry).Version.ToString());
             }
         }
     }

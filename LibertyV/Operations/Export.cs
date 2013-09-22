@@ -22,7 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using LibertyV.RPF7.Entries;
+using LibertyV.RPF.V7.Entries;
 using LibertyV.Utils;
 
 namespace LibertyV.Operations
@@ -33,7 +33,8 @@ namespace LibertyV.Operations
         public static void ExportFile(FileEntry entry)
         {
             string selectedFilename;
-            if (entry is ResourceEntry)
+            // Open a folder selection instead of file selection only if there is need to.
+            if (entry is ResourceEntry && Properties.Settings.Default.ExportResourcesChoice == Settings.ExportResourcesChoice.SYSGFX && ((ResourceEntry)entry).GraphicSize > 0)
             {
                 selectedFilename = GUI.FolderSelection();
             }

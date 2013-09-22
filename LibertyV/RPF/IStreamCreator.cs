@@ -22,22 +22,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using LibertyV.RPF.V7.Entries;
+using System.IO;
 
-namespace LibertyV.Operations
+namespace LibertyV.RPF
 {
-    static class Rename
+    public interface IStreamCreator
     {
-        public static void RenameFile(FileEntry entry)
-        {
-            entry.ViewItem.ListView.LabelEdit = true;
-            entry.ViewItem.BeginEdit();
-        }
-
-        public static void RenameFolder(DirectoryEntry entry)
-        {
-            entry.Node.TreeView.LabelEdit = true;
-            entry.Node.BeginEdit();
-        }
+        Stream GetStream();
+        int GetSize();
     }
 }

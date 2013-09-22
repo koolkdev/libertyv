@@ -22,5 +22,17 @@ namespace LibertyV.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public global::LibertyV.Settings.ExportResourcesChoice ExportResourcesChoice {
+            get {
+                return ((global::LibertyV.Settings.ExportResourcesChoice)(this["ExportResourcesChoice"]));
+            }
+            set {
+                this["ExportResourcesChoice"] = value;
+            }
+        }
     }
 }

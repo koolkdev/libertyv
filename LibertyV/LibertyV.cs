@@ -26,8 +26,8 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using LibertyV.RPF7;
-using LibertyV.RPF7.Entries;
+using LibertyV.RPF.V7;
+using LibertyV.RPF.V7.Entries;
 using System.IO;
 using LibertyV.Utils;
 
@@ -446,6 +446,11 @@ namespace LibertyV
             {
                 this.File.Write(file);
             }
+        }
+
+        private void settingsButton_Click(object sender, EventArgs e)
+        {
+            new Settings.Settings().ShowDialog();
         }
     }
 }

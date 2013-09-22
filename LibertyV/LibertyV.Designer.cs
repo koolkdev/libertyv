@@ -53,15 +53,16 @@ namespace LibertyV
             this.filesTreeContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.filesListContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolbar = new System.Windows.Forms.ToolStrip();
+            this.fileOpenButton = new System.Windows.Forms.ToolStripButton();
+            this.saveButton = new System.Windows.Forms.ToolStripButton();
+            this.saveAsButton = new System.Windows.Forms.ToolStripButton();
+            this.settingsButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.exportAllButton = new System.Windows.Forms.ToolStripButton();
             this.exportSelectedButton = new System.Windows.Forms.ToolStripButton();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.filesTree = new System.Windows.Forms.TreeView();
             this.filesList = new System.Windows.Forms.ListView();
-            this.fileOpenButton = new System.Windows.Forms.ToolStripButton();
-            this.saveButton = new System.Windows.Forms.ToolStripButton();
-            this.saveAsButton = new System.Windows.Forms.ToolStripButton();
             this.toolbar.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -90,6 +91,7 @@ namespace LibertyV
             this.fileOpenButton,
             this.saveButton,
             this.saveAsButton,
+            this.settingsButton,
             this.toolStripSeparator1,
             this.exportAllButton,
             this.exportSelectedButton});
@@ -98,6 +100,48 @@ namespace LibertyV
             this.toolbar.Size = new System.Drawing.Size(776, 54);
             this.toolbar.TabIndex = 2;
             this.toolbar.Text = "toolbar";
+            // 
+            // fileOpenButton
+            // 
+            this.fileOpenButton.Image = ((System.Drawing.Image)(resources.GetObject("fileOpenButton.Image")));
+            this.fileOpenButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.fileOpenButton.Name = "fileOpenButton";
+            this.fileOpenButton.Size = new System.Drawing.Size(40, 51);
+            this.fileOpenButton.Text = "Open";
+            this.fileOpenButton.TextDirection = System.Windows.Forms.ToolStripTextDirection.Horizontal;
+            this.fileOpenButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.fileOpenButton.Click += new System.EventHandler(this.fileOpenButton_Click);
+            // 
+            // saveButton
+            // 
+            this.saveButton.Enabled = false;
+            this.saveButton.Image = ((System.Drawing.Image)(resources.GetObject("saveButton.Image")));
+            this.saveButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.saveButton.Name = "saveButton";
+            this.saveButton.Size = new System.Drawing.Size(36, 51);
+            this.saveButton.Text = "Save";
+            this.saveButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.saveButton.Click += new System.EventHandler(this.saveButton_Click);
+            // 
+            // saveAsButton
+            // 
+            this.saveAsButton.Image = global::LibertyV.Properties.Resources.saveas;
+            this.saveAsButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.saveAsButton.Name = "saveAsButton";
+            this.saveAsButton.Size = new System.Drawing.Size(55, 51);
+            this.saveAsButton.Text = "Save as..";
+            this.saveAsButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.saveAsButton.Click += new System.EventHandler(this.saveAsButton_Click);
+            // 
+            // settingsButton
+            // 
+            this.settingsButton.Image = global::LibertyV.Properties.Resources.preferences;
+            this.settingsButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.settingsButton.Name = "settingsButton";
+            this.settingsButton.Size = new System.Drawing.Size(53, 51);
+            this.settingsButton.Text = "Settings";
+            this.settingsButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.settingsButton.Click += new System.EventHandler(this.settingsButton_Click);
             // 
             // toolStripSeparator1
             // 
@@ -173,38 +217,6 @@ namespace LibertyV
             this.filesList.KeyDown += new System.Windows.Forms.KeyEventHandler(this.filesList_KeyDown);
             this.filesList.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.filesList_DoubleClick);
             // 
-            // fileOpenButton
-            // 
-            this.fileOpenButton.Image = ((System.Drawing.Image)(resources.GetObject("fileOpenButton.Image")));
-            this.fileOpenButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.fileOpenButton.Name = "fileOpenButton";
-            this.fileOpenButton.Size = new System.Drawing.Size(40, 51);
-            this.fileOpenButton.Text = "Open";
-            this.fileOpenButton.TextDirection = System.Windows.Forms.ToolStripTextDirection.Horizontal;
-            this.fileOpenButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-            this.fileOpenButton.Click += new System.EventHandler(this.fileOpenButton_Click);
-            // 
-            // saveButton
-            // 
-            this.saveButton.Enabled = false;
-            this.saveButton.Image = global::LibertyV.Properties.Resources.save;
-            this.saveButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.saveButton.Name = "saveButton";
-            this.saveButton.Size = new System.Drawing.Size(36, 51);
-            this.saveButton.Text = "Save";
-            this.saveButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-            this.saveButton.Click += new System.EventHandler(this.saveButton_Click);
-            // 
-            // saveAsButton
-            // 
-            this.saveAsButton.Image = global::LibertyV.Properties.Resources.saveas;
-            this.saveAsButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.saveAsButton.Name = "saveAsButton";
-            this.saveAsButton.Size = new System.Drawing.Size(55, 51);
-            this.saveAsButton.Text = "Save as..";
-            this.saveAsButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-            this.saveAsButton.Click += new System.EventHandler(this.saveAsButton_Click);
-            // 
             // LibertyV
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -240,6 +252,7 @@ namespace LibertyV
         private System.Windows.Forms.ListView filesList;
         private System.Windows.Forms.ToolStripButton saveButton;
         private System.Windows.Forms.ToolStripButton saveAsButton;
+        private System.Windows.Forms.ToolStripButton settingsButton;
     }
 }
 

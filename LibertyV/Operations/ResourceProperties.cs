@@ -26,7 +26,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using LibertyV.RPF7.Entries;
+using LibertyV.RPF.V7.Entries;
 
 namespace LibertyV.Operations
 {
@@ -39,7 +39,7 @@ namespace LibertyV.Operations
             InitializeComponent();
 
             this.Entry = entry;
-            this.typeTextBox.Text = entry.Type.ToString();
+            this.typeTextBox.Text = entry.Version.ToString();
         }
 
         public new void Close()
@@ -50,7 +50,7 @@ namespace LibertyV.Operations
                 MessageBox.Show("Invalid type (must be 0-256)");
                 return;
             }
-            Entry.Type = newType;
+            Entry.Version = newType;
 
             base.Close();
         }

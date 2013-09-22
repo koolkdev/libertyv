@@ -22,22 +22,35 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using LibertyV.RPF.V7.Entries;
+using LibertyV.Utils;
+using System.IO;
 
-namespace LibertyV.Operations
+namespace LibertyV.RPF
 {
-    static class Rename
+    public class CompressedFileStreamCreator : FileStreamCreator
     {
-        public static void RenameFile(FileEntry entry)
+        private int UncompressedSize;
+        public bool Encrypted;
+
+        public CompressedFileStreamCreator(Stream fileStream, long offset, int compressedSize, int uncompressedSize, bool encrypted = true)
+            : base(fileStream, offset, compressedSize)
         {
-            entry.ViewItem.ListView.LabelEdit = true;
-            entry.ViewItem.BeginEdit();
+            this.UncompressedSize = uncompressedSize;
+            this.Encrypted = encrypted;
         }
 
-        public static void RenameFolder(DirectoryEntry entry)
+        public override Stream GetStream()
         {
-            entry.Node.TreeView.LabelEdit = true;
-            entry.Node.BeginEdit();
+            if (this.Encrypted) {
+                return Platform.GetDecompressStream(AES.DecryptStream(base.GetStream()));
+            } else {
+                return Platform.GetDecompressStream(base.GetStream());
+            }
+        }
+
+        public override int GetSize()
+        {
+            return this.UncompressedSize;
         }
     }
 }

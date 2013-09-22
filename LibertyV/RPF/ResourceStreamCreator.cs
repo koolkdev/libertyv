@@ -22,22 +22,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using LibertyV.Utils;
 using LibertyV.RPF.V7.Entries;
+using System.IO;
 
-namespace LibertyV.Operations
+namespace LibertyV.RPF
 {
-    static class Rename
+    public class ResourceStreamCreator : CompressedFileStreamCreator
     {
-        public static void RenameFile(FileEntry entry)
+
+        // Ignore first 0x10, it is supposed to be the header, but is it junk since we got all the information that we need about the resource from the flags?
+        public ResourceStreamCreator(Stream fileStream, long offset, int compressedSize, uint systemFlag, uint graphicsFlag, string resourceType)
+            : base(fileStream, offset + 0x10, compressedSize - 0x10, (int)(ResourceEntry.GetSizeFromSystemFlag(systemFlag) + ResourceEntry.GetSizeFromGraphicsFlag(graphicsFlag)), ResourceEntry.IsResourceEncrypted(resourceType))
         {
-            entry.ViewItem.ListView.LabelEdit = true;
-            entry.ViewItem.BeginEdit();
         }
 
-        public static void RenameFolder(DirectoryEntry entry)
-        {
-            entry.Node.TreeView.LabelEdit = true;
-            entry.Node.BeginEdit();
-        }
     }
 }

@@ -83,26 +83,34 @@
       <DependentUpon>LibertyV.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
+    <Compile Include="ProgramTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Operations\Export.cs" />
     <Compile Include="Operations\RPFOperations.cs" />
     <Compile Include="Operations\Operations.cs" />
-    <Compile Include="RPF7\ExternalFileStreamCreator.cs" />
-    <Compile Include="RPF7\ResourceStreamCreator.cs" />
+    <Compile Include="RPF\ExternalFileStreamCreator.cs" />
+    <Compile Include="RPF\ResourceStreamCreator.cs" />
     <Compile Include="EntryListViewItem.cs" />
-    <Compile Include="RPF7\Entries\RegularFileEntry.cs" />
-    <Compile Include="RPF7\Entries\DirectoryEntry.cs" />
-    <Compile Include="RPF7\Entries\FileEntry.cs" />
-    <Compile Include="RPF7\Entries\ResourceEntry.cs" />
-    <Compile Include="RPF7\CompressedFileStreamCreator.cs" />
-    <Compile Include="RPF7\FileStreamCreator.cs" />
-    <Compile Include="RPF7\IStreamCreator.cs" />
+    <Compile Include="RPF\V7\Entries\RegularFileEntry.cs" />
+    <Compile Include="RPF\V7\Entries\DirectoryEntry.cs" />
+    <Compile Include="RPF\V7\Entries\FileEntry.cs" />
+    <Compile Include="RPF\V7\Entries\ResourceEntry.cs" />
+    <Compile Include="RPF\CompressedFileStreamCreator.cs" />
+    <Compile Include="RPF\FileStreamCreator.cs" />
+    <Compile Include="RPF\IStreamCreator.cs" />
     <Compile Include="EntryTreeNode.cs" />
-    <Compile Include="RPF7\Structs.cs" />
+    <Compile Include="RPF\V7\Structs.cs" />
+    <Compile Include="Settings.cs" />
+    <Compile Include="Settings\Settings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Settings\Settings.Designer.cs">
+      <DependentUpon>Settings.cs</DependentUpon>
+    </Compile>
     <Compile Include="Utils\StreamExtension.cs" />
     <Compile Include="Utils\AES.cs" />
-    <Compile Include="RPF7\Entries\Entry.cs" />
-    <Compile Include="RPF7\RPF7File.cs" />
+    <Compile Include="RPF\V7\Entries\Entry.cs" />
+    <Compile Include="RPF\V7\RPF7File.cs" />
     <Compile Include="Utils\PartialStream.cs" />
     <Compile Include="Utils\StreamKeeper.cs" />
     <Compile Include="Utils\XMemCompressStream.cs" />
@@ -133,6 +141,10 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="Settings\Settings.resx">
+      <DependentUpon>Settings.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="app.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -148,6 +160,7 @@
     <Content Include="liberty_v_logo.ico" />
     <None Include="Resources\save.bmp" />
     <None Include="Resources\saveas.bmp" />
+    <None Include="Resources\preferences.png" />
     <Content Include="xcompress.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

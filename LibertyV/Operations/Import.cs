@@ -22,11 +22,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using LibertyV.RPF7.Entries;
+using LibertyV.RPF.V7.Entries;
 using System.Windows.Forms;
 using LibertyV.Utils;
 using System.IO;
-using LibertyV.RPF7;
+using LibertyV.RPF.V7;
+using LibertyV.RPF;
 
 namespace LibertyV.Operations
 {
