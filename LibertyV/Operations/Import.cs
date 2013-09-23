@@ -37,27 +37,9 @@ namespace LibertyV.Operations
         {
             OpenFileDialog fileDialog = new OpenFileDialog();
             fileDialog.Multiselect = true;
-            if (fileDialog.ShowDialog() == DialogResult.OK) {
-                foreach (String file in fileDialog.FileNames)
-                {
-                    if (entry.GetEntries().Any(e => e.Name == Path.GetFileName(file)))
-                    {
-                        // TODO: Ask for overwrite
-                        MessageBox.Show(String.Format("Error: file {0} already exists.", Path.GetFileName(file)));
-                        return;
-                    }
-                }
-                foreach (String file in fileDialog.FileNames)
-                {
-                    // TODO: add resources, decide if to compress or not, all by extentions.
-                    // Right now all regular files compressed by default
-                    RegularFileEntry addedFile = new RegularFileEntry(Path.GetFileName(file), new ExternalFileStreamCreator(File.Open(file, FileMode.Open, FileAccess.Read, FileShare.Read)), true);
-                    entry.AddEntry(addedFile);
-                    if (entry.FilesListView != null)
-                    {
-                        entry.FilesListView.Items.Add(new EntryListViewItem(addedFile));
-                    }
-                }
+            if (fileDialog.ShowDialog() == DialogResult.OK)
+            {
+                new ImportingWindow(entry, Path.GetDirectoryName(fileDialog.FileNames[0]), fileDialog.FileNames.Select(filename => Path.GetFileName(filename)).ToList()).ShowDialog();
             }
         }
         public static void ImportFolder(DirectoryEntry entry)

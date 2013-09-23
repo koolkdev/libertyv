@@ -31,12 +31,14 @@ namespace LibertyV.RPF.V7.Entries
     {
         private SortedList<string, Entry> Entries;
         public EntryTreeNode Node = null;
-        public System.Windows.Forms.ListView FilesListView = null; 
+        public System.Windows.Forms.ListView FilesListView = null;
 
-        public DirectoryEntry(String filename, List<Entry> entries) : base(filename)
+        public DirectoryEntry(String filename, List<Entry> entries)
+            : base(filename)
         {
             this.Entries = new SortedList<string, Entry>();
-            foreach (Entry entry in entries) {
+            foreach (Entry entry in entries)
+            {
                 this.Entries.Add(entry.Name, entry);
                 entry.Parent = this;
             }
@@ -47,15 +49,68 @@ namespace LibertyV.RPF.V7.Entries
             return Entries.Values;
         }
 
+        public Entry GetEntry(string name)
+        {
+            // Clean the input (for the case it is /dir/)
+            while (name.Length > 0 && (name[0] == '\\' || name[0] == '/'))
+            {
+                name = name.Substring(1);
+            }
+            if (name == "")
+            {
+                return this;
+            }
+
+            int dirSplit = name.IndexOfAny(new char[] { '\\', '/' });
+            Entry entry = null;
+            if (dirSplit == -1)
+            {
+                // No directory
+                this.Entries.TryGetValue(name, out entry);
+                return entry;
+            }
+            this.Entries.TryGetValue(name.Substring(0, dirSplit), out entry);
+            DirectoryEntry dirEntry = entry as DirectoryEntry;
+            if (dirEntry != null)
+            {
+                return dirEntry.GetEntry(name.Substring(dirSplit + 1));
+            }
+            return null;
+        }
+
         public void AddEntry(Entry entry)
         {
             Entries.Add(entry.Name, entry);
             entry.Parent = this;
+            // Add to GUI if needed
+            if (entry is FileEntry)
+            {
+                if (this.FilesListView != null)
+                {
+                    this.FilesListView.Items.Add(new EntryListViewItem(entry as FileEntry));
+                }
+            }
+            else
+            {
+                this.Node.Nodes.Add(new EntryTreeNode(entry as DirectoryEntry, new EntryTreeNode[] { }));
+            }
         }
 
         public void RemoveEntry(Entry entry)
         {
             Entries.Remove(entry.Name);
+            // Remove from GUI if needed
+            if (entry is FileEntry)
+            {
+                if (((FileEntry)entry).ViewItem != null)
+                {
+                    ((FileEntry)entry).ViewItem.Remove();
+                }
+            }
+            else
+            {
+                ((DirectoryEntry)entry).Node.Remove();
+            }
         }
         public bool IsRoot()
         {

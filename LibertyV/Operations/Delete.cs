@@ -61,7 +61,6 @@ namespace LibertyV.Operations
             if (force || MessageBox.Show(String.Format("Are you sure you want to delete the folder '{0}'?", entry.Name), "Delete Confirmation", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK)
             {
                 entry.Parent.RemoveEntry(entry);
-                entry.Node.Remove();
             }
         }
 
@@ -70,7 +69,6 @@ namespace LibertyV.Operations
             if (force || MessageBox.Show(String.Format("Are you sure you want to delete the item '{0}'?", entry.Name), "Delete Confirmation", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK)
             {
                 entry.Parent.RemoveEntry(entry);
-                entry.ViewItem.Remove();
             }
         }
 
@@ -81,7 +79,6 @@ namespace LibertyV.Operations
                 foreach (FileEntry entry in entries)
                 {
                     entry.Parent.RemoveEntry(entry);
-                    entry.ViewItem.Remove();
                 }
             }
         }

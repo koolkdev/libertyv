@@ -22,26 +22,33 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using LibertyV.Utils;
 using LibertyV.RPF.V7.Entries;
+using System.IO;
 
-namespace LibertyV.Operations
+namespace LibertyV.RPF
 {
-    static class New
+    public class RSC7StreamCreator : IStreamCreator
     {
-        public static void NewFolder(DirectoryEntry entry)
+        
+        private Stream Stream;
+
+        // Same as ExternalFileStreamCreator, but this time we ignore the first 0x10 bytes
+        public RSC7StreamCreator(Stream stream)
         {
-            string name = "New Folder";
-            int i = 1;
-            for (; entry.GetEntries().Any(e => e.Name == name); ++i, name = String.Format("New Folder ({0})", i)) ;
-            DirectoryEntry addedFolder = new DirectoryEntry(name, new List<Entry>());
-            entry.AddEntry(addedFolder);
-            if (!entry.Node.IsExpanded)
-            {
-                entry.Node.Expand();
-            }
-            addedFolder.Node.TreeView.SelectedNode = addedFolder.Node;
-            addedFolder.Node.TreeView.LabelEdit = true;
-            addedFolder.Node.BeginEdit();
+            this.Stream = stream;
         }
+
+        public virtual Stream GetStream()
+        {
+            // just a way to reset and duplicate the stream
+            return new PartialStream(this.Stream, 0x10, this.GetSize());
+        }
+
+        public virtual int GetSize()
+        {
+            return (int)this.Stream.Length - 0x10;
+        }
+
     }
 }

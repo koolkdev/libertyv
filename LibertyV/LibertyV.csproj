@@ -51,6 +51,12 @@
   <ItemGroup>
     <Compile Include="GlobalOptions.cs" />
     <Compile Include="Operations\Helper.cs" />
+    <Compile Include="Operations\ImportingWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Operations\ImportingWindow.Designer.cs">
+      <DependentUpon>ImportingWindow.cs</DependentUpon>
+    </Compile>
     <Compile Include="Operations\New.cs" />
     <Compile Include="Operations\ResourceProperties.cs">
       <SubType>Form</SubType>
@@ -87,6 +93,7 @@
     <Compile Include="Operations\Export.cs" />
     <Compile Include="Operations\RPFOperations.cs" />
     <Compile Include="Operations\Operations.cs" />
+    <Compile Include="RPF\RSC7StreamCreator.cs" />
     <Compile Include="RPF\ExternalFileStreamCreator.cs" />
     <Compile Include="RPF\ResourceStreamCreator.cs" />
     <Compile Include="EntryListViewItem.cs" />
@@ -117,6 +124,9 @@
     <Compile Include="Utils\GUI.cs" />
     <Compile Include="Utils\Reflector.cs" />
     <Compile Include="Utils\XMemDecompressStream.cs" />
+    <EmbeddedResource Include="Operations\ImportingWindow.resx">
+      <DependentUpon>ImportingWindow.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Operations\ResourceProperties.resx">
       <DependentUpon>ResourceProperties.cs</DependentUpon>
     </EmbeddedResource>

@@ -145,5 +145,53 @@ namespace LibertyV.RPF.V7
                 }
             }
         }
+
+        public struct RSC7Header
+        {
+            public char[] Magic;
+            public int Version;
+            public uint SystemFlag;
+            public uint GraphicsFlag;
+
+            public RSC7Header(uint systemFlag, uint graphicsFlag)
+            {
+                Magic = new char[] { 'R', 'S', 'C', '7' };
+                this.SystemFlag = systemFlag;
+                this.GraphicsFlag = graphicsFlag;
+
+                this.Version = Entries.ResourceEntry.GetResourceVersionFromFlags(this.SystemFlag, this.GraphicsFlag);
+            }
+
+            public RSC7Header(Stream stream)
+            {
+                using (BinaryReader s = new BinaryReader(new StreamKeeper(stream)))
+                {
+                    Magic = new char[4];
+                    s.Read(Magic, 0, 4);
+                    if (new string(Magic) != "RSC7") {
+                        throw new Exception("Invalid RSC7 magic");
+                    }
+                    Version = (int)SwapEndian(s.ReadUInt32());
+                    SystemFlag = SwapEndian(s.ReadUInt32());
+                    GraphicsFlag = SwapEndian(s.ReadUInt32());
+
+                    if (Entries.ResourceEntry.GetResourceVersionFromFlags(this.SystemFlag, this.GraphicsFlag) != Version)
+                    {
+                        throw new Exception("Invalid RSC7 header");
+                    }
+                }
+            }
+
+            public void Write(Stream stream)
+            {
+                using (BinaryWriter s = new BinaryWriter(new StreamKeeper(stream)))
+                {
+                    s.Write(Magic);
+                    s.Write(SwapEndian((uint)Version));
+                    s.Write(SwapEndian(SystemFlag));
+                    s.Write(SwapEndian(GraphicsFlag));
+                }
+            }
+        }
     }
 }
