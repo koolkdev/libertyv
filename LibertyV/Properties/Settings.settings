@@ -5,5 +5,17 @@
     <Setting Name="ExportResourcesChoice" Type="LibertyV.Settings.ExportResourcesChoice" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
+    <Setting Name="Xbox360KeyFile" Type="System.String" Scope="User">
+      <Value Profile="(Default)">key_xbox360.dat</Value>
+    </Setting>
+    <Setting Name="PS3KeyFile" Type="System.String" Scope="User">
+      <Value Profile="(Default)">key_ps3.dat</Value>
+    </Setting>
+    <Setting Name="Xbox360KeyFileEnabled" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="PS3KeyFileEnabled" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -26,6 +26,8 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using LibertyV.Utils;
+using System.IO;
 
 namespace LibertyV
 {
@@ -34,23 +36,38 @@ namespace LibertyV
         public PlatformSelection()
         {
             InitializeComponent();
+            UpdatePlatformButtons();
+        }
+
+        private void UpdatePlatformButtons()
+        {
+            xboxSelect.Enabled = Properties.Settings.Default.Xbox360KeyFileEnabled;
+            playstationSelect.Enabled = Properties.Settings.Default.PS3KeyFileEnabled;
         }
 
         private void xboxSelect_Click(object sender, EventArgs e)
         {
             GlobalOptions.Platform = Platform.PlatformType.XBOX360;
+            AES.Key = File.ReadAllBytes(Properties.Settings.Default.Xbox360KeyFile);
             Close();
         }
 
         private void playstationSelect_Click(object sender, EventArgs e)
         {
             GlobalOptions.Platform = Platform.PlatformType.PLAYSTATION3;
+            AES.Key = File.ReadAllBytes(Properties.Settings.Default.PS3KeyFile);
             Close();
         }
 
         private void closeButton_Click(object sender, EventArgs e)
         {
             Close();
+        }
+
+        private void settingsButton_Click(object sender, EventArgs e)
+        {
+            new Settings.Settings().ShowDialog();
+            UpdatePlatformButtons();
         }
     }
 }

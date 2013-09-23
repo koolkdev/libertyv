@@ -34,5 +34,53 @@ namespace LibertyV.Properties {
                 this["ExportResourcesChoice"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("key_xbox360.dat")]
+        public string Xbox360KeyFile {
+            get {
+                return ((string)(this["Xbox360KeyFile"]));
+            }
+            set {
+                this["Xbox360KeyFile"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("key_ps3.dat")]
+        public string PS3KeyFile {
+            get {
+                return ((string)(this["PS3KeyFile"]));
+            }
+            set {
+                this["PS3KeyFile"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool Xbox360KeyFileEnabled {
+            get {
+                return ((bool)(this["Xbox360KeyFileEnabled"]));
+            }
+            set {
+                this["Xbox360KeyFileEnabled"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool PS3KeyFileEnabled {
+            get {
+                return ((bool)(this["PS3KeyFileEnabled"]));
+            }
+            set {
+                this["PS3KeyFileEnabled"] = value;
+            }
+        }
     }
 }

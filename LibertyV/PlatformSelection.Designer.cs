@@ -51,6 +51,7 @@ namespace LibertyV
             this.xboxSelect = new System.Windows.Forms.Button();
             this.playstationSelect = new System.Windows.Forms.Button();
             this.closeButton = new System.Windows.Forms.Button();
+            this.settingsButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // xboxSelect
@@ -77,13 +78,23 @@ namespace LibertyV
             // 
             // closeButton
             // 
-            this.closeButton.Location = new System.Drawing.Point(48, 128);
+            this.closeButton.Location = new System.Drawing.Point(93, 128);
             this.closeButton.Name = "closeButton";
-            this.closeButton.Size = new System.Drawing.Size(75, 23);
+            this.closeButton.Size = new System.Drawing.Size(69, 23);
             this.closeButton.TabIndex = 2;
             this.closeButton.Text = "Close";
             this.closeButton.UseVisualStyleBackColor = true;
             this.closeButton.Click += new System.EventHandler(this.closeButton_Click);
+            // 
+            // settingsButton
+            // 
+            this.settingsButton.Location = new System.Drawing.Point(12, 128);
+            this.settingsButton.Name = "settingsButton";
+            this.settingsButton.Size = new System.Drawing.Size(69, 23);
+            this.settingsButton.TabIndex = 3;
+            this.settingsButton.Text = "Settings";
+            this.settingsButton.UseVisualStyleBackColor = true;
+            this.settingsButton.Click += new System.EventHandler(this.settingsButton_Click);
             // 
             // PlatformSelection
             // 
@@ -91,6 +102,7 @@ namespace LibertyV
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(177, 163);
             this.ControlBox = false;
+            this.Controls.Add(this.settingsButton);
             this.Controls.Add(this.closeButton);
             this.Controls.Add(this.playstationSelect);
             this.Controls.Add(this.xboxSelect);
@@ -109,5 +121,6 @@ namespace LibertyV
         private System.Windows.Forms.Button xboxSelect;
         private System.Windows.Forms.Button playstationSelect;
         private System.Windows.Forms.Button closeButton;
+        private System.Windows.Forms.Button settingsButton;
     }
 }

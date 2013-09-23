@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.IO;
 
 namespace LibertyV.Settings
 {
@@ -52,10 +53,77 @@ namespace LibertyV.Settings
                         break;
                     }
             }
+
+            xbox360KeyCheckBox.Checked = Properties.Settings.Default.Xbox360KeyFileEnabled;
+            xbox360KeyFile.Enabled = xbox360KeyCheckBox.Checked;
+            xbox360KeyFile.Text = Properties.Settings.Default.Xbox360KeyFile;
+            ps3KeyCheckBox.Checked = Properties.Settings.Default.PS3KeyFileEnabled;
+            ps3KeyFile.Enabled = ps3KeyCheckBox.Checked;
+            ps3KeyFile.Text = Properties.Settings.Default.PS3KeyFile;
+
         }
 
-        private void SaveSettings()
+        private static bool CheckKey(string keyFile, string keymd5)
         {
+            if (!File.Exists(keyFile))
+            {
+                return false;
+            }
+            byte[] key;
+            try
+            {
+                key = File.ReadAllBytes(keyFile);
+            }
+            catch (Exception)
+            {
+                // Failed to read the file
+                return false;
+            }
+
+            string keyMD5 = BitConverter.ToString(new System.Security.Cryptography.MD5CryptoServiceProvider().ComputeHash(key)).Replace("-", "");
+
+            return keyMD5 == keymd5.ToUpper();
+        }
+
+        public static bool CheckXbox360Key(string keyFile)
+        {
+            return CheckKey(keyFile, "ead1ea1a3870557b424bc8cf73f51018");
+        }
+
+        public static bool CheckPS3Key(string keyFile)
+        {
+            return CheckKey(keyFile, "1df41d237d8056ec87a5bc71925c4cde");
+        }
+
+        private bool SaveSettings()
+        {
+            // Verify settings first
+            if ((xbox360KeyCheckBox.Checked && !File.Exists(xbox360KeyFile.Text)))
+            {
+                MessageBox.Show("Invalid key file for Xbox 360.");
+                return false;
+            }
+
+            if ((ps3KeyCheckBox.Checked && !File.Exists(ps3KeyFile.Text)))
+            {
+                MessageBox.Show("Invalid key file for PlayStation 3.");
+                return false;
+            }
+
+            // TODO: If failed to open the file it will save invalid key instead invalid key file..
+            if ((xbox360KeyCheckBox.Checked && !CheckXbox360Key(xbox360KeyFile.Text)))
+            {
+                MessageBox.Show("Invalid key for Xbox 360.");
+                return false;
+            }
+
+            if ((ps3KeyCheckBox.Checked && !CheckPS3Key(ps3KeyFile.Text)))
+            {
+                MessageBox.Show("Invalid key for PlayStation 3.");
+                return false;
+            }
+
+            // Now save them
             if (rsc7Button.Checked)
             {
                 Properties.Settings.Default.ExportResourcesChoice = ExportResourcesChoice.RSC7;
@@ -68,7 +136,15 @@ namespace LibertyV.Settings
             {
                 Properties.Settings.Default.ExportResourcesChoice = ExportResourcesChoice.RAW;
             }
+
+            Properties.Settings.Default.Xbox360KeyFileEnabled = xbox360KeyCheckBox.Checked;
+            Properties.Settings.Default.Xbox360KeyFile = xbox360KeyFile.Text;
+            Properties.Settings.Default.PS3KeyFileEnabled = ps3KeyCheckBox.Checked;
+            Properties.Settings.Default.PS3KeyFile = ps3KeyFile.Text;
+
             Properties.Settings.Default.Save();
+
+            return true;
         }
 
         private void cancelButton_Click(object sender, EventArgs e)
@@ -78,8 +154,10 @@ namespace LibertyV.Settings
 
         private void okButton_Click(object sender, EventArgs e)
         {
-            SaveSettings();
-            Close();
+            if (SaveSettings())
+            {
+                Close();
+            }
         }
 
 
@@ -109,5 +187,26 @@ namespace LibertyV.Settings
             SettingsChanged();
         }
 
+        private void xbox360KeyCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            xbox360KeyFile.Enabled = xbox360KeyCheckBox.Checked;
+            SettingsChanged();
+        }
+
+        private void ps3KeyCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            ps3KeyFile.Enabled = ps3KeyCheckBox.Checked;
+            SettingsChanged();
+        }
+
+        private void xbox360KeyFile_TextChanged(object sender, EventArgs e)
+        {
+            SettingsChanged();
+        }
+
+        private void ps3KeyFile_TextChanged(object sender, EventArgs e)
+        {
+            SettingsChanged();
+        }
     }
 }

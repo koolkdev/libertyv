@@ -38,6 +38,17 @@ namespace LibertyV
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
+            // Check that the configuration is still valid
+            if (Properties.Settings.Default.Xbox360KeyFileEnabled && !Settings.Settings.CheckPS3Key(Properties.Settings.Default.Xbox360KeyFile))
+            {
+                Properties.Settings.Default.Xbox360KeyFileEnabled = false;
+            }
+
+            if (Properties.Settings.Default.PS3KeyFileEnabled && !Settings.Settings.CheckPS3Key(Properties.Settings.Default.PS3KeyFile))
+            {
+                Properties.Settings.Default.PS3KeyFileEnabled = false;
+            }
+
             new PlatformSelection().ShowDialog();
 
             if (GlobalOptions.Platform == Platform.PlatformType.NONE)
@@ -45,34 +56,6 @@ namespace LibertyV
                 return;
             }
 
-            if (!File.Exists("key.dat"))
-            {
-                MessageBox.Show("Couldn't find key.dat");
-                return;
-            }
-
-            AES.Key = File.ReadAllBytes("key.dat");
-
-            string keyMD5 = BitConverter.ToString(new System.Security.Cryptography.MD5CryptoServiceProvider().ComputeHash(AES.Key)).Replace("-", "");
-
-            // check if md5 of key is one of the known keys
-            if (GlobalOptions.Platform == Platform.PlatformType.XBOX360)
-            {
-                if (keyMD5 != "ead1ea1a3870557b424bc8cf73f51018".ToUpper())
-                {
-                    MessageBox.Show("Invalid key for Xbox 360.");
-                    return;
-                }
-            }
-
-            if (GlobalOptions.Platform == Platform.PlatformType.PLAYSTATION3)
-            {
-                if (keyMD5 != "1df41d237d8056ec87a5bc71925c4cde".ToUpper())
-                {
-                    MessageBox.Show("Invalid key for Playstation 3.");
-                    return;
-                }
-            }
             Application.Run(new LibertyV());
         }
     }
