@@ -38,16 +38,9 @@ namespace LibertyV
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            // Check that the configuration is still valid
-            if (Properties.Settings.Default.Xbox360KeyFileEnabled && !Settings.Settings.CheckPS3Key(Properties.Settings.Default.Xbox360KeyFile))
-            {
-                Properties.Settings.Default.Xbox360KeyFileEnabled = false;
-            }
-
-            if (Properties.Settings.Default.PS3KeyFileEnabled && !Settings.Settings.CheckPS3Key(Properties.Settings.Default.PS3KeyFile))
-            {
-                Properties.Settings.Default.PS3KeyFileEnabled = false;
-            }
+            // Set the configuration by the validity of the keys
+            Properties.Settings.Default.Xbox360KeyFileEnabled = Settings.Settings.CheckXbox360Key(Properties.Settings.Default.Xbox360KeyFile);
+            Properties.Settings.Default.PS3KeyFileEnabled = Settings.Settings.CheckPS3Key(Properties.Settings.Default.PS3KeyFile);
 
             new PlatformSelection().ShowDialog();
 
