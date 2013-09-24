@@ -22,30 +22,35 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using LibertyV.Rage.RPF.V7.Entries;
-using System.Windows.Forms;
+using LibertyV.Utils;
+using System.IO;
 
-namespace LibertyV.Operations
+namespace LibertyV.Rage.RPF
 {
-    static class Helper
+    public class CompressedFileStreamCreator : FileStreamCreator
     {
-        static public void SelectAll(DirectoryEntry entry)
+        private int UncompressedSize;
+        public bool Encrypted;
+
+        public CompressedFileStreamCreator(Stream fileStream, long offset, int compressedSize, int uncompressedSize, bool encrypted = true)
+            : base(fileStream, offset, compressedSize)
         {
-            if (entry.FilesListView != null)
-            {
-                foreach (ListViewItem item in entry.FilesListView.Items)
-                {
-                    item.Selected = true;
-                }
+            this.UncompressedSize = uncompressedSize;
+            this.Encrypted = encrypted;
+        }
+
+        public override Stream GetStream()
+        {
+            if (this.Encrypted) {
+                return Platform.GetDecompressStream(AES.DecryptStream(base.GetStream()));
+            } else {
+                return Platform.GetDecompressStream(base.GetStream());
             }
         }
-        static public void SelectAll(FileEntry entry)
+
+        public override int GetSize()
         {
-            SelectAll(entry.Parent);
-        }
-        static public void SelectAll(List<FileEntry> entries)
-        {
-            SelectAll(entries[0]);
+            return this.UncompressedSize;
         }
     }
 }

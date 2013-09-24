@@ -93,19 +93,19 @@
     <Compile Include="Operations\Export.cs" />
     <Compile Include="Operations\RPFOperations.cs" />
     <Compile Include="Operations\Operations.cs" />
-    <Compile Include="RPF\RSC7StreamCreator.cs" />
-    <Compile Include="RPF\ExternalFileStreamCreator.cs" />
-    <Compile Include="RPF\ResourceStreamCreator.cs" />
+    <Compile Include="Rage\RPF\RSC7StreamCreator.cs" />
+    <Compile Include="Rage\RPF\ExternalFileStreamCreator.cs" />
+    <Compile Include="Rage\RPF\ResourceStreamCreator.cs" />
     <Compile Include="EntryListViewItem.cs" />
-    <Compile Include="RPF\V7\Entries\RegularFileEntry.cs" />
-    <Compile Include="RPF\V7\Entries\DirectoryEntry.cs" />
-    <Compile Include="RPF\V7\Entries\FileEntry.cs" />
-    <Compile Include="RPF\V7\Entries\ResourceEntry.cs" />
-    <Compile Include="RPF\CompressedFileStreamCreator.cs" />
-    <Compile Include="RPF\FileStreamCreator.cs" />
-    <Compile Include="RPF\IStreamCreator.cs" />
+    <Compile Include="Rage\RPF\V7\Entries\RegularFileEntry.cs" />
+    <Compile Include="Rage\RPF\V7\Entries\DirectoryEntry.cs" />
+    <Compile Include="Rage\RPF\V7\Entries\FileEntry.cs" />
+    <Compile Include="Rage\RPF\V7\Entries\ResourceEntry.cs" />
+    <Compile Include="Rage\RPF\CompressedFileStreamCreator.cs" />
+    <Compile Include="Rage\RPF\FileStreamCreator.cs" />
+    <Compile Include="Rage\RPF\IStreamCreator.cs" />
     <Compile Include="EntryTreeNode.cs" />
-    <Compile Include="RPF\V7\Structs.cs" />
+    <Compile Include="Rage\RPF\V7\Structs.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Settings\Settings.cs">
       <SubType>Form</SubType>
@@ -115,8 +115,8 @@
     </Compile>
     <Compile Include="Utils\StreamExtension.cs" />
     <Compile Include="Utils\AES.cs" />
-    <Compile Include="RPF\V7\Entries\Entry.cs" />
-    <Compile Include="RPF\V7\RPF7File.cs" />
+    <Compile Include="Rage\RPF\V7\Entries\Entry.cs" />
+    <Compile Include="Rage\RPF\V7\RPF7File.cs" />
     <Compile Include="Utils\PartialStream.cs" />
     <Compile Include="Utils\StreamKeeper.cs" />
     <Compile Include="Utils\XMemCompressStream.cs" />

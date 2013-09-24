@@ -22,30 +22,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using LibertyV.Rage.RPF.V7.Entries;
-using System.Windows.Forms;
+using System.IO;
 
-namespace LibertyV.Operations
+namespace LibertyV.Rage.RPF
 {
-    static class Helper
+    public interface IStreamCreator
     {
-        static public void SelectAll(DirectoryEntry entry)
-        {
-            if (entry.FilesListView != null)
-            {
-                foreach (ListViewItem item in entry.FilesListView.Items)
-                {
-                    item.Selected = true;
-                }
-            }
-        }
-        static public void SelectAll(FileEntry entry)
-        {
-            SelectAll(entry.Parent);
-        }
-        static public void SelectAll(List<FileEntry> entries)
-        {
-            SelectAll(entries[0]);
-        }
+        Stream GetStream();
+        int GetSize();
     }
 }

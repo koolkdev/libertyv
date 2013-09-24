@@ -22,30 +22,33 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using LibertyV.Utils;
 using LibertyV.Rage.RPF.V7.Entries;
-using System.Windows.Forms;
+using System.IO;
 
-namespace LibertyV.Operations
+namespace LibertyV.Rage.RPF
 {
-    static class Helper
+    public class RSC7StreamCreator : IStreamCreator
     {
-        static public void SelectAll(DirectoryEntry entry)
+        
+        private Stream Stream;
+
+        // Same as ExternalFileStreamCreator, but this time we ignore the first 0x10 bytes
+        public RSC7StreamCreator(Stream stream)
         {
-            if (entry.FilesListView != null)
-            {
-                foreach (ListViewItem item in entry.FilesListView.Items)
-                {
-                    item.Selected = true;
-                }
-            }
+            this.Stream = stream;
         }
-        static public void SelectAll(FileEntry entry)
+
+        public virtual Stream GetStream()
         {
-            SelectAll(entry.Parent);
+            // just a way to reset and duplicate the stream
+            return new PartialStream(this.Stream, 0x10, this.GetSize());
         }
-        static public void SelectAll(List<FileEntry> entries)
+
+        public virtual int GetSize()
         {
-            SelectAll(entries[0]);
+            return (int)this.Stream.Length - 0x10;
         }
+
     }
 }

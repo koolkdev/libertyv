@@ -22,30 +22,41 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using LibertyV.Rage.RPF.V7.Entries;
-using System.Windows.Forms;
+using System.IO;
+using LibertyV.Utils;
 
-namespace LibertyV.Operations
+namespace LibertyV.Rage.RPF
 {
-    static class Helper
+    public class FileStreamCreator : IStreamCreator
     {
-        static public void SelectAll(DirectoryEntry entry)
+        private long Offset;
+        private int Size;
+        protected Stream FileStream;
+
+        public FileStreamCreator(Stream fileStream, long offset, int size)
         {
-            if (entry.FilesListView != null)
+            this.FileStream = fileStream;
+            this.Offset = offset;
+            this.Size = size;
+        }
+
+        public virtual Stream GetStream()
+        {
+            return new PartialStream(this.FileStream, this.Offset, this.Size);
+        }
+
+        public virtual int GetSize()
+        {
+            return this.Size;
+        }
+
+        public void WriteRaw(Stream stream)
+        {
+            // Write the original data
+            using (Stream input = new PartialStream(this.FileStream, this.Offset, this.Size))
             {
-                foreach (ListViewItem item in entry.FilesListView.Items)
-                {
-                    item.Selected = true;
-                }
+                input.CopyTo(stream);
             }
-        }
-        static public void SelectAll(FileEntry entry)
-        {
-            SelectAll(entry.Parent);
-        }
-        static public void SelectAll(List<FileEntry> entries)
-        {
-            SelectAll(entries[0]);
         }
     }
 }
