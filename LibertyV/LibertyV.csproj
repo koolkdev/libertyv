@@ -96,7 +96,6 @@
     <Compile Include="Operations\Operations.cs" />
     <Compile Include="Rage\Audio\AWC\Audio.cs" />
     <Compile Include="Rage\Audio\AWC\ChunkStream.cs" />
-    <Compile Include="Rage\Audio\AWC\ChannelStream.cs" />
     <Compile Include="Rage\Audio\AWC\AWCFile.cs" />
     <Compile Include="Rage\Audio\AWC\IAudio.cs" />
     <Compile Include="Rage\Audio\AWC\MultiChannelAudio.cs" />
