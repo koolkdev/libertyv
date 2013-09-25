@@ -24,6 +24,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using LibertyV.Utils;
+using System.Runtime.InteropServices;
 
 namespace LibertyV.Rage.RPF.V7.Entries
 {
@@ -33,10 +34,18 @@ namespace LibertyV.Rage.RPF.V7.Entries
         public EntryTreeNode Node = null;
         public System.Windows.Forms.ListView FilesListView = null;
 
+        private class OrdinalComparer : IComparer<string>
+        {
+            public int Compare(string x, string y)
+            {
+                return string.CompareOrdinal(x, y);
+            }
+        }
+
         public DirectoryEntry(String filename, List<Entry> entries)
             : base(filename)
         {
-            this.Entries = new SortedList<string, Entry>();
+            this.Entries = new SortedList<string, Entry>(new OrdinalComparer());
             foreach (Entry entry in entries)
             {
                 this.Entries.Add(entry.Name, entry);
