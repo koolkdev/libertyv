@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GlobalOptions.cs" />
+    <Compile Include="Operations\AWCOperations.cs" />
     <Compile Include="Operations\Helper.cs" />
     <Compile Include="Operations\ImportingWindow.cs">
       <SubType>Form</SubType>
@@ -93,6 +94,18 @@
     <Compile Include="Operations\Export.cs" />
     <Compile Include="Operations\RPFOperations.cs" />
     <Compile Include="Operations\Operations.cs" />
+    <Compile Include="Rage\Audio\AWC\Audio.cs" />
+    <Compile Include="Rage\Audio\AWC\ChunkStream.cs" />
+    <Compile Include="Rage\Audio\AWC\ChannelStream.cs" />
+    <Compile Include="Rage\Audio\AWC\AWCFile.cs" />
+    <Compile Include="Rage\Audio\AWC\IAudio.cs" />
+    <Compile Include="Rage\Audio\AWC\MultiChannelAudio.cs" />
+    <Compile Include="Rage\Audio\AWC\MultiChannelPCMStream.cs" />
+    <Compile Include="Rage\Audio\AWC\SplittedAudio.cs" />
+    <Compile Include="Rage\Audio\AWC\SplittedAudioPCMStream.cs" />
+    <Compile Include="Rage\Audio\AWC\Structs.cs" />
+    <Compile Include="Rage\Audio\AWC\WAVFile.cs" />
+    <Compile Include="Rage\Audio\Codecs\MP3\MP3DecoderStream.cs" />
     <Compile Include="Rage\RPF\RSC7StreamCreator.cs" />
     <Compile Include="Rage\RPF\ExternalFileStreamCreator.cs" />
     <Compile Include="Rage\RPF\ResourceStreamCreator.cs" />
@@ -113,6 +126,7 @@
     <Compile Include="Settings\Settings.Designer.cs">
       <DependentUpon>Settings.cs</DependentUpon>
     </Compile>
+    <Compile Include="Utils\Hash.cs" />
     <Compile Include="Utils\StreamExtension.cs" />
     <Compile Include="Utils\AES.cs" />
     <Compile Include="Rage\RPF\V7\Entries\Entry.cs" />

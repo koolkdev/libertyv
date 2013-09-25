@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibertyV", "LibertyV.csproj
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lzx", "..\lzx\lzx.vcxproj", "{B97A470C-E6E6-4D61-AA00-60643A70E8CF}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libmad", "..\libmad\msvc++\libmad.vcxproj", "{B3BB1E15-FF06-8A13-742A-67BD846F0AF5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -35,6 +37,16 @@ Global
 		{B97A470C-E6E6-4D61-AA00-60643A70E8CF}.Release|Win32.ActiveCfg = Release|Win32
 		{B97A470C-E6E6-4D61-AA00-60643A70E8CF}.Release|Win32.Build.0 = Release|Win32
 		{B97A470C-E6E6-4D61-AA00-60643A70E8CF}.Release|x86.ActiveCfg = Release|Win32
+		{B3BB1E15-FF06-8A13-742A-67BD846F0AF5}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{B3BB1E15-FF06-8A13-742A-67BD846F0AF5}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{B3BB1E15-FF06-8A13-742A-67BD846F0AF5}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B3BB1E15-FF06-8A13-742A-67BD846F0AF5}.Debug|Win32.Build.0 = Debug|Win32
+		{B3BB1E15-FF06-8A13-742A-67BD846F0AF5}.Debug|x86.ActiveCfg = Debug|Win32
+		{B3BB1E15-FF06-8A13-742A-67BD846F0AF5}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{B3BB1E15-FF06-8A13-742A-67BD846F0AF5}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{B3BB1E15-FF06-8A13-742A-67BD846F0AF5}.Release|Win32.ActiveCfg = Release|Win32
+		{B3BB1E15-FF06-8A13-742A-67BD846F0AF5}.Release|Win32.Build.0 = Release|Win32
+		{B3BB1E15-FF06-8A13-742A-67BD846F0AF5}.Release|x86.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

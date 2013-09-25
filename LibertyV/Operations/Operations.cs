@@ -32,6 +32,7 @@ namespace LibertyV.Operations
 
         public static OperationsList<FileEntry> FileOperations = new OperationsList<FileEntry>(){
             {"Open RPF", RPFOperations.OpenRPF, Keys.None, true, RPFOperations.IsRPF},
+            {"Export to wav...", AWCOperations.ExportAWC, Keys.None, false, AWCOperations.IsAWC},
             {"Export file...", Export.ExportFile},
             {"Rename", Rename.RenameFile, Keys.F2},
             {"Delete", Delete.AskDeleteFile, Keys.Delete},
@@ -44,7 +45,8 @@ namespace LibertyV.Operations
         };
 
         public static OperationsList<List<FileEntry>> MultipleFilesOperations = new OperationsList<List<FileEntry>>(){
-            {"Export files...", Export.ExportFiles},
+            {"Export to wav...", AWCOperations.ExportAWCs, Keys.None, false, AWCOperations.IsAWCs},
+            {"Export files..", Export.ExportFiles},
             {"Delete", Delete.AskDeleteFiles, Keys.Delete}
         };
 
