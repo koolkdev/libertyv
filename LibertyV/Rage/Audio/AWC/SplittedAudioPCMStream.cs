@@ -10,17 +10,12 @@ namespace LibertyV.Rage.Audio.AWC
     {
         private List<Stream> _streams;
         int _currentStream = 0;
-        int[] _streamSkipBytes;
-        int[] _streamsBytes;
 
-        public SplittedAudioPCMStream(List<Stream> streams, List<Tuple<int, int>> streamsSamples, int bits, int channels)
+        public SplittedAudioPCMStream(List<Stream> streams)
         {
             _streams = streams;
             foreach (Stream stream in _streams)
                 if (!(stream.CanRead)) throw new ArgumentException("Stream not readable", "streams");
-
-            _streamSkipBytes = streamsSamples.Select(samples => (int)(samples.Item1 * (bits / 8) * channels)).ToArray();     
-            _streamsBytes = streamsSamples.Select(samples => (int)(samples.Item2 * (bits / 8) * channels)).ToArray();            
         }
 
         public override bool CanRead
@@ -80,32 +75,16 @@ namespace LibertyV.Rage.Audio.AWC
                     // EOF
                     break;
                 }
-                int toRead;
-                if (_streamSkipBytes[_currentStream] != 0)
+                int read = _streams[_currentStream].Read(buffer, offset, count);
+
+                if (read < count)
                 {
-                    byte[] skipBytes = new byte[_streamSkipBytes[_currentStream] < 0x8000 ? _streamSkipBytes[_currentStream] : 0x8000];
-                    while (_streamSkipBytes[_currentStream] > 0)
-                    {
-                        toRead = _streamSkipBytes[_currentStream] < skipBytes.Length ? _streamSkipBytes[_currentStream] : skipBytes.Length;
-                        if (_streams[_currentStream].Read(skipBytes, 0, toRead) != toRead)
-                        {
-                            throw new Exception("Bad stream, read unexcepted amount of samples");
-                        }
-                        _streamSkipBytes[_currentStream] -= toRead;
-                    }
-                }
-                toRead = (count < _streamsBytes[_currentStream]) ? count : _streamsBytes[_currentStream];
-                if (_streams[_currentStream].Read(buffer, offset, toRead) != toRead) 
-                {
-                    throw new Exception("Bad stream, read unexcepted amount of samples");
-                }
-                _streamsBytes[_currentStream] -= toRead;
-                count -= toRead;
-                offset += toRead;
-                if (_streamsBytes[_currentStream] == 0)
-                {
+                    // eof, next stream
                     _currentStream += 1;
                 }
+
+                count -= read;
+                offset += read;
             }
 
             return offset - startOffset;
@@ -130,7 +109,6 @@ namespace LibertyV.Rage.Audio.AWC
                     _streams = null;
                 }
             }
-            _streamsBytes = null;
         }
     }
 }

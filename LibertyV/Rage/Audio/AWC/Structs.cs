@@ -197,7 +197,7 @@ namespace LibertyV.Rage.Audio.AWC
             public ushort unknownWord1;
             public ushort SamplesPerSecond;
             public byte unknownByte2;
-            public byte unknownByte3; // Pad?
+            public byte RoundSize; 
             public ushort unknownWord2;
 
             public ChannelsInfoChunkItem(Stream stream, bool bigEndian)
@@ -209,7 +209,7 @@ namespace LibertyV.Rage.Audio.AWC
                     unknownWord1 = FixEndian(s.ReadUInt16(), bigEndian);
                     SamplesPerSecond = FixEndian(s.ReadUInt16(), bigEndian);
                     unknownByte2 = s.ReadByte();
-                    unknownByte3 = s.ReadByte(); // Pad?
+                    RoundSize = s.ReadByte();
                     unknownWord2 = FixEndian(s.ReadUInt16(), bigEndian);
                 }
             }
@@ -238,6 +238,7 @@ namespace LibertyV.Rage.Audio.AWC
             public int Chunks;
             // Samples in chunk
             public uint Samples;
+            public int DataSize;
 
             public ChannelChunkHeader(Stream stream, bool bigEndian)
             {
@@ -259,7 +260,12 @@ namespace LibertyV.Rage.Audio.AWC
                     if (GlobalOptions.Platform == Platform.PlatformType.PLAYSTATION3)
                     {
                         // PS3 has another 8 unknown bytes (2 dwords)
-                        s.ReadBytes(0x8);
+                        s.ReadInt32();
+                        DataSize = (int)FixEndian(s.ReadUInt32(), bigEndian);
+                    }
+                    else
+                    {
+                        DataSize = Chunks * 0x800;
                     }
                 }
             }

@@ -69,7 +69,7 @@ namespace LibertyV.Rage.Audio.AWC
 
             if (MultiChannel)
             {
-                List<Structs.FormatChunk> streamsInfo = new List<Structs.FormatChunk>();
+                List<Structs.ChannelsInfoChunkItem> streamsInfo = new List<Structs.ChannelsInfoChunkItem>();
                 Structs.ChannelsInfoChunkHeader channelsInfoHeader;
                 // Haven't figured out that hash yet
                 // stream with id 0 is just info on the other channels
@@ -83,7 +83,7 @@ namespace LibertyV.Rage.Audio.AWC
 
                     for (int i = 0; i < channelsInfoHeader.ChannelsCount; ++i)
                     {
-                        streamsInfo.Add(new Structs.FormatChunk(new Structs.ChannelsInfoChunkItem(chunkReader, header.BigEndian)));
+                        streamsInfo.Add(new Structs.ChannelsInfoChunkItem(chunkReader, header.BigEndian));
                         AudioIds.Add(info[i + 1].Id);
                     }
                 }
@@ -110,6 +110,10 @@ namespace LibertyV.Rage.Audio.AWC
         {
             if (MultiChannel)
             {
+                /*using (Stream file = File.Create(baseName + ".wav"))
+                {
+                    ExportWav(AudioStreams[0], file);
+                }*/
                 for (int i = 0; i < ((MultiChannelAudio)AudioStreams[0]).Channels.Count; ++i)
                 {
                     using (Stream file = File.Create(baseName + "." + AudioIds[i] + ".wav"))

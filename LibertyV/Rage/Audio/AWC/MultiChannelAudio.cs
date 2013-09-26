@@ -9,47 +9,47 @@ namespace LibertyV.Rage.Audio.AWC
 {
     class MultiChannelAudio : IAudio
     {
-        // To improve: right now I decode the same mp3 as number of channels, it can be improved
         public List<SplittedAudio> Channels = new List<SplittedAudio>();
 
-        public MultiChannelAudio(Stream data, Structs.ChannelsInfoChunkHeader channelsInfoHeader, List<Structs.FormatChunk> channelsInfo, bool bigEndian)
+        public MultiChannelAudio(Stream data, Structs.ChannelsInfoChunkHeader channelsInfoHeader, List<Structs.ChannelsInfoChunkItem> channelsInfo, bool bigEndian)
         {
             int chunkSize = 0x800;
-            
-            List<Tuple<int, int>>[] channelsChunksSamples = new List<Tuple<int, int>>[channelsInfoHeader.ChannelsCount];
-            List<Tuple<int, int>> samplesInfo = new List<Tuple<int, int>>();
-            List<IAudio> audio = new List<IAudio>();
+
+            List<Stream>[] channelsStreams = new List<Stream>[channelsInfoHeader.ChannelsCount];
+
             for (int i = 0; i < channelsInfoHeader.ChannelsCount; ++i)
             {
-                channelsChunksSamples[i] = new List<Tuple<int, int>>();
+                channelsStreams[i] = new List<Stream>();
             }
 
             while (data.Position != data.Length)
             {
                 int totalChunks = 0;
-                uint samplePos = 0;
-                // Warning! We assume that the header size is smaller than 0x800, but it seems to be always the case
                 long startPos = data.Position;
-                long size = 0;
+                long pos = startPos;
+                int[] dataSizes = new int[channelsInfoHeader.ChannelsCount];
                 for (int i = 0; i < channelsInfoHeader.ChannelsCount; ++i)
                 {
                     Structs.ChannelChunkHeader header = new Structs.ChannelChunkHeader(data, bigEndian);
-                    // number of chunk's chunks
-                    if (header.Chunks != 0)
+                    dataSizes[i] = header.DataSize;
+                    if (channelsInfo[i].RoundSize != 0)
                     {
-                        channelsChunksSamples[i].Add(Tuple.Create((int)samplePos, (int)header.Samples));
-                        samplePos += header.Samples;
+                        dataSizes[i] += (((-dataSizes[i]) % channelsInfo[i].RoundSize) + channelsInfo[i].RoundSize) % channelsInfo[i].RoundSize;
                     }
                     totalChunks += header.Chunks;
-                    size += header.Chunks * chunkSize;
                 }
 
                 int headerSize = totalChunks * 4 + channelsInfoHeader.ChannelsCount * Structs.ChannelChunkHeader.Size;
                 headerSize += (((-headerSize) % chunkSize) + chunkSize) % chunkSize;
+                
+                pos += headerSize;
+                for (int i = 0; i < channelsInfoHeader.ChannelsCount; ++i)
+                {
+                    channelsStreams[i].Add(new PartialStream(data, pos, dataSizes[i]));
+                    pos += dataSizes[i];
+                }
 
-                size += headerSize;
-
-                if (size > channelsInfoHeader.BigChunkSize)
+                if (pos - startPos > channelsInfoHeader.BigChunkSize)
                 {
                     throw new Exception("Chunks too big");
                 }
@@ -59,20 +59,13 @@ namespace LibertyV.Rage.Audio.AWC
                     throw new Exception("Unexpected value");
                 }
 
-                
-                //samplesInfo.Add(Tuple.Create(0, (int)samplePos));
-                // We assume two things:
-                // 1. it is the same for all the channels
-                // 2. we have at least one channel
-                audio.Add(new Audio(new PartialStream(data, startPos + headerSize, channelsInfoHeader.BigChunkSize - headerSize), samplePos, channelsInfo[0].SamplesPerSecond));
-
                 // After each chunk, there is header's size zeros block
                 data.Seek(startPos + channelsInfoHeader.BigChunkSize, SeekOrigin.Begin);
             }
 
             for (int i = 0; i < channelsInfoHeader.ChannelsCount; ++i)
             {
-                Channels.Add(new SplittedAudio(audio, channelsChunksSamples[i], channelsInfo[i].Samples, channelsInfo[i].SamplesPerSecond));
+                Channels.Add(new SplittedAudio(channelsStreams[i], channelsInfo[i].Samples, channelsInfo[i].SamplesPerSecond));
             }
             // notice that the samples count is as the audio for all the channels is mono, which this is the case, we need to create the channels from it
             //Audio = new SplittedAudio(audio, samplesInfo, (uint)channelsInfo.Sum(info => info.Samples), channelsInfo[0].SamplesPerSecond);
@@ -84,6 +77,8 @@ namespace LibertyV.Rage.Audio.AWC
             // OK, so it wrongs righ now, I need to understand how to split it. Maybe in frame start/end?
         }
 
+        // 1. it is the same for all the channels
+        // 2. we have at least one channel
         public int GetBits()
         {
             return Channels[0].GetBits();

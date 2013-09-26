@@ -77,25 +77,30 @@ namespace LibertyV.Rage.Audio.AWC
             int channels = _streams.Count;
             int startOffset = offset;
             // If we are in the middle of a channel, let's write it first
-            while (_currentChannel != 0 && count > 0)
+            if (_currentSampleSize != 0 && count > 0)
             {
-                int toRead = count < _currentSampleSize ? count : _currentSampleSize;
-
-                if (_streams[_currentChannel].Read(buffer, offset, toRead) != toRead)
+                do
                 {
-                    throw new Exception("Invalid channel stream");
-                }
+                    int toRead = count < _currentSampleSize ? count : _currentSampleSize;
 
-                count -= toRead;
-                offset += toRead;
-                _currentSampleSize -= toRead;
+                    if (_streams[_currentChannel].Read(buffer, offset, toRead) != toRead)
+                    {
+                        throw new Exception("Invalid channel stream");
+                    }
 
-                if (_currentSampleSize == 0)
-                {
-                    _currentChannel = (_currentChannel + 1) % channels;
-                    _currentSampleSize = _sampleSize;
+                    count -= toRead;
+                    offset += toRead;
+                    _currentSampleSize -= toRead;
+
+                    if (_currentSampleSize == 0)
+                    {
+                        _currentChannel = (_currentChannel + 1) % channels;
+                        _currentSampleSize = _sampleSize;
+                    }
                 }
+                while (_currentChannel != 0 && count > 0);
             }
+            _currentSampleSize = 0;
 
             // Calculate how many full samples are we going to read
             int samplesToRead = count / (_sampleSize * channels);
@@ -131,10 +136,9 @@ namespace LibertyV.Rage.Audio.AWC
             if (count != 0 && _currentSample < _samples)
             {
                 ++_currentSample;
-                _currentSampleSize = _sampleSize;
                 while (count > 0)
                 {
-                    int toRead = count < _currentSampleSize ? count : _currentSampleSize;
+                    int toRead = count < _sampleSize ? count : _sampleSize;
 
                     if (_streams[_currentChannel].Read(buffer, offset, toRead) != toRead)
                     {
@@ -143,12 +147,11 @@ namespace LibertyV.Rage.Audio.AWC
 
                     count -= toRead;
                     offset += toRead;
-                    _currentSampleSize -= toRead;
+                    _currentSampleSize = _sampleSize - toRead;
 
-                    if (toRead == _currentSampleSize)
+                    if (toRead == _sampleSize)
                     {
                         _currentChannel = (_currentChannel + 1) % _streams.Count;
-                        _currentSampleSize = _sampleSize;
                     }
                 }
             }

@@ -254,6 +254,7 @@ __declspec(dllexport) int __stdcall mpeg_decoder_process(
 				{
 					// Save that value, we will right it next time
 					state->lastValue = Sample;
+					state->pcmPos++;
 					break;
 				}
 

@@ -8,17 +8,15 @@ namespace LibertyV.Rage.Audio.AWC
 {
     class SplittedAudio : IAudio
     {
-        List<IAudio> Streams;
-        List<Tuple<int, int>> StreamsSamplesInfo;
+        List<Audio> Streams;
         uint Samples;
         int SamplesPerSecond;
 
-        public SplittedAudio(List<IAudio> streams, List<Tuple<int, int>> streamsSamplesInfo, uint samples, int samplesPerSecond)
+        public SplittedAudio(List<Stream> streams, uint samples, int samplesPerSecond)
         {
             this.Samples = samples;
             this.SamplesPerSecond = samplesPerSecond;
-            Streams = streams;
-            StreamsSamplesInfo = streamsSamplesInfo;
+            Streams = streams.Select(stream => new Audio(stream, samples, samplesPerSecond)).ToList();
         }
 
         public int GetBits()
@@ -44,7 +42,7 @@ namespace LibertyV.Rage.Audio.AWC
 
         public Stream GetPCMStream()
         {
-            return new SplittedAudioPCMStream(Streams.Select(stream => stream.GetPCMStream()).ToList(), StreamsSamplesInfo, this.GetBits(), this.GetChannels());
+            return new SplittedAudioPCMStream(Streams.Select(stream => stream.GetPCMStream()).ToList());
         }
 
         public void Dispose()
