@@ -49,7 +49,7 @@ namespace LibertyV.Rage.Audio.Codecs.MP3
 
             readFunc = UnsafeRead;
             isEOFFunc = IsEOF;
-            _state = mpeg_decoder_init(24, readFunc, isEOFFunc);
+            _state = mpeg_decoder_init(GlobalOptions.AudioBits, readFunc, isEOFFunc);
             if (_state == IntPtr.Zero)
             {
                 throw new Exception("XMemCreateDecompressionContext failed");

@@ -30,8 +30,7 @@ namespace LibertyV.Rage.Audio.AWC
 
         public int GetBits()
         {
-            // I export all in 24bit right now
-            return 24;
+            return GlobalOptions.AudioBits;
         }
 
         public uint GetSamplesCount()

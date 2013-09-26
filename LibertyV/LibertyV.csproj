@@ -97,11 +97,11 @@
     <Compile Include="Rage\Audio\AWC\Audio.cs" />
     <Compile Include="Rage\Audio\AWC\ChunkStream.cs" />
     <Compile Include="Rage\Audio\AWC\AWCFile.cs" />
+    <Compile Include="Utils\SplittedStream.cs" />
     <Compile Include="Rage\Audio\AWC\IAudio.cs" />
     <Compile Include="Rage\Audio\AWC\MultiChannelAudio.cs" />
     <Compile Include="Rage\Audio\AWC\MultiChannelPCMStream.cs" />
     <Compile Include="Rage\Audio\AWC\SplittedAudio.cs" />
-    <Compile Include="Rage\Audio\AWC\SplittedAudioPCMStream.cs" />
     <Compile Include="Rage\Audio\AWC\Structs.cs" />
     <Compile Include="Rage\Audio\AWC\WAVFile.cs" />
     <Compile Include="Rage\Audio\Codecs\MP3\MP3DecoderStream.cs" />

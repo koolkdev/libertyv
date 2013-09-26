@@ -6,16 +6,47 @@ using System.IO;
 
 namespace LibertyV.Rage.Audio.AWC
 {
-    class SplittedAudioPCMStream : Stream
+    class SplittedStream : Stream
     {
         private List<Stream> _streams;
         int _currentStream = 0;
+        long _position = 0;
 
-        public SplittedAudioPCMStream(List<Stream> streams)
+        public SplittedStream(List<Stream> streams)
         {
             _streams = streams;
             foreach (Stream stream in _streams)
+            {
                 if (!(stream.CanRead)) throw new ArgumentException("Stream not readable", "streams");
+                if (!(stream.CanSeek)) throw new ArgumentException("Stream not seekable", "streams");
+            }
+        }
+
+        private void UpdatePosition(long pos)
+        {
+            if (pos == _position)
+            {
+                return;
+            }
+            long tempPos = pos;
+            int newStream = 0;
+            while (tempPos > _streams[newStream].Length)
+            {
+                _streams[newStream].Seek(tempPos, SeekOrigin.End);
+                tempPos -= _streams[newStream].Length;
+                newStream += 1;
+                if (newStream == _streams.Count)
+                {
+                    throw new Exception("Position is out of bounds");
+                }
+            }
+            _streams[newStream].Seek(tempPos, SeekOrigin.Begin);
+            _currentStream = newStream;
+            _position = pos;
+            for (++newStream; newStream < _streams.Count; ++newStream)
+            {
+                _streams[newStream].Seek(0, SeekOrigin.Begin);
+            }
         }
 
         public override bool CanRead
@@ -25,7 +56,7 @@ namespace LibertyV.Rage.Audio.AWC
 
         public override bool CanSeek
         {
-            get { return false; }
+            get { return true; }
         }
 
         public override bool CanWrite
@@ -35,13 +66,13 @@ namespace LibertyV.Rage.Audio.AWC
 
         public override long Length
         {
-            get { throw new NotSupportedException("Unseekable Stream"); }
+            get { return _streams.Sum(stream => stream.Length); }
         }
 
         public override long Position
         {
-            get { throw new NotSupportedException("Unseekable Stream"); }
-            set { throw new NotSupportedException("Unseekable Stream"); }
+            get { return _position; }
+            set { UpdatePosition(value); }
         }
 
         public override void Flush()
@@ -50,12 +81,43 @@ namespace LibertyV.Rage.Audio.AWC
 
         public override long Seek(long offset, SeekOrigin origin)
         {
-            throw new NotSupportedException("Unseekable Stream");
+            long tempPosition = 0;
+            switch (origin)
+            {
+                case SeekOrigin.Begin:
+                    {
+                        tempPosition = offset;
+                        break;
+                    }
+                case SeekOrigin.Current:
+                    {
+                        tempPosition = _position + offset;
+                        break;
+                    }
+                case SeekOrigin.End:
+                    {
+                        tempPosition = Length + offset;
+                        break;
+                    }
+                default:
+                    throw new ArgumentException("Invalid seek origin");
+            }
+
+            if (tempPosition != _position)
+            {
+                if (tempPosition < 0)
+                    throw new IOException("Seek before begin");
+                if (tempPosition > Length)
+                    throw new IOException("Seek after end");
+                UpdatePosition(tempPosition);
+            }
+
+            return _position;
         }
 
         public override void SetLength(long value)
         {
-            throw new NotSupportedException("Unseekable Stream");
+            throw new NotSupportedException("Can't change stream size");
         }
 
         public override int Read(byte[] buffer, int offset, int count)
@@ -83,6 +145,7 @@ namespace LibertyV.Rage.Audio.AWC
                     _currentStream += 1;
                 }
 
+                _position += read;
                 count -= read;
                 offset += read;
             }

@@ -67,14 +67,6 @@ namespace LibertyV.Rage.Audio.AWC
             {
                 Channels.Add(new SplittedAudio(channelsStreams[i], channelsInfo[i].Samples, channelsInfo[i].SamplesPerSecond));
             }
-            // notice that the samples count is as the audio for all the channels is mono, which this is the case, we need to create the channels from it
-            //Audio = new SplittedAudio(audio, samplesInfo, (uint)channelsInfo.Sum(info => info.Samples), channelsInfo[0].SamplesPerSecond);
-
-            // Big question:
-            // There is a waste of samples in each level, there is more information than what we need
-            // What I do right now, is to cut the left samples at the end of each part (how do I know that the samples in each part are splitted perfectly for each channel?)
-            // Cut the left samples from the end
-            // OK, so it wrongs righ now, I need to understand how to split it. Maybe in frame start/end?
         }
 
         // 1. it is the same for all the channels
