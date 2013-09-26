@@ -30,7 +30,7 @@ namespace LibertyV.Rage.Audio.AWC
                 uint samplePos = 0;
                 // Warning! We assume that the header size is smaller than 0x800, but it seems to be always the case
                 long startPos = data.Position;
-                long pos = data.Position + chunkSize;
+                long size = 0;
                 for (int i = 0; i < channelsInfoHeader.ChannelsCount; ++i)
                 {
                     Structs.ChannelChunkHeader header = new Structs.ChannelChunkHeader(data, bigEndian);
@@ -41,16 +41,15 @@ namespace LibertyV.Rage.Audio.AWC
                         samplePos += header.Samples;
                     }
                     totalChunks += header.Chunks;
-                    pos += header.Chunks * chunkSize;
+                    size += header.Chunks * chunkSize;
                 }
 
-                if (totalChunks * 4 + channelsInfoHeader.ChannelsCount * Structs.ChannelChunkHeader.Size > chunkSize)
-                {
-                    // Checking our assumpetion 
-                    throw new Exception("Too big chunk header");
-                }
+                int headerSize = totalChunks * 4 + channelsInfoHeader.ChannelsCount * Structs.ChannelChunkHeader.Size;
+                headerSize += (((-headerSize) % chunkSize) + chunkSize) % chunkSize;
 
-                if (pos - startPos > channelsInfoHeader.BigChunkSize)
+                size += headerSize;
+
+                if (size > channelsInfoHeader.BigChunkSize)
                 {
                     throw new Exception("Chunks too big");
                 }
@@ -65,7 +64,7 @@ namespace LibertyV.Rage.Audio.AWC
                 // We assume two things:
                 // 1. it is the same for all the channels
                 // 2. we have at least one channel
-                audio.Add(new Audio(new PartialStream(data, startPos + chunkSize, channelsInfoHeader.BigChunkSize - chunkSize), samplePos, channelsInfo[0].SamplesPerSecond));
+                audio.Add(new Audio(new PartialStream(data, startPos + headerSize, channelsInfoHeader.BigChunkSize - headerSize), samplePos, channelsInfo[0].SamplesPerSecond));
 
                 // After each chunk, there is header's size zeros block
                 data.Seek(startPos + channelsInfoHeader.BigChunkSize, SeekOrigin.Begin);
