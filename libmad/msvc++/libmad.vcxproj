@@ -134,6 +134,7 @@
     <ClInclude Include="..\synth.h" />
     <ClInclude Include="..\timer.h" />
     <ClInclude Include="..\version.h" />
+    <ClInclude Include="mad.h" />
     <ClInclude Include="madlldlib.h" />
   </ItemGroup>
   <ItemGroup>

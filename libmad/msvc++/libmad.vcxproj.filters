@@ -95,6 +95,9 @@
     <ClInclude Include="madlldlib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="mad.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\D.dat">
