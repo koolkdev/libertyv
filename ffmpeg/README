@@ -1,0 +1,16 @@
+I slightly modified ffmpeg, so it will be able to decode xma. The header of xma is 4 bytes, but in wmapro it is a variable size.
+So I have two solutions:
+1. Make the header shorter (And shift all the bits accordingly)
+2. Change wmapro decoder.
+Right now I chose the second solution, because it is simpler.
+The patch file with the change is in this folder.
+
+If you want to compile it, follow the instructions at:
+http://libav.org/platform.html#Microsoft-Visual-C_002b_002b-or-Intel-C_002b_002b-Compiler-for-Windows
+
+Apply my patch, and configure libav with the following command line:
+./configure --toolchain=msvc --disable-everything --enable-decoder=wmapro --extra-cflags="-I ~/include" --enable-shared --disable-debug
+
+(The only decoder that we use right now is wmapro)
+
+Good luck!

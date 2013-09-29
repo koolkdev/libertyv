@@ -5,6 +5,7 @@ using System.Text;
 using System.IO;
 using LibertyV.Rage.Audio.Codecs.MP3;
 using LibertyV.Utils;
+using LibertyV.Rage.Audio.Codecs.XMA;
 
 namespace LibertyV.Rage.Audio.AWC
 {
@@ -55,6 +56,10 @@ namespace LibertyV.Rage.Audio.AWC
                 // The playstation3 use mp3 encode
                 // The partial stream is because we want that each reader will have its own seeker
                 return new MP3DecoderStream(new PartialStream(this.Data, 0, this.Data.Length));
+            }
+            else if (GlobalOptions.Platform == Platform.PlatformType.XBOX360)
+            {
+                return new XMA2DecoderStream(new PartialStream(this.Data, 0, this.Data.Length));
             }
             return null;
         }

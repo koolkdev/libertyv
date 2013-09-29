@@ -1,0 +1,10 @@
+--- "wmaprodec.c.orig"
++++ "wmaprodec.c"
+@@ -1541,6 +1541,7 @@ static int decode_packet(AVCodecContext *avctx, void *data,
+         num_bits_prev_frame = get_bits(gb, s->log2_frame_size);
+         av_dlog(avctx, "packet[%d]: nbpf %x\n", avctx->frame_number,
+                 num_bits_prev_frame);
++        skip_bits(gb, 11);
+ 
+         /** check for packet loss */
+         if (!s->packet_loss &&

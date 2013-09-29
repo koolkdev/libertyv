@@ -17,6 +17,8 @@ namespace LibertyV.Rage.Audio.AWC
 
             List<Stream>[] channelsStreams = new List<Stream>[channelsInfoHeader.ChannelsCount];
 
+            uint[] sampless = new uint[channelsInfoHeader.ChannelsCount];
+
             for (int i = 0; i < channelsInfoHeader.ChannelsCount; ++i)
             {
                 channelsStreams[i] = new List<Stream>();
@@ -32,11 +34,9 @@ namespace LibertyV.Rage.Audio.AWC
                 {
                     Structs.ChannelChunkHeader header = new Structs.ChannelChunkHeader(data, bigEndian);
                     dataSizes[i] = header.DataSize;
-                    if (channelsInfo[i].RoundSize != 0)
-                    {
-                        dataSizes[i] += (((-dataSizes[i]) % channelsInfo[i].RoundSize) + channelsInfo[i].RoundSize) % channelsInfo[i].RoundSize;
-                    }
                     totalChunks += header.Chunks;
+
+                    sampless[i] += header.Samples;
                 }
 
                 int headerSize = totalChunks * 4 + channelsInfoHeader.ChannelsCount * Structs.ChannelChunkHeader.Size;
@@ -46,6 +46,11 @@ namespace LibertyV.Rage.Audio.AWC
                 for (int i = 0; i < channelsInfoHeader.ChannelsCount; ++i)
                 {
                     channelsStreams[i].Add(new PartialStream(data, pos, dataSizes[i]));
+
+                    if (channelsInfo[i].RoundSize != 0)
+                    {
+                        dataSizes[i] += (((-dataSizes[i]) % channelsInfo[i].RoundSize) + channelsInfo[i].RoundSize) % channelsInfo[i].RoundSize;
+                    }
                     pos += dataSizes[i];
                 }
 

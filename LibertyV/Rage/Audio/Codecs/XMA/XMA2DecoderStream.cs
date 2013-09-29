@@ -5,52 +5,34 @@ using System.Text;
 using System.IO;
 using System.Runtime.InteropServices;
 
-namespace LibertyV.Rage.Audio.Codecs.MP3
+namespace LibertyV.Rage.Audio.Codecs.XMA
 {
-    class MP3DecoderStream : Stream
+    class XMA2DecoderStream : Stream
     {
         private Stream _stream;
-        private IntPtr _state;
+        private IntPtr _ctx;
 
-        delegate int ReadDelegate(IntPtr destPtr, int offset, int count);
-        delegate int IsEOFDelegate();
+        [DllImport(@"xmadec.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr xma2_dec_init(int sample_rate, int channels, int bits);
 
-        ReadDelegate readFunc;
-        IsEOFDelegate isEOFFunc;
+        [DllImport(@"xmadec.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern int xma2_dec_prepare_packet(IntPtr ctx, byte[] input, int input_size);
 
-        [DllImport(@"libmad.dll")]
-        private static extern IntPtr mpeg_decoder_init(int bits, ReadDelegate readFunc, IsEOFDelegate isEOF);
+        [DllImport(@"xmadec.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern int xma2_dec_read(IntPtr ctx, byte[] output, int output_offset, int output_size);
 
-        [DllImport(@"libmad.dll")]
-        private static extern int mpeg_decoder_process(IntPtr State, byte[] pDestination, int Offset, int DestSize);
+        [DllImport(@"xmadec.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern void xma2_dec_destroy(IntPtr State);
 
-        [DllImport(@"libmad.dll")]
-        private static extern int mpeg_decoder_destroy(IntPtr State);
-
-        private int IsEOF()
-        {
-            return (_stream.Position == _stream.Length) ? 1 : 0;
-        }
-
-        private int UnsafeRead(IntPtr destPtr, int offset, int count)
-        {
-            byte[] dest = new byte[count];
-            int res = _stream.Read(dest, offset, count);
-            Marshal.Copy(dest, 0, destPtr, res);
-            return res;
-        }
-
-        public MP3DecoderStream(Stream stream)
+        public XMA2DecoderStream(Stream stream)
         {
             _stream = stream;
             if (!(_stream.CanRead)) throw new ArgumentException("Stream not readable", "stream");
             // need seeking for eof checking
             if (!(_stream.CanSeek)) throw new ArgumentException("Stream not seekable", "stream");
 
-            readFunc = UnsafeRead;
-            isEOFFunc = IsEOF;
-            _state = mpeg_decoder_init(GlobalOptions.AudioBits, readFunc, isEOFFunc);
-            if (_state == IntPtr.Zero)
+            _ctx = xma2_dec_init(32000, 1, GlobalOptions.AudioBits);
+            if (_ctx == IntPtr.Zero)
             {
                 throw new Exception("XMemCreateDecompressionContext failed");
             }
@@ -106,14 +88,37 @@ namespace LibertyV.Rage.Audio.Codecs.MP3
             if (buffer.Length - offset < count)
                 throw new ArgumentException("Invalid offset and length");
 
-            int read = mpeg_decoder_process(_state, buffer, offset, count);
+            int originalOffset = offset;
 
-            if (read < 0)
+            while (count > 0)
             {
-                throw new Exception("mpeg_decoder_process failed");
+                int read = xma2_dec_read(_ctx, buffer, offset, count);
+
+                if (read < 0)
+                {
+                    throw new Exception("xma2_dec_read failed");
+                }
+                offset += read;
+                count -= read;
+
+                if (read == 0)
+                {
+                    // Read one packet
+                    byte[] packet = new byte[0x800];
+
+                    if (_stream.Read(packet, 0, packet.Length) != packet.Length) {
+                        // EOF, failed to read whole packet
+                        break;
+                    }
+
+                    if (xma2_dec_prepare_packet(_ctx, packet, packet.Length) < 0)
+                    {
+                        throw new Exception("xma2_dec_prepare_packet failed");
+                    }
+                }
             }
 
-            return read;
+            return offset - originalOffset;
         }
 
 
@@ -128,14 +133,12 @@ namespace LibertyV.Rage.Audio.Codecs.MP3
             {
                 _stream.Close();
             }
-            if (_state != IntPtr.Zero)
+            if (_ctx != IntPtr.Zero)
             {
-                mpeg_decoder_destroy(_state);
-                _state = IntPtr.Zero;
+                xma2_dec_destroy(_ctx);
+                _ctx = IntPtr.Zero;
             }
             _stream = null;
-            readFunc = null;
-            isEOFFunc = null;
         }
     }
 }

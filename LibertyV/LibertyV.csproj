@@ -97,6 +97,7 @@
     <Compile Include="Rage\Audio\AWC\Audio.cs" />
     <Compile Include="Rage\Audio\AWC\ChunkStream.cs" />
     <Compile Include="Rage\Audio\AWC\AWCFile.cs" />
+    <Compile Include="Rage\Audio\Codecs\XMA\XMA2DecoderStream.cs" />
     <Compile Include="Utils\SplittedStream.cs" />
     <Compile Include="Rage\Audio\AWC\IAudio.cs" />
     <Compile Include="Rage\Audio\AWC\MultiChannelAudio.cs" />
@@ -179,6 +180,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\open.bmp" />
+    <Content Include="avcodec-55.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="avutil-52.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="liberty_v_logo.ico" />
     <None Include="Resources\save.bmp" />
     <None Include="Resources\saveas.bmp" />

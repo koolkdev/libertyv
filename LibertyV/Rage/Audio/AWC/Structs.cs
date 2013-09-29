@@ -228,7 +228,7 @@ namespace LibertyV.Rage.Audio.AWC
                     }
                     else
                     {
-                        return 0x10C;
+                        return 0x10;
                     }
                 }
             }
@@ -244,17 +244,9 @@ namespace LibertyV.Rage.Audio.AWC
             {
                 using (BinaryReader s = new BinaryReader(new StreamKeeper(stream)))
                 {
-                    if (GlobalOptions.Platform == Platform.PlatformType.XBOX360)
-                    {
-                        Unknown = (int)FixEndian(s.ReadUInt32(), bigEndian);
-                    }
                     StartChunk = (int)FixEndian(s.ReadUInt32(), bigEndian);
                     Chunks = (int)FixEndian(s.ReadUInt32(), bigEndian);
-                    if (GlobalOptions.Platform == Platform.PlatformType.PLAYSTATION3)
-                    {
-                        // This case is true for max payn 3 pc version too
-                        Unknown = (int)FixEndian(s.ReadUInt32(), bigEndian);
-                    }
+                    Unknown = (int)FixEndian(s.ReadUInt32(), bigEndian);
                     Samples = FixEndian(s.ReadUInt32(), bigEndian);
 
                     if (GlobalOptions.Platform == Platform.PlatformType.PLAYSTATION3)
