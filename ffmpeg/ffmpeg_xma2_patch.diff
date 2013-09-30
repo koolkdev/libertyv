@@ -1,5 +1,14 @@
 --- "wmaprodec.c.orig"
 +++ "wmaprodec.c"
+@@ -308,7 +308,7 @@ static av_cold int decode_init(AVCodecContext *avctx)
+     s->log2_frame_size = av_log2(avctx->block_align) + 4;
+ 
+     /** frame info */
+-    s->skip_frame  = 1; /* skip first frame */
++    s->skip_frame  = 0; /* don't skip first frame */
+     s->packet_loss = 1;
+     s->len_prefix  = (s->decode_flags & 0x40);
+ 
 @@ -1541,6 +1541,7 @@ static int decode_packet(AVCodecContext *avctx, void *data,
          num_bits_prev_frame = get_bits(gb, s->log2_frame_size);
          av_dlog(avctx, "packet[%d]: nbpf %x\n", avctx->frame_number,

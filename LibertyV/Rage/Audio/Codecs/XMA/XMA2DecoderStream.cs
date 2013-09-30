@@ -22,7 +22,7 @@ namespace LibertyV.Rage.Audio.Codecs.XMA
         private static extern int xma2_dec_read(IntPtr ctx, byte[] output, int output_offset, int output_size);
 
         [DllImport(@"xmadec.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void xma2_dec_destroy(IntPtr State);
+        private static extern void xma2_dec_free(IntPtr State);
 
         public XMA2DecoderStream(Stream stream)
         {
@@ -135,7 +135,7 @@ namespace LibertyV.Rage.Audio.Codecs.XMA
             }
             if (_ctx != IntPtr.Zero)
             {
-                xma2_dec_destroy(_ctx);
+                xma2_dec_free(_ctx);
                 _ctx = IntPtr.Zero;
             }
             _stream = null;

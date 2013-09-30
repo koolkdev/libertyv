@@ -233,7 +233,7 @@ namespace LibertyV.Rage.Audio.AWC
                 }
             }
             // zero most of the time
-            public int Unknown;
+            public int SamplesSkip;
             public int StartChunk;
             public int Chunks;
             // Samples in chunk
@@ -246,7 +246,7 @@ namespace LibertyV.Rage.Audio.AWC
                 {
                     StartChunk = (int)FixEndian(s.ReadUInt32(), bigEndian);
                     Chunks = (int)FixEndian(s.ReadUInt32(), bigEndian);
-                    Unknown = (int)FixEndian(s.ReadUInt32(), bigEndian);
+                    SamplesSkip = (int)FixEndian(s.ReadUInt32(), bigEndian);
                     Samples = FixEndian(s.ReadUInt32(), bigEndian);
 
                     if (GlobalOptions.Platform == Platform.PlatformType.PLAYSTATION3)

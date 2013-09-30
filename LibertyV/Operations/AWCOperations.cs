@@ -43,11 +43,6 @@ namespace LibertyV.Operations
 
         public static void ExportAWCs(List<FileEntry> entries)
         {
-            if (GlobalOptions.Platform == Platform.PlatformType.XBOX360)
-            {
-                MessageBox.Show("Not supported yet on Xbox");
-                return;
-            }
             string selectedFolder = GUI.FolderSelection();
             if (selectedFolder != null)
             {

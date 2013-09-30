@@ -146,7 +146,10 @@ namespace LibertyV.Rage.Audio.AWC
 
         public static void ExportWav(IAudio audio, Stream output)
         {
-            WAVFile.WAVFromPCM(audio.GetPCMStream(), output, (short)audio.GetChannels(), audio.GetSamplesPerSecond(), audio.GetBits());
+            using (Stream input = audio.GetPCMStream())
+            {
+                WAVFile.WAVFromPCM(input, output, (short)audio.GetChannels(), audio.GetSamplesPerSecond(), audio.GetBits(), (int)audio.GetSamplesCount());
+            }
         }
     }
 }

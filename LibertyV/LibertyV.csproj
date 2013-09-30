@@ -97,6 +97,7 @@
     <Compile Include="Rage\Audio\AWC\Audio.cs" />
     <Compile Include="Rage\Audio\AWC\ChunkStream.cs" />
     <Compile Include="Rage\Audio\AWC\AWCFile.cs" />
+    <Compile Include="Rage\Audio\AWC\SplittedAudioPCMStream.cs" />
     <Compile Include="Rage\Audio\Codecs\XMA\XMA2DecoderStream.cs" />
     <Compile Include="Utils\SplittedStream.cs" />
     <Compile Include="Rage\Audio\AWC\IAudio.cs" />

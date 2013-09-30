@@ -16,12 +16,12 @@ namespace LibertyV.Rage.Audio.AWC
             int chunkSize = 0x800;
 
             List<Stream>[] channelsStreams = new List<Stream>[channelsInfoHeader.ChannelsCount];
-
-            uint[] sampless = new uint[channelsInfoHeader.ChannelsCount];
+            List<Tuple<int, int>>[] samples = new List<Tuple<int, int>>[channelsInfoHeader.ChannelsCount];
 
             for (int i = 0; i < channelsInfoHeader.ChannelsCount; ++i)
             {
                 channelsStreams[i] = new List<Stream>();
+                samples[i] = new List<Tuple<int, int>>();
             }
 
             while (data.Position != data.Length)
@@ -30,13 +30,14 @@ namespace LibertyV.Rage.Audio.AWC
                 long startPos = data.Position;
                 long pos = startPos;
                 int[] dataSizes = new int[channelsInfoHeader.ChannelsCount];
+                int[] firstNewData = new int[channelsInfoHeader.ChannelsCount];
                 for (int i = 0; i < channelsInfoHeader.ChannelsCount; ++i)
                 {
                     Structs.ChannelChunkHeader header = new Structs.ChannelChunkHeader(data, bigEndian);
                     dataSizes[i] = header.DataSize;
                     totalChunks += header.Chunks;
 
-                    sampless[i] += header.Samples;
+                    samples[i].Add(Tuple.Create(header.SamplesSkip, (int)header.Samples - header.SamplesSkip));
                 }
 
                 int headerSize = totalChunks * 4 + channelsInfoHeader.ChannelsCount * Structs.ChannelChunkHeader.Size;
@@ -70,7 +71,7 @@ namespace LibertyV.Rage.Audio.AWC
 
             for (int i = 0; i < channelsInfoHeader.ChannelsCount; ++i)
             {
-                Channels.Add(new SplittedAudio(channelsStreams[i], channelsInfo[i].Samples, channelsInfo[i].SamplesPerSecond));
+                Channels.Add(new SplittedAudio(channelsStreams[i], samples[i], channelsInfo[i].Samples, channelsInfo[i].SamplesPerSecond));
             }
         }
 

@@ -28,9 +28,10 @@ namespace LibertyV.Utils
 {
     static class StreamExtension
     {
-        public static void CopyToCount(this Stream stream, Stream output, int count)
+        public static int CopyToCount(this Stream stream, Stream output, int count)
         {
             byte[] buffer = new byte[32768];
+            int start_count = count;
             int read = buffer.Length;
             if (read > count)
             {
@@ -46,6 +47,7 @@ namespace LibertyV.Utils
                     read = count;
                 }
             }
+            return start_count - count;
         }
     }
 }
