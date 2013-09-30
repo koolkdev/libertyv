@@ -73,6 +73,8 @@ namespace LibertyV.Rage.Audio.AWC
             {
                 Channels.Add(new SplittedAudio(channelsStreams[i], samples[i], channelsInfo[i].Samples, channelsInfo[i].SamplesPerSecond));
             }
+
+            // following the headers, there is a seek table: For each chunk, there is the dword - which is the first sample in the block
         }
 
         // 1. it is the same for all the channels

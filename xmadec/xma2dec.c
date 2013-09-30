@@ -159,8 +159,18 @@ int xma2_dec_read(xma2_dec_context * ctx, unsigned char * output, int output_off
 			ctx->frame_samples_size = ctx->codec_ctx->channels * ctx->decoded_frame->nb_samples * sample_size;
 
 			for (i = 0; i < ctx->codec_ctx->channels * ctx->decoded_frame->nb_samples; ++i) {
-				int sample = (int)(curSample[i] * (1<<(ctx->bits -1)));
-				int j;
+				float fsample = curSample[i] * (1<<(ctx->bits -1));
+				int sample, j;
+				// Wierd problem: the sample should be in range -1, 1. but it isn't the case. it is bigger sometimes..
+				if (fsample >= 0) {
+					fsample += 0.5;
+					if (fsample > (1<<(ctx->bits - 1)) - 1) {
+						fsample = (float)(1<<(ctx->bits - 1)) - 1;
+					}
+				} else {
+					fsample -= 0.5;
+				}
+				sample = (int)fsample;
 				for (j = 0; j < sample_size; ++j) {
 					ctx->current_frame[i * sample_size + j] = sample & 0xff;
 					sample >>= 8;
