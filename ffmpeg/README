@@ -9,8 +9,6 @@ If you want to compile it, follow the instructions at:
 http://libav.org/platform.html#Microsoft-Visual-C_002b_002b-or-Intel-C_002b_002b-Compiler-for-Windows
 
 Apply my patch, and configure libav with the following command line:
-./configure --toolchain=msvc --disable-everything --enable-decoder=wmapro --extra-cflags="-I ~/include" --enable-shared --disable-debug
-
-(The only decoder that we use right now is wmapro)
+./configure --toolchain=msvc --disable-everything --enable-decoder=wmapro,mp3 --extra-cflags="-I ~/include" --enable-shared --disable-debug
 
 Good luck!

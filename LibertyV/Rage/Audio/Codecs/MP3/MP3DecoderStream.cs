@@ -13,24 +13,18 @@ namespace LibertyV.Rage.Audio.Codecs.MP3
         private IntPtr _state;
 
         delegate int ReadDelegate(IntPtr destPtr, int offset, int count);
-        delegate int IsEOFDelegate();
 
         ReadDelegate readFunc;
-        IsEOFDelegate isEOFFunc;
 
-        [DllImport(@"libmad.dll")]
-        private static extern IntPtr mpeg_decoder_init(int bits, ReadDelegate readFunc, IsEOFDelegate isEOF);
+        [DllImport(@"libav_wrapper.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr mp3_dec_init(ReadDelegate readFunc, int bits);
 
-        [DllImport(@"libmad.dll")]
-        private static extern int mpeg_decoder_process(IntPtr State, byte[] pDestination, int Offset, int DestSize);
+        [DllImport(@"libav_wrapper.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern int mp3_dec_read(IntPtr ctx, byte[] output, int output_offset, int output_size);
 
-        [DllImport(@"libmad.dll")]
-        private static extern int mpeg_decoder_destroy(IntPtr State);
+        [DllImport(@"libav_wrapper.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern void mp3_dec_free(IntPtr State);
 
-        private int IsEOF()
-        {
-            return (_stream.Position == _stream.Length) ? 1 : 0;
-        }
 
         private int UnsafeRead(IntPtr destPtr, int offset, int count)
         {
@@ -48,8 +42,7 @@ namespace LibertyV.Rage.Audio.Codecs.MP3
             if (!(_stream.CanSeek)) throw new ArgumentException("Stream not seekable", "stream");
 
             readFunc = UnsafeRead;
-            isEOFFunc = IsEOF;
-            _state = mpeg_decoder_init(GlobalOptions.AudioBits, readFunc, isEOFFunc);
+            _state = mp3_dec_init(readFunc, GlobalOptions.AudioBits);
             if (_state == IntPtr.Zero)
             {
                 throw new Exception("XMemCreateDecompressionContext failed");
@@ -106,7 +99,7 @@ namespace LibertyV.Rage.Audio.Codecs.MP3
             if (buffer.Length - offset < count)
                 throw new ArgumentException("Invalid offset and length");
 
-            int read = mpeg_decoder_process(_state, buffer, offset, count);
+            int read = mp3_dec_read(_state, buffer, offset, count);
 
             if (read < 0)
             {
@@ -130,12 +123,11 @@ namespace LibertyV.Rage.Audio.Codecs.MP3
             }
             if (_state != IntPtr.Zero)
             {
-                mpeg_decoder_destroy(_state);
+                mp3_dec_free(_state);
                 _state = IntPtr.Zero;
             }
             _stream = null;
             readFunc = null;
-            isEOFFunc = null;
         }
     }
 }

@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using LibertyV.Utils;
 
 namespace LibertyV.Rage.Audio.AWC
 {
     class SplittedAudio : IAudio
     {
-        List<Audio> Streams;
+        List<Stream> Streams;
         List<Tuple<int, int>> StreamsSamples;
         uint Samples;
         int SamplesPerSecond;
@@ -18,7 +19,7 @@ namespace LibertyV.Rage.Audio.AWC
             this.Samples = samples;
             this.SamplesPerSecond = samplesPerSecond;
             this.StreamsSamples = streamsSamples;
-            Streams = streams.Select(stream => new Audio(stream, samples, samplesPerSecond)).ToList();
+            Streams = streams;
         }
 
         public int GetBits()
@@ -43,12 +44,15 @@ namespace LibertyV.Rage.Audio.AWC
 
         public Stream GetPCMStream()
         {
-            return new SplittedAudioPCMStream(Streams.Select(stream => stream.GetPCMStream()).ToList(), StreamsSamples, this.GetChannels(), this.GetBits());
+            // At first I made a decoder for each stream. But the problem is that mp3 is stateful, so I did something ugly.
+            SplittedAudioPCMStream stream = new SplittedAudioPCMStream(this.Streams.Select(_stream => new PartialStream(_stream, 0, _stream.Length)).ToList<Stream>(), this.StreamsSamples, this.GetChannels(), this.GetBits());
+            stream.SetDecoderStream(Audio.GetCodecStream(stream.GetRawReadStream()));
+            return stream;
         }
 
         public void Dispose()
         {
-            foreach (IAudio stream in Streams)
+            foreach (Stream stream in Streams)
             {
                 stream.Dispose();
             }

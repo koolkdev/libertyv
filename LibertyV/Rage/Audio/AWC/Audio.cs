@@ -64,6 +64,21 @@ namespace LibertyV.Rage.Audio.AWC
             return null;
         }
 
+        public static Stream GetCodecStream(Stream input)
+        {
+            if (GlobalOptions.Platform == Platform.PlatformType.PLAYSTATION3)
+            {
+                // The playstation3 use mp3 encode
+                // The partial stream is because we want that each reader will have its own seeker
+                return new MP3DecoderStream(input);
+            }
+            else if (GlobalOptions.Platform == Platform.PlatformType.XBOX360)
+            {
+                return new XMA2DecoderStream(input);
+            }
+            return null;
+        }
+
         public void Dispose()
         {
             Data.Dispose();

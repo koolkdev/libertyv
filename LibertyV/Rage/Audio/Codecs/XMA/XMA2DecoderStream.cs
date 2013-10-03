@@ -12,16 +12,16 @@ namespace LibertyV.Rage.Audio.Codecs.XMA
         private Stream _stream;
         private IntPtr _ctx;
 
-        [DllImport(@"xmadec.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(@"libav_wrapper.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr xma2_dec_init(int sample_rate, int channels, int bits);
 
-        [DllImport(@"xmadec.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(@"libav_wrapper.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern int xma2_dec_prepare_packet(IntPtr ctx, byte[] input, int input_size);
 
-        [DllImport(@"xmadec.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(@"libav_wrapper.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern int xma2_dec_read(IntPtr ctx, byte[] output, int output_offset, int output_size);
 
-        [DllImport(@"xmadec.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(@"libav_wrapper.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern void xma2_dec_free(IntPtr State);
 
         public XMA2DecoderStream(Stream stream)
