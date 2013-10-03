@@ -27,16 +27,16 @@ namespace LibertyV.Operations
             string selectedFolder = GUI.FolderSelection();
             if (selectedFolder != null)
             {
-                //try
+                try
                 {
                     using (AWCFile awc = new AWCFile(entry.Data.GetStream()))
                     {
                         awc.ExportWav(Path.Combine(selectedFolder, entry.Name));
                     }
                 }
-                //catch (Exception)
+                catch (Exception)
                 {
-                //    MessageBox.Show("Failed to open AWC, please report to the developer");
+                    MessageBox.Show("Failed to open AWC, please report to the developer");
                 }
             }
         }
