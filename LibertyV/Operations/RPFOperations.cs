@@ -26,6 +26,7 @@ using LibertyV.Rage.RPF.V7.Entries;
 using System.IO;
 using System.Diagnostics;
 using LibertyV.Rage.RPF.V7;
+using LibertyV.Rage.RPF;
 
 namespace LibertyV.Operations
 {
@@ -38,8 +39,21 @@ namespace LibertyV.Operations
         
         public static void OpenRPF(FileEntry entry)
         {
-            LibertyV window = new LibertyV(new RPF7File(entry.Data.GetStream(), entry.Name));
+            string tempPath = Path.GetTempFileName();
+            Stream tempFile = new FileStream(tempPath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite, 0x1000, FileOptions.DeleteOnClose);
+            LibertyV window = new LibertyV(new RPF7File(entry.Data.GetStream(), entry.Name), tempPath);
             window.ShowDialog();
+            if (tempFile.Length > 0)
+            {
+                // Replace data
+                entry.Data.Dispose();
+                entry.Data = new ExternalFileStreamCreator(tempFile);
+                entry.ViewItem.Update();
+            }
+            else
+            {
+                tempFile.Close();
+            }
         }
     }
 }

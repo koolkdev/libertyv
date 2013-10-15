@@ -125,6 +125,7 @@ namespace LibertyV
             // 
             // saveAsButton
             // 
+            this.saveAsButton.Enabled = false;
             this.saveAsButton.Image = global::LibertyV.Properties.Resources.saveas;
             this.saveAsButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.saveAsButton.Name = "saveAsButton";
@@ -227,6 +228,7 @@ namespace LibertyV
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "LibertyV";
             this.Text = "LibertyV - Grand Theft Auto V RPF Explorer";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.LibertyV_FormClosed);
             this.toolbar.ResumeLayout(false);
             this.toolbar.PerformLayout();
             this.splitContainer1.Panel1.ResumeLayout(false);

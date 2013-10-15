@@ -37,16 +37,26 @@ namespace LibertyV.Rage.RPF.V7.Entries
             this.Compressed = compressed;
         }
 
-        public override void Write(Stream stream)
+        public override FileStreamCreator TryGetOriginalFileStreamCreator()
         {
-            // optimization: Check if we have the data from the original file, and we don't need to encrypt and compress it again
             if (this.Compressed && this.Data.GetType() == typeof(CompressedFileStreamCreator))
             {
-                (this.Data as CompressedFileStreamCreator).WriteRaw(stream);
+                return (this.Data as CompressedFileStreamCreator);
             }
             else if (!this.Compressed && this.Data.GetType() == typeof(FileStreamCreator))
             {
-                (this.Data as FileStreamCreator).WriteRaw(stream);
+                return (this.Data as FileStreamCreator);
+            }
+            return null;
+        }
+
+        public override void Write(Stream stream)
+        {
+            FileStreamCreator originalStream = this.TryGetOriginalFileStreamCreator();
+            // optimization: Check if we have the data from the original file, and we don't need to encrypt and compress it again
+            if (originalStream != null)
+            {
+                originalStream.WriteRaw(stream);
             }
             else
             {

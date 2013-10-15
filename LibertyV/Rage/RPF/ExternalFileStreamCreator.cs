@@ -46,5 +46,10 @@ namespace LibertyV.Rage.RPF
         {
             return (int)this.Stream.Length;
         }
+
+        public void Dispose()
+        {
+            this.Stream.Close();
+        }
     }
 }

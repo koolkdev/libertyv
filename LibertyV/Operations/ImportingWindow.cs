@@ -249,7 +249,7 @@ namespace LibertyV.Operations
                 {
                     string filepath = Path.GetTempFileName();
                     // Let's copy the file to temp folder, this file will be deleted on close
-                    FileStream writeStream = new FileStream(filepath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite | FileShare.Delete, 0x1000, FileOptions.DeleteOnClose);
+                    FileStream writeStream = new FileStream(filepath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite, 0x1000, FileOptions.DeleteOnClose);
                     Files[filename].Seek(0, SeekOrigin.Begin);
                     Files[filename].CopyTo(writeStream);
 

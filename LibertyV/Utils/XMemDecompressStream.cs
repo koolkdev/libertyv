@@ -17,6 +17,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  
  */
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -162,6 +163,7 @@ namespace LibertyV.Utils
                 {
                     _OutputBuffer = new byte[0x8000];
                 }
+
                 if (LZXdecompress(_state, tempBuffer, _OutputBuffer, inputSize, outputSize) != 0)
                 {
                     throw new Exception("LZXdecompress failed");

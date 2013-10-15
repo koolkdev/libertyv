@@ -22,19 +22,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.IO;
 
-namespace LibertyV.Rage.Audio.AWC
+namespace LibertyV.Utils
 {
-    interface IAudio : IDisposable
+    public interface IProgressReport
     {
-        int GetBits();
-        uint GetSamplesCount();
-        int GetSamplesPerSecond();
-        int GetChannels();
-
-        int GetSize();
-
-        Stream GetPCMStream();
+        void SetProgress(long value);
+        void SetMessage(string message);
+        long GetFullValue();
+        bool IsCanceled();
     }
 }

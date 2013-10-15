@@ -30,6 +30,7 @@ namespace LibertyV.Operations
     {
         public static void RenameFile(FileEntry entry)
         {
+            // TODO: Move the handling to here?
             entry.ViewItem.ListView.LabelEdit = true;
             entry.ViewItem.BeginEdit();
         }

@@ -77,14 +77,24 @@ namespace LibertyV.Rage.RPF.V7.Entries
             ResourceType = Path.GetExtension(filename).Substring(2);
         }
 
+        public override FileStreamCreator TryGetOriginalFileStreamCreator()
+        {
+            if (this.Data.GetType() == typeof(ResourceStreamCreator) && ((ResourceStreamCreator)this.Data).Encrypted == IsResourceEncrypted(this.ResourceType))
+            {
+                return (this.Data as ResourceStreamCreator);
+            }
+            return null;
+        }
+
         public override void Write(Stream stream)
         {
             // 0x10 ignored bytes
             stream.Write(new byte[0x10], 0, 0x10);
+            FileStreamCreator originalStream = this.TryGetOriginalFileStreamCreator();
             // optimization: Check if we have the data from the original file, and we don't need to encrypt and compress it again
-            if (this.Data.GetType() == typeof(CompressedFileStreamCreator) && ((CompressedFileStreamCreator)this.Data).Encrypted == IsResourceEncrypted(this.ResourceType))
+            if (originalStream != null)
             {
-                (this.Data as CompressedFileStreamCreator).WriteRaw(stream);
+                originalStream.WriteRaw(stream);
             }
             else
             {
@@ -100,7 +110,7 @@ namespace LibertyV.Rage.RPF.V7.Entries
             }
         }
 
-        public override void Export(String foldername)
+        public override void Export(String foldername, IProgressReport progress = null)
         {
             string filename;
             if (Directory.Exists(foldername))
@@ -110,6 +120,11 @@ namespace LibertyV.Rage.RPF.V7.Entries
             else
             {
                 filename = foldername;
+            }
+
+            if (progress != null)
+            {
+                progress.SetMessage("Extracting " + this.Name + ".");
             }
 
             switch (Properties.Settings.Default.ExportResourcesChoice)
@@ -129,13 +144,17 @@ namespace LibertyV.Rage.RPF.V7.Entries
 
                             using (Stream stream = this.Data.GetStream())
                             {
-                                stream.CopyTo(file);
+                                stream.CopyToCount(file, this.Data.GetSize(), progress);
                             }
                         }
                         break;
                     }
                 case Settings.ExportResourcesChoice.SYSGFX:
                     {
+                        if (progress != null)
+                        {
+                            progress = new SubProgressReport(progress, (int)(this.SystemSize + this.GraphicsFlag));
+                        }
                         using (Stream stream = this.Data.GetStream())
                         {
                             // If there is no graphics information, no need to extract into two files
@@ -144,7 +163,7 @@ namespace LibertyV.Rage.RPF.V7.Entries
                             {
                                 using (FileStream file = File.Create(filename + sysExtension))
                                 {
-                                    stream.CopyToCount(file, this.SystemSize);
+                                    stream.CopyToCount(file, this.SystemSize, progress == null ? null : new SubProgressReport(progress, 0, this.SystemSize));
                                 }
                             }
 
@@ -152,7 +171,7 @@ namespace LibertyV.Rage.RPF.V7.Entries
                             {
                                 using (FileStream file = File.Create(filename + ".gfx"))
                                 {
-                                    stream.CopyToCount(file, this.GraphicSize);
+                                    stream.CopyToCount(file, this.GraphicSize, progress == null ? null : new SubProgressReport(progress, this.SystemSize, (int)(this.SystemSize + this.GraphicsFlag)));
                                 }
                             }
                         }
@@ -165,6 +184,10 @@ namespace LibertyV.Rage.RPF.V7.Entries
                             // Well, it isn't REALLY raw. We are rewriting it, so of the regular random-header, there are zeros, 
                             //but it is close enough, that information is random anyway
                             this.Write(file);
+                            if (progress != null)
+                            {
+                                progress.SetProgress(progress.GetFullValue());
+                            }
                         }
                         break;
                     }

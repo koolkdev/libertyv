@@ -90,6 +90,12 @@
       <DependentUpon>LibertyV.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
+    <Compile Include="ProgressWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ProgressWindow.Designer.cs">
+      <DependentUpon>ProgressWindow.cs</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Operations\Export.cs" />
     <Compile Include="Operations\RPFOperations.cs" />
@@ -99,6 +105,9 @@
     <Compile Include="Rage\Audio\AWC\AWCFile.cs" />
     <Compile Include="Rage\Audio\AWC\SplittedAudioPCMStream.cs" />
     <Compile Include="Rage\Audio\Codecs\XMA\XMA2DecoderStream.cs" />
+    <Compile Include="Rage\Exceptions.cs" />
+    <Compile Include="Utils\IProgressReport.cs" />
+    <Compile Include="Utils\Range.cs" />
     <Compile Include="Utils\SplittedStream.cs" />
     <Compile Include="Rage\Audio\AWC\IAudio.cs" />
     <Compile Include="Rage\Audio\AWC\MultiChannelAudio.cs" />
@@ -134,6 +143,7 @@
     <Compile Include="Rage\RPF\V7\RPF7File.cs" />
     <Compile Include="Utils\PartialStream.cs" />
     <Compile Include="Utils\StreamKeeper.cs" />
+    <Compile Include="Utils\SubProgressReport.cs" />
     <Compile Include="Utils\XMemCompressStream.cs" />
     <Compile Include="Utils\FolderSelectDialog.cs" />
     <Compile Include="Utils\GUI.cs" />
@@ -155,6 +165,9 @@
       <DependentUpon>LibertyV.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="ProgressWindow.resx">
+      <DependentUpon>ProgressWindow.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -169,6 +182,7 @@
       <DependentUpon>Settings.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="app.config" />
+    <None Include="LibertyV.licenseheader" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

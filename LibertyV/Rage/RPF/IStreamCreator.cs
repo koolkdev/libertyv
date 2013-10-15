@@ -26,7 +26,7 @@ using System.IO;
 
 namespace LibertyV.Rage.RPF
 {
-    public interface IStreamCreator
+    public interface IStreamCreator : IDisposable
     {
         Stream GetStream();
         int GetSize();

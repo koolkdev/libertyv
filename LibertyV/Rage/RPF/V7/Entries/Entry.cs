@@ -27,7 +27,7 @@ using LibertyV.Utils;
 
 namespace LibertyV.Rage.RPF.V7.Entries
 {
-    public abstract class Entry
+    public abstract class Entry : IDisposable
     {
         public String Name;
         public DirectoryEntry Parent = null;
@@ -36,7 +36,7 @@ namespace LibertyV.Rage.RPF.V7.Entries
             this.Name = filename;
         }
 
-        public virtual void Export(String foldername)
+        public virtual void Export(String foldername, IProgressReport progress = null)
         {
             throw new Exception("Not implemented"); 
         }
@@ -45,76 +45,7 @@ namespace LibertyV.Rage.RPF.V7.Entries
         {
             entryList.Add(this);
         }
-     
-        public static Entry CreateFromHeader(Structs.RPF7EntryInfoTemplate info, RPF7File file, MemoryStream entriesInfo, MemoryStream filenames)
-        {
-            bool isResource = info.Field1 == 1;
-            long offset = (long)info.Field2;
-            int compressedSize = (int)info.Field3;
-            int filenameOffset = (int)info.Field4;
 
-            filenames.Seek(filenameOffset << file.Info.ShiftNameAccessBy, SeekOrigin.Begin);
-            String filename = "";
-            // Read null-terminated filename
-            int currentChar;
-            while ((currentChar = filenames.ReadByte()) != 0)
-            {
-                if (currentChar == -1)
-                {
-                    throw new Exception("Unexpected EOF");
-                }
-                filename += (char)currentChar;
-            }
-
-            if (offset == 0x7FFFFF)
-            {
-                // Is a Directory
-                if (isResource)
-                {
-                    throw new Exception("Invalid type");
-                }
-                int subentriesStartIndex = (int)info.Field5;
-                int subentriesCount = (int)info.Field6;
-                List<Entry> entries = new List<Entry>();
-                for (int i = 0; i < subentriesCount; ++i)
-                {
-                    entriesInfo.Seek(0x10 * (i + subentriesStartIndex), SeekOrigin.Begin);
-                    entries.Add(Entry.CreateFromHeader(new Structs.RPF7EntryInfoTemplate(entriesInfo), file, entriesInfo, filenames));
-                }
-                return new DirectoryEntry(filename, entries);
-            }
-
-            offset <<= 9;
-
-            if (isResource)
-            {
-                if (compressedSize == 0xFFFFFF)
-                {
-                    throw new Exception("Resource with size -1, not supported");
-                }
-                uint systemFlag = info.Field5;
-                uint graphicsFlag = info.Field6;
-                return new ResourceEntry(filename, new ResourceStreamCreator(file.Stream, offset, compressedSize, systemFlag, graphicsFlag, Path.GetExtension(filename).Substring(2)), systemFlag, graphicsFlag);
-            }
-
-            // Regular file
-            int uncompressedSize = (int)info.Field5;
-            int isEncrypted = (int)info.Field6;
-
-            if (compressedSize == 0)
-            {
-                // Uncompressed file
-                if (isEncrypted != 0)
-                {
-                    throw new Exception("Unexcepted value");
-                }
-                return new RegularFileEntry(filename, new FileStreamCreator(file.Stream, offset, uncompressedSize), false);
-            }
-            else
-            {
-                // Compressed file
-                return new RegularFileEntry(filename, new CompressedFileStreamCreator(file.Stream, offset, compressedSize, uncompressedSize, isEncrypted != 0), true);
-            }
-        }
+        public abstract void Dispose();
     }
 }

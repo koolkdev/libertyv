@@ -24,6 +24,7 @@ using System.Linq;
 using System.Text;
 using LibertyV.Rage.RPF.V7.Entries;
 using LibertyV.Utils;
+using System.Windows.Forms;
 
 namespace LibertyV.Operations
 {
@@ -44,7 +45,19 @@ namespace LibertyV.Operations
             }
             if (selectedFilename != null)
             {
-                entry.Export(selectedFilename);
+                ProgressWindow progress = new ProgressWindow("Exporting", report => entry.Export(selectedFilename, report), true);
+                try
+                {
+                    progress.Run();
+                }
+                catch (OperationCanceledException)
+                {
+                    MessageBox.Show("Operation canceled.");
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("Operation canceled.");
+                }
             }
         }
 
@@ -53,9 +66,23 @@ namespace LibertyV.Operations
             string selectedFolder = GUI.FolderSelection();
             if (selectedFolder != null)
             {
-                foreach (FileEntry entry in entries)
+                ProgressWindow progress = new ProgressWindow("Exporting", report =>
                 {
-                    entry.Export(selectedFolder);
+                    int passed = 0;
+                    report = new SubProgressReport(report, entries.Sum(entry => entry.Data.GetSize()));
+                    foreach (FileEntry entry in entries)
+                    {
+                        entry.Export(selectedFolder, new SubProgressReport(report, passed, entry.Data.GetSize()));
+                        passed += entry.Data.GetSize();
+                    }
+                }, true);
+                try
+                {
+                    progress.Run();
+                }
+                catch (OperationCanceledException)
+                {
+                    MessageBox.Show("Operation canceled.");
                 }
             }
         }
@@ -65,7 +92,15 @@ namespace LibertyV.Operations
             string selectedFolder = GUI.FolderSelection();
             if (selectedFolder != null)
             {
-                entry.Export(selectedFolder);
+                ProgressWindow progress = new ProgressWindow("Exporting", report => entry.Export(selectedFolder, report), true);
+                try
+                {
+                    progress.Run();
+                }
+                catch (OperationCanceledException)
+                {
+                    MessageBox.Show("Operation canceled.");
+                }
             }
         }
     }

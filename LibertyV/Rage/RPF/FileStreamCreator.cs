@@ -29,9 +29,9 @@ namespace LibertyV.Rage.RPF
 {
     public class FileStreamCreator : IStreamCreator
     {
-        private long Offset;
-        private int Size;
-        protected Stream FileStream;
+        public readonly long Offset;
+        public readonly int Size;
+        public readonly Stream FileStream;
 
         public FileStreamCreator(Stream fileStream, long offset, int size)
         {
@@ -57,6 +57,12 @@ namespace LibertyV.Rage.RPF
             {
                 input.CopyTo(stream);
             }
+        }
+
+        public void Dispose()
+        {
+            // We don't want to close the file because it is used file
+            // If you don't want to point to the original file, use external file stream creator instead
         }
     }
 }

@@ -22,19 +22,22 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.IO;
 
-namespace LibertyV.Rage.Audio.AWC
+namespace LibertyV.Rage
 {
-    interface IAudio : IDisposable
+    public class RPFParsingException : Exception
     {
-        int GetBits();
-        uint GetSamplesCount();
-        int GetSamplesPerSecond();
-        int GetChannels();
+        public RPFParsingException(string error)
+            : base(error)
+        {
+        }
+    }
 
-        int GetSize();
-
-        Stream GetPCMStream();
+    public class RPFEntryParsingException : RPFParsingException
+    {
+        public RPFEntryParsingException(string error)
+            : base(error)
+        {
+        }
     }
 }

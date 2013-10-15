@@ -30,6 +30,7 @@ using LibertyV.Rage.RPF.V7;
 using LibertyV.Rage.RPF.V7.Entries;
 using System.IO;
 using LibertyV.Utils;
+using LibertyV.Rage;
 
 namespace LibertyV
 {
@@ -44,9 +45,14 @@ namespace LibertyV
         }
 
         public RPF7File File = null;
-        public LibertyV(RPF7File rpf = null)
+        private string TempOutputFile = null;
+        private string CurrentFilePath = null;
+
+        public LibertyV(RPF7File rpf = null, string tempOutputFile = null)
         {
             InitializeComponent();
+
+            TempOutputFile = tempOutputFile;
 
             filesList.Columns.Add("Name", 300);
             filesList.Columns.Add("Size", 100);
@@ -59,24 +65,120 @@ namespace LibertyV
             {
                 this.LoadRPF(rpf);
             }
+
+            if (tempOutputFile != null)
+            {
+                // limit the gui,, TODO: better
+                fileOpenButton.Enabled = false;
+            }
         }
 
-        private void LoadRPF(RPF7File rpf)
+        private void UpdateGUIEntiresNodes(EntryTreeNode node, string path)
         {
+            node.Entry = this.File.Root.GetEntry(path) as DirectoryEntry;
+            if (node.Entry == null)
+            {
+                throw new Exception("Failed to update GUI with new file");
+            }
+            node.Entry.Node = node;
+            foreach (TreeNode cnode in node.Nodes)
+            {
+                UpdateGUIEntiresNodes(cnode as EntryTreeNode, path + "/" + cnode.Text);
+            }
+        }
+        private void UpdateGUIEntries()
+        {
+            // Update tree
+            UpdateGUIEntiresNodes(filesTree.Nodes[0] as EntryTreeNode, "");
+            filesTree.Nodes[0].Text = this.File.Filename;
+
+            foreach (TreeNode node in filesTree.Nodes)
+            {
+                EntryTreeNode enode = node as EntryTreeNode;
+                if (enode.Parent == null)
+                {
+                    // root entry
+                    enode.Entry = this.File.Root;
+                    this.File.Root.Node = enode;
+                }
+                else
+                {
+                    string path = enode.Text;
+                    EntryTreeNode currentNode = enode;
+                    while ((currentNode = currentNode.Parent as EntryTreeNode).Parent != null)
+                    {
+                        path = currentNode.Text + "/" + path;
+                    }
+                }
+            }
+
+            if (filesTree.SelectedNode != null)
+            {
+                EntryTreeNode enode = filesTree.SelectedNode as EntryTreeNode;
+
+                // Update list
+                foreach (ListViewItem item in filesList.Items)
+                {
+                    EntryListViewItem eitem = item as EntryListViewItem;
+
+                    eitem.Entry = enode.Entry.GetEntry(eitem.Text) as FileEntry;
+                    if (eitem.Entry == null)
+                    {
+                        throw new Exception("Failed to update GUI with new file");
+                    }
+                    eitem.Entry.ViewItem = eitem;
+                }
+            }
+        }
+
+        private void LoadRPF(RPF7File rpf, bool updateGui = false)
+        {
+            // Close file
+            CloseRPF(!updateGui);
             this.File = rpf;
+            this.Text = String.Format("Liberty V - {0}", this.File.Filename);
 
-            exportAllButton.Enabled = true;
-            UpdateExportSelectButton();
-            filesTree.Nodes.Clear();
-            filesList.Items.Clear();
+            this.saveAsButton.Enabled = true;
+            this.saveButton.Enabled = true;
 
-            TreeNode root = GetTreeNodes(this.File.Root as DirectoryEntry);
-            root.Text = rpf.Filename;
-            filesTree.Nodes.Add(root);
+            if (updateGui)
+            {
+                UpdateGUIEntries();
+            }
+            else
+            {
+                exportAllButton.Enabled = true;
+                UpdateExportSelectButton();
+                filesTree.Nodes.Clear();
+                filesList.Items.Clear();
 
-            filesTree.SelectedNode = root;
-            UpdateExportSelectButton();
-            UpdateFilesList();
+                TreeNode root = GetTreeNodes(this.File.Root as DirectoryEntry);
+                root.Text = rpf.Filename;
+                filesTree.Nodes.Add(root);
+
+                filesTree.SelectedNode = root;
+                UpdateExportSelectButton();
+                UpdateFilesList();
+            }
+        }
+
+        public void CloseRPF(bool clearGui = true)
+        {
+            if (this.File != null)
+            {
+                // Close last file
+                this.File.Close();
+                this.File = null;
+            }
+            this.saveAsButton.Enabled = false;
+            this.saveButton.Enabled = false;
+
+            if (clearGui)
+            {
+                filesTree.Nodes.Clear();
+                filesList.Items.Clear();
+                this.Text = String.Format("Liberty V - Grand Theft Auto V RPF Viewer");
+            }
         }
 
         public static EntryTreeNode GetTreeNodes(DirectoryEntry entry)
@@ -116,7 +218,8 @@ namespace LibertyV
                 {
                     foreach (Entry entry in (filesTree.SelectedNode as EntryTreeNode).Entry.GetEntries())
                     {
-                        if (entry is FileEntry) {
+                        if (entry is FileEntry)
+                        {
                             filesList.Items.Add(new EntryListViewItem(entry as FileEntry));
                         }
                     }
@@ -130,7 +233,7 @@ namespace LibertyV
             {
                 HashSet<string> seenItems = new HashSet<string>();
                 // find the changes
-                foreach (EntryListViewItem item in filesList.Items) 
+                foreach (EntryListViewItem item in filesList.Items)
                 {
                     if (!(filesTree.SelectedNode as EntryTreeNode).Entry.GetEntries().Any(entry => entry == item.Entry))
                     {
@@ -190,7 +293,25 @@ namespace LibertyV
             openFileDialog.Title = "Select a file";
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                LoadRPF(new RPF7File(openFileDialog.OpenFile(), Path.GetFileName(openFileDialog.FileName)));
+                RPF7File file = null;
+                CurrentFilePath = openFileDialog.FileName;
+                Stream stream = openFileDialog.OpenFile();
+                try
+                {
+                    new ProgressWindow("Open", progress =>
+                    {
+                        progress.SetMessage("Loading..");
+                        progress.SetProgress(-1);
+                        file = new RPF7File(stream, Path.GetFileName(openFileDialog.FileName));
+                    }).Run();
+                }
+                catch (RPFParsingException ex)
+                {
+                    MessageBox.Show(ex.Message, "Failed to load RPF", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    stream.Close();
+                    return;
+                }
+                LoadRPF(file);
             }
         }
 
@@ -206,6 +327,113 @@ namespace LibertyV
         private void exportSelectedButton_Click(object sender, EventArgs e)
         {
             ExtractSelected();
+        }
+
+        private void saveButton_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Are you sure you want to save all changes?", "Save", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != System.Windows.Forms.DialogResult.Yes)
+            {
+                return;
+            }
+            string originalFilename = this.File.Filename;
+
+            // Write to temporary file
+            string tempFilePath = null;
+            FileStream file = null;
+            if (CurrentFilePath != null)
+            {
+                tempFilePath = CurrentFilePath + "." + Path.GetRandomFileName();
+                file = System.IO.File.Create(tempFilePath);
+            }
+            else
+            {
+                // This is a temporary file, we need to open it with the right flags
+                tempFilePath = TempOutputFile;
+                file = new FileStream(tempFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite | FileShare.Delete);
+            }
+
+            ProgressWindow progress = new ProgressWindow("Saving", update => this.File.Write(file, update), true);
+            try
+            {
+                progress.Run();
+            }
+            catch (OperationCanceledException)
+            {
+                // This operation cancelled    
+                if (CurrentFilePath != null)
+                {
+                    // delete the file
+                    file.Close();
+                    System.IO.File.Delete(tempFilePath);
+                }
+                else
+                {
+                    // Well it is a temporary file, so we don't want to delete it, just make it empty again
+                    file.SetLength(0);
+                    file.Close();
+                }
+                MessageBox.Show("Operation canceled.");
+                return;
+            }
+
+            file.SetLength(file.Position);
+
+            if (CurrentFilePath != null)
+            {
+                // Update the file and reopen it
+                file.Close();
+                CloseRPF(false);
+                System.IO.File.Delete(CurrentFilePath);
+                System.IO.File.Move(tempFilePath, CurrentFilePath);
+                file = System.IO.File.Open(CurrentFilePath, FileMode.Open);
+            }
+
+            // Now open this file
+            file.Seek(0, SeekOrigin.Begin);
+            LoadRPF(new RPF7File(file, originalFilename), true);
+        }
+
+        private void saveAsButton_Click(object sender, EventArgs e)
+        {
+            string result = GUI.FileSaveSelection(Path.GetFileName(this.File.Filename));
+            if (result == null)
+            {
+                return;
+            }
+            FileStream file = null;
+            try
+            {
+                file = System.IO.File.Create(result);
+            }
+            catch (IOException ex)
+            {
+                MessageBox.Show(ex.Message, "Failed to open file for writing", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            ProgressWindow progress = new ProgressWindow("Saving", update => this.File.Write(file, update), true);
+            try
+            {
+                progress.Run();
+            }
+            catch (OperationCanceledException)
+            {
+                // delete the file
+                file.Close();
+                System.IO.File.Delete(result);
+                MessageBox.Show("Operation canceled.");
+                return;
+            }
+
+            // Now open this file
+            file.Seek(0, SeekOrigin.Begin);
+            CurrentFilePath = result;
+            LoadRPF(new RPF7File(file, Path.GetFileName(result)), true);
+        }
+
+        private void settingsButton_Click(object sender, EventArgs e)
+        {
+            new Settings.Settings().ShowDialog();
         }
 
         #endregion
@@ -422,35 +650,13 @@ namespace LibertyV
 
         #endregion
 
-        private void saveButton_Click(object sender, EventArgs e)
+        private void LibertyV_FormClosed(object sender, FormClosedEventArgs e)
         {
-            if (this.File == null)
+            if (this.File != null)
             {
-                MessageBox.Show("Please load an rpf first");
+                this.File.Close();
+                this.File = null;
             }
-        }
-
-        private void saveAsButton_Click(object sender, EventArgs e)
-        {
-            if (this.File == null)
-            {
-                MessageBox.Show("Please open a file first.");
-                return;
-            }
-            string result = GUI.FileSaveSelection(Path.GetFileName(this.File.Filename));
-            if (result == null)
-            {
-                return;
-            }
-            using (FileStream file = System.IO.File.Create(result))
-            {
-                this.File.Write(file);
-            }
-        }
-
-        private void settingsButton_Click(object sender, EventArgs e)
-        {
-            new Settings.Settings().ShowDialog();
         }
     }
 }

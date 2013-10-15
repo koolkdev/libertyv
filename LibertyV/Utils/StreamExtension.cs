@@ -28,11 +28,16 @@ namespace LibertyV.Utils
 {
     static class StreamExtension
     {
-        public static int CopyToCount(this Stream stream, Stream output, int count)
+        public static int CopyToCount(this Stream stream, Stream output, int count, IProgressReport writingProgress = null)
         {
+            if (writingProgress != null)
+            {
+                writingProgress = new SubProgressReport(writingProgress, count);
+            }
             byte[] buffer = new byte[32768];
             int start_count = count;
             int read = buffer.Length;
+            int wrote = 0;
             if (read > count)
             {
                 read = count;
@@ -40,6 +45,15 @@ namespace LibertyV.Utils
             while (read > 0 && (read = stream.Read(buffer, 0, read)) > 0)
             {
                 output.Write(buffer, 0, read);
+                if (writingProgress != null)
+                {
+                    if (writingProgress.IsCanceled())
+                    {
+                        throw new OperationCanceledException();
+                    }
+                    wrote += read;
+                    writingProgress.SetProgress(wrote);
+                }
                 count -= read;
                 read = buffer.Length;
                 if (read > count)

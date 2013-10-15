@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using LibertyV.Utils;
 
 namespace LibertyV.Rage.RPF.V7.Entries
 {
@@ -44,7 +45,7 @@ namespace LibertyV.Rage.RPF.V7.Entries
             }
         }
 
-        public override void Export(String path)
+        public override void Export(String path, IProgressReport progress = null)
         {
             string filename;
             if (Directory.Exists(path))
@@ -56,14 +57,25 @@ namespace LibertyV.Rage.RPF.V7.Entries
                 filename = path;
             }
 
+            if (progress != null)
+            {
+                progress.SetMessage("Extracting " + this.Name + ".");
+            }
+
             using (FileStream file = File.Create(filename))
             {
                 using (Stream stream = this.Data.GetStream())
                 {
-                    stream.CopyTo(file);
+                    stream.CopyToCount(file, this.Data.GetSize(), progress);
                 }
             }
         }
+
+        public virtual FileStreamCreator TryGetOriginalFileStreamCreator()
+        {
+            return null;
+        }
+
 
         public string GetExtension()
         {
@@ -78,6 +90,11 @@ namespace LibertyV.Rage.RPF.V7.Entries
         public bool IsResource()
         {
             return this is ResourceEntry;
+        }
+
+        public override void Dispose()
+        {
+            Data.Dispose();
         }
     }
 }

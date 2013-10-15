@@ -58,6 +58,11 @@ namespace LibertyV.Rage.RPF.V7.Entries
             return Entries.Values;
         }
 
+        public long GetEntriesSize()
+        {
+            return this.Entries.Values.Sum(entry => entry is FileEntry ? (long)((FileEntry)entry).Data.GetSize() : (long)((DirectoryEntry)entry).GetEntriesSize());
+        }
+
         public Entry GetEntry(string name)
         {
             // Clean the input (for the case it is /dir/)
@@ -120,19 +125,31 @@ namespace LibertyV.Rage.RPF.V7.Entries
             {
                 ((DirectoryEntry)entry).Node.Remove();
             }
+
+            // Dispose entry
+            entry.Dispose();
         }
         public bool IsRoot()
         {
             return Parent == null;
         }
 
-        public override void Export(String foldername)
+        public override void Export(String foldername, IProgressReport progress = null)
         {
+            long passed = 0;
+            if (progress != null)
+            {
+                progress = new SubProgressReport(progress, this.GetEntriesSize());
+            }
             String subfolder = Path.Combine(foldername, this.Name);
             Directory.CreateDirectory(subfolder);
             foreach (Entry entry in this.Entries.Values)
             {
-                entry.Export(subfolder);
+                entry.Export(subfolder, progress == null ? null : new SubProgressReport(progress, passed, entry is FileEntry ? ((FileEntry)entry).Data.GetSize() : ((DirectoryEntry)entry).GetEntriesSize()));
+                if (progress != null)
+                {
+                    passed += entry is FileEntry ? ((FileEntry)entry).Data.GetSize() : ((DirectoryEntry)entry).GetEntriesSize();
+                }
             }
         }
 
@@ -142,6 +159,14 @@ namespace LibertyV.Rage.RPF.V7.Entries
             foreach (Entry entry in this.Entries.Values)
             {
                 entry.AddToList(entryList);
+            }
+        }
+
+        public override void Dispose()
+        {
+            foreach (Entry entry in this.Entries.Values)
+            {
+                entry.Dispose();
             }
         }
     }

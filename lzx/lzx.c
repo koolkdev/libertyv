@@ -499,7 +499,8 @@ int LZXdecompress(struct LZXstate *pState, unsigned char *inpos, unsigned char *
         /* last block finished, new block expected */
         if (pState->block_remaining == 0) {
             if (pState->block_type == LZX_BLOCKTYPE_UNCOMPRESSED) {
-                if (pState->block_length & 1) inpos++; /* realign bitstream to word */
+				// This statement isn't true for xcompress
+                //if (pState->block_length & 1) inpos++; /* realign bitstream to word */
                 INIT_BITSTREAM;
             }
 

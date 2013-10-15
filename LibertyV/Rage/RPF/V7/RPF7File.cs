@@ -29,26 +29,57 @@ using System.IO.Compression;
 
 namespace LibertyV.Rage.RPF.V7
 {
-    public class RPF7File
+    public class RPF7File : IDisposable
     {
         public Stream Stream;
 
         public Structs.RPF7Header Info;
         private bool sixteenRoundsDecrypt;
 
-        public Entry Root;
+        public DirectoryEntry Root;
         public String Filename;
 
         public RPF7File(Stream inputStream, String filname = "")
         {
+            if (!inputStream.CanRead)
+            {
+                throw new RPFParsingException("Stream isn't readable");
+            }
             this.Filename = filname;
             Stream = inputStream;
 
-            Info = new Structs.RPF7Header(Stream);
+            try
+            {
+                Info = new Structs.RPF7Header(Stream);
+            }
+            catch (Exception e)
+            {
+                throw new RPFParsingException(String.Format("Failed to read header: {0}", e.Message));
+            }
 
             if (new string(Info.Magic) != "RPF7")
             {
-                throw new Exception("Invalid RPF Magic");
+                throw new RPFParsingException("Invalid RPF Magic");
+            }
+
+            if (GlobalOptions.Platform == Platform.PlatformType.PLAYSTATION3)
+            {
+                if (Info.PlatformBit != 0)
+                {
+                    throw new RPFParsingException("Invalid platform bit (Are you sure that this RPF is for PlayStation 3?)");
+                }
+            }
+            else if (GlobalOptions.Platform == Platform.PlatformType.XBOX360)
+            {
+                if (Info.PlatformBit != 1)
+                {
+                    throw new RPFParsingException("Invalid platform bit (Are you sure that this RPF is for Xbox 360?)");
+                }
+            }
+
+            if (Info.EntriesCount == 0)
+            {
+                throw new RPFParsingException("Empty RPF - no root directory");
             }
 
             sixteenRoundsDecrypt = (Info.Flag >> 28) == 0xf;
@@ -62,40 +93,148 @@ namespace LibertyV.Rage.RPF.V7
             {
                 MemoryStream entriesInfo = new MemoryStream(binaryStream.ReadBytes(0x10 * Info.EntriesCount));
                 MemoryStream filenames = new MemoryStream(binaryStream.ReadBytes(Info.EntriesNamesLength));
-                this.Root = Entry.CreateFromHeader(new Structs.RPF7EntryInfoTemplate(entriesInfo), this, entriesInfo, filenames);
+                Range<Boolean> fileUsage = new Range<Boolean>(Stream.Length);
+                // Just mark the root entry info and the header as used
+                fileUsage.AddItem(0, 0x10 + 0x10, true);
+                this.Root = CreateFromHeader(new Structs.RPF7EntryInfoTemplate(entriesInfo), entriesInfo, filenames, fileUsage) as DirectoryEntry;
             }
 
 
-            if (!(this.Root is DirectoryEntry))
+            if (this.Root == null)
             {
-                throw new Exception("Expected root to be directory");
+                throw new RPFParsingException("Expected root to be a directory.");
             }
         }
 
-        public void Write(Stream stream)
+        public void Close()
         {
-            if (this.Filename == "")
+            this.Dispose();
+        }
+
+        public void Dispose()
+        {
+            this.Root.Dispose();
+            this.Stream.Close();
+        }
+
+        private Entry CreateFromHeader(Structs.RPF7EntryInfoTemplate entryInfo, MemoryStream entriesInfo, MemoryStream filenames, Range<Boolean> fileUsage)
+        {
+            // Todo: check sizes and offsets
+            bool isResource = entryInfo.Field1 == 1;
+            long offset = (long)entryInfo.Field2;
+            int compressedSize = (int)entryInfo.Field3;
+            int filenameOffset = (int)entryInfo.Field4;
+
+            filenameOffset <<= Info.ShiftNameAccessBy;
+
+            if (filenameOffset < 0 || filenameOffset >= filenames.Length)
             {
-                throw new Exception("Can't save");
+                throw new RPFEntryParsingException("Reading entry name: Invalid offst");
             }
-            // Get all the entries
-            List<Entry> entries = new List<Entry>();
-            this.Root.AddToList(entries);
+            filenames.Seek(filenameOffset, SeekOrigin.Begin);
 
-
-            Dictionary<Entry, Structs.RPF7EntryInfoTemplate> entriesInfo = new Dictionary<Entry, Structs.RPF7EntryInfoTemplate>();
-            foreach (Entry entry in entries)
+            String filename = "";
+            // Read null-terminated filename
+            int currentChar;
+            while ((currentChar = filenames.ReadByte()) != 0)
             {
-                Structs.RPF7EntryInfoTemplate entryInfo = new Structs.RPF7EntryInfoTemplate();
-                // update the is resource field
-                entryInfo.Field1 = (entry is ResourceEntry) ? 1U : 0U;
-                entriesInfo[entry] = entryInfo;
+                if (currentChar == -1)
+                {
+                    throw new RPFEntryParsingException("Reading entry name: Unexpected EOF");
+                }
+                filename += (char)currentChar;
+            }
+            // There may be duplicate names usage, so don't check it
+            if (!fileUsage.AddItem(0x10 + entriesInfo.Length + filenameOffset, filename.Length + 1, true))
+            {
+                throw new RPFEntryParsingException("Reading entry entry: Invalid duplicate usage of a name");
             }
 
+            if (offset == 0x7FFFFF)
+            {
+                // Is a Directory
+                if (isResource)
+                {
+                    throw new RPFEntryParsingException("Invalid entry type (directory and resource)");
+                }
+                int subentriesStartIndex = (int)entryInfo.Field5;
+                int subentriesCount = (int)entryInfo.Field6;
+                if (subentriesStartIndex < 0 || (subentriesStartIndex + subentriesCount) * 0x10 > entriesInfo.Length)
+                {
+                    throw new RPFEntryParsingException("Invalid directory entry: Invalid subentries info");
+                }
+
+                List<Entry> entries = new List<Entry>();
+                // This will prevent recursion..
+                if (!fileUsage.AddItem(0x10 * (1 + subentriesStartIndex), 0x10 * subentriesCount, true, false))
+                {
+                    throw new RPFEntryParsingException("Reading directory entry: Duplicate usage of an entries - may lead to recursion");
+                }
+
+                for (int i = 0; i < subentriesCount; ++i)
+                {
+                    entriesInfo.Seek(0x10 * (i + subentriesStartIndex), SeekOrigin.Begin);
+                    entries.Add(CreateFromHeader(new Structs.RPF7EntryInfoTemplate(entriesInfo), entriesInfo, filenames, fileUsage));
+                }
+                return new DirectoryEntry(filename, entries);
+            }
+
+            offset <<= 9;
+
+            if (offset < 0 || offset > Stream.Length)
+            {
+                throw new RPFEntryParsingException("Invalid entry info: Invalid data offset");
+            }
+
+            if (isResource)
+            {
+                if (compressedSize == 0xFFFFFF)
+                {
+                    throw new RPFEntryParsingException("Resource with size -1, not supported (Contact developr if seen)");
+                }
+                if (!fileUsage.AddItem(offset, compressedSize, true, false)) // Can't use the same data for two files
+                {
+                    throw new RPFEntryParsingException("Reading entry data: Data position is wierd");
+                }
+                uint systemFlag = entryInfo.Field5;
+                uint graphicsFlag = entryInfo.Field6;
+                return new ResourceEntry(filename, new ResourceStreamCreator(Stream, offset, compressedSize, systemFlag, graphicsFlag, Path.GetExtension(filename).Substring(2)), systemFlag, graphicsFlag);
+            }
+
+            // Regular file
+            int uncompressedSize = (int)entryInfo.Field5;
+            int isEncrypted = (int)entryInfo.Field6;
+
+            if (compressedSize == 0)
+            {
+                // Uncompressed file
+                if (isEncrypted != 0)
+                {
+                    throw new RPFEntryParsingException("Unexcepted file - compressed but unencrypted (Contact developr if seen)");
+                }
+                if (!fileUsage.AddItem(offset, uncompressedSize, true, false)) // Can't use the same data for two files
+                {
+                    throw new RPFEntryParsingException("Reading entry data: Data position is wierd");
+                }
+                return new RegularFileEntry(filename, new FileStreamCreator(Stream, offset, uncompressedSize), false);
+            }
+            else
+            {
+                if (!fileUsage.AddItem(offset, compressedSize, true, false)) // Can't use the same data for two files
+                {
+                    throw new RPFEntryParsingException("Reading entry data: Data position is wierd");
+                }
+                // Compressed file
+                return new RegularFileEntry(filename, new CompressedFileStreamCreator(Stream, offset, compressedSize, uncompressedSize, isEncrypted != 0), true);
+            }
+        }
+
+        private MemoryStream WriteNames(List<Entry> entries, Dictionary<Entry, Structs.RPF7EntryInfoTemplate> entriesInfo, out int shiftNameAccessBy)
+        {
             IEnumerable<string> entriesNames = entries.Select(entry => entry.Name);
 
             int namesLength = entriesNames.Sum(name => name.Length);
-            int shiftNameAccessBy = -1;
+            shiftNameAccessBy = -1;
             for (int i = 0; i < 8; ++i)
             {
                 // the multipcation is the maximum number of nulls, TODO: it can be done better, because it is not always the worst case
@@ -113,27 +252,39 @@ namespace LibertyV.Rage.RPF.V7
             }
 
             int currentPos = 0;
-            // Write the names
-            stream.Seek(currentPos + 0x10 * (entries.Count + 1), SeekOrigin.Begin);
 
-            using (BinaryWriter writer = new BinaryWriter(AES.EncryptStream(new StreamKeeper(stream), sixteenRoundsDecrypt)))
+            MemoryStream filenames = new MemoryStream();
+            SortedList<string, int> WritedNames = new SortedList<string, int>();
+
+            using (BinaryWriter writer = new BinaryWriter(new StreamKeeper(filenames)))
             {
                 foreach (Entry entry in entries)
                 {
+                    int nameOffset;
+
+                    // Check if we already wrote this name, if it is use it
+                    if (!WritedNames.TryGetValue(entry.Name, out nameOffset))
+                    {
+                        nameOffset = currentPos;
+                        WritedNames[entry.Name] = nameOffset;
+
+                        // write name and null, and keep the position
+                        writer.Write(entry.Name.ToArray<char>());
+                        writer.Write((byte)0);
+                        currentPos += entry.Name.Length + 1;
+
+                        // Make the next entry alligned
+                        while ((currentPos % (1 << shiftNameAccessBy)) != 0)
+                        {
+                            writer.Write((byte)0);
+                            currentPos += 1;
+                        }
+                    }
+
                     // Update name offset in entry info
                     Structs.RPF7EntryInfoTemplate entryInfo = entriesInfo[entry];
-                    entryInfo.Field4 = (uint)currentPos;
+                    entryInfo.Field4 = (uint)nameOffset;
                     entriesInfo[entry] = entryInfo;
-                    // write name and null, and keep the position
-                    writer.Write(entry.Name.ToArray<char>());
-                    writer.Write((byte)0);
-                    currentPos += entry.Name.Length + 1;
-                    // Make the next entry alligned
-                    while ((currentPos % (1 << shiftNameAccessBy)) != 0)
-                    {
-                        writer.Write((byte)0);
-                        currentPos += 1;
-                    }
                 }
                 // Align to 0x10 byte
                 while (currentPos % 0x10 != 0)
@@ -143,25 +294,30 @@ namespace LibertyV.Rage.RPF.V7
                 }
             }
 
-            // Fill the header
-            Info.EntriesCount = entries.Count;
-            Info.ShiftNameAccessBy = shiftNameAccessBy;
-            Info.EntriesNamesLength = currentPos;
+            return filenames;
+        }
 
-            long[] dataOffsets = new long[entries.Count];
-            long[] dataSizes = new long[entries.Count];
-            // align to 0x200
-            if (stream.Position % (1 << 9) != 0)
+        private void WriteData(Stream stream, List<Entry> entries, Dictionary<Entry, Structs.RPF7EntryInfoTemplate> entriesInfo, IProgressReport progressReport = null)
+        {
+            if (progressReport != null)
             {
-                stream.Write(new byte[(1 << 9) - ((int)stream.Position % (1 << 9))], 0, (1 << 9) - ((int)stream.Position % (1 << 9)));
+                progressReport = new SubProgressReport(progressReport, entries.Sum(entry => entry is FileEntry ? ((FileEntry)entry).Data.GetSize() : 0));
             }
+
+            int passed = 0;
             // Write data and fill entry info
-            // TODO: I don't like that the reading logic happens in Entry and the writing logic here
-            // I think that I should move the reading logic to here, and split things to functions
             foreach (Entry entry in entries)
             {
+                if (progressReport != null && progressReport.IsCanceled())
+                {
+                    throw new OperationCanceledException();
+                }
                 if (entry is FileEntry)
                 {
+                    if (progressReport != null)
+                    {
+                        progressReport.SetMessage(String.Format("Writing file {0}.", entry.Name));
+                    }
                     long entryOffset = stream.Position;
                     (entry as FileEntry).Write(stream);
                     int entrySize = (int)(stream.Position - entryOffset);
@@ -203,6 +359,12 @@ namespace LibertyV.Rage.RPF.V7
 
                     entriesInfo[entry] = entryInfo;
 
+                    if (progressReport != null)
+                    {
+                        passed += (entry as FileEntry).Data.GetSize();
+                        progressReport.SetProgress(passed);
+                    }
+
                 }
                 else
                 {
@@ -212,6 +374,132 @@ namespace LibertyV.Rage.RPF.V7
                     entriesInfo[entry] = entryInfo;
                 }
             }
+        }
+
+        /* TODO:
+        private void WriteDataInline(Stream stream, List<Entry> entries, Dictionary<Entry, Structs.RPF7EntryInfoTemplate> entriesInfo, int headersEnd)
+        {
+            Range<FileEntry> oldFileLayout = new Range<FileEntry>(Math.Max(stream.Length, (long)headersEnd));
+            List<FileEntry> emptyEntries = new List<FileEntry>();
+            List<FileEntry> moveEntries = new List<FileEntry>();
+            List<FileEntry> newEntries = new List<FileEntry>();
+            // Entries that should be written to temporary files 
+            List<FileEntry> newSavedEntries = new List<FileEntry>();
+
+            // A dictionary of the raw data stream that we need to write to the file
+            Dictionary<FileEntry, Stream> entriesStream = new Dictionary<FileEntry, System.IO.Stream>();
+
+            // Add the header
+            oldFileLayout.AddItem(0, headersEnd, null);
+
+            foreach (Entry entry in entries)
+            {
+                FileEntry fentry = entry as FileEntry;
+                if (fentry != null)
+                {
+
+                    // We need to find all the files that depends on the origianl stream first
+                    FileStreamCreator originalStream = fentry.TryGetOriginalFileStreamCreator();
+                    if (fentry.Data.GetSize() == 0 && fentry.IsRegularFile() && !((RegularFileEntry)fentry).Compressed)
+                    {
+                        emptyEntries.Add(fentry);
+                    }
+                    else if (originalStream != null && originalStream.FileStream == this.Stream)
+                    {
+                        if (originalStream.Offset < headersEnd) {
+                            moveEntries.Add(fentry);
+                        }
+                        if (!oldFileLayout.AddItem(originalStream.Offset, originalStream.Size, fentry, false))
+                        {
+                            // If failed for some reason.. well it can happen if two entries have the same data. Anyway I don't want that two entries will use the same data.
+                            newSavedEntries.Add(fentry);
+                        }
+                        else
+                        {
+                            entriesStream[fentry] = new PartialStream(this.Stream, originalStream.Offset, originalStream.Size);
+                        }
+                    }
+                    else if (fentry.Data is FileStreamCreator && ((FileStreamCreator)fentry.Data).FileStream == this.Stream)
+                    {
+                        // This file points to the original file, but something about it changed (compression, encryption, ..)
+                        newSavedEntries.Add(fentry);
+                    }
+                    // From here are entries that are not depends on the original strema
+                    else if ((fentry.IsRegularFile() && ((RegularFileEntry)fentry).Compressed) || fentry.IsResource())
+                    {
+                        newSavedEntries.Add(fentry);
+                    }
+                    else
+                    {
+                        entriesStream[fentry] = fentry.Data.GetStream();
+                        newEntries.Add(fentry);
+                    }
+                }
+            }
+
+            foreach (FileEntry entry in newSavedEntries) 
+            {
+                string filepath = Path.GetTempFileName();
+                // Let's copy the file to temp folder, this file will be deleted on close
+                FileStream writeStream = new FileStream(filepath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite | FileShare.Delete, 0x1000, FileOptions.DeleteOnClose);
+
+                entry.Data.GetStream().CopyTo(writeStream);
+
+                // Take an handle to the file, so it will be delete only when this handle will be closed.
+                FileStream readStream = File.Open(filepath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+                writeStream.Close();
+
+                entriesStream[entry] = writeStream;
+            }
+
+            Range<FileEntry> newFileLayout = new Range<FileEntry>();
+        }
+         */
+
+        public void Write(Stream stream, IProgressReport progressReport = null)
+        {
+            if (progressReport != null)
+            {
+                progressReport.SetMessage("Preparing...");
+                progressReport.SetProgress(-1);
+            }
+            if (this.Filename == "")
+            {
+                throw new Exception("Can't save");
+            }
+            // Get all the entries
+            List<Entry> entries = new List<Entry>();
+            this.Root.AddToList(entries);
+
+
+            Dictionary<Entry, Structs.RPF7EntryInfoTemplate> entriesInfo = new Dictionary<Entry, Structs.RPF7EntryInfoTemplate>();
+            foreach (Entry entry in entries)
+            {
+                Structs.RPF7EntryInfoTemplate entryInfo = new Structs.RPF7EntryInfoTemplate();
+                // update the is resource field
+                entryInfo.Field1 = (entry is ResourceEntry) ? 1U : 0U;
+                entriesInfo[entry] = entryInfo;
+            }
+
+            int shiftNameAccessBy;
+            Stream names = WriteNames(entries, entriesInfo, out shiftNameAccessBy);
+
+            // Fill the header
+            Info.EntriesCount = entries.Count;
+            Info.ShiftNameAccessBy = shiftNameAccessBy;
+            Info.EntriesNamesLength = (int)names.Length;
+
+            // Go to current position
+            stream.Seek(0x10 + 0x10 * Info.EntriesCount + Info.EntriesNamesLength, SeekOrigin.Begin);
+
+            // align to 0x200
+            if (stream.Position % (1 << 9) != 0)
+            {
+                stream.Write(new byte[(1 << 9) - ((int)stream.Position % (1 << 9))], 0, (1 << 9) - ((int)stream.Position % (1 << 9)));
+            }
+            WriteData(stream, entries, entriesInfo, progressReport);
+
+            long end = stream.Position;
 
             using (Stream writer = AES.EncryptStream(new StreamKeeper(stream), sixteenRoundsDecrypt))
             {
@@ -242,7 +530,14 @@ namespace LibertyV.Rage.RPF.V7
                     // Write the entry info
                     entriesInfo[entry].Write(writer);
                 }
+
+                // Write names
+                names.Seek(0, SeekOrigin.Begin);
+                names.CopyTo(writer);
             }
+
+            // Seek to end
+            stream.Seek(end, SeekOrigin.Begin);
             // Done!
         }
     }

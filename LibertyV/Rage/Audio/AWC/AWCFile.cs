@@ -1,4 +1,24 @@
-﻿using System;
+﻿/*
+ 
+    LibertyV - Viewer/Editor for RAGE Package File version 7
+    Copyright (C) 2013  koolk <koolkdev at gmail.com>
+   
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+   
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ 
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -106,19 +126,42 @@ namespace LibertyV.Rage.Audio.AWC
             // note: there is fourth unknown 0x21E86A3 tag
         }
 
-        public void ExportWav(string baseName)
+
+        public void ExportWav(string baseName, IProgressReport progress = null)
         {
+            int bytesWrote = 0;
             if (MultiChannel)
             {
                 /*using (Stream file = File.Create(baseName + ".wav"))
                 {
                     ExportWav(AudioStreams[0], file);
                 }*/
+                if (progress != null)
+                {
+                    // Calculate how many bytes are going to be written
+                    progress = new SubProgressReport(progress, (((MultiChannelAudio)AudioStreams[0]).Channels.Sum(audio => audio.GetSize())));
+                }
                 for (int i = 0; i < ((MultiChannelAudio)AudioStreams[0]).Channels.Count; ++i)
                 {
                     using (Stream file = File.Create(baseName + "." + AudioIds[i] + ".wav"))
                     {
-                        ExportWav(((MultiChannelAudio)AudioStreams[0]).Channels[i], file);
+                        if (progress != null)
+                        {
+                            progress.SetMessage("Decoding " + AudioIds[i]);
+                        }
+                        int audioSize = ((MultiChannelAudio)AudioStreams[0]).Channels[i].GetSize() ;
+                        try
+                        {
+                            ExportWav(((MultiChannelAudio)AudioStreams[0]).Channels[i], file, progress == null ? null : new SubProgressReport(progress, bytesWrote, audioSize));
+                        }
+                        catch (Exception e)
+                        {
+                            file.Close();
+                            // Delete uncompleted file
+                            File.Delete(baseName + "." + AudioIds[i] + ".wav");
+                            throw e;
+                        }
+                        bytesWrote += audioSize;
                     }
                 }
             }
@@ -126,9 +169,30 @@ namespace LibertyV.Rage.Audio.AWC
             {
                 for (int i = 0; i < AudioStreams.Count; ++i)
                 {
+                    if (progress != null)
+                    {
+                        // Calculate how many bytes are going to be written
+                        progress = new SubProgressReport(progress, AudioStreams.Sum(audio => audio.GetSize()));
+                    }
                     using (Stream file = File.Create(baseName + "." + AudioIds[i] + ".wav"))
                     {
-                        ExportWav(AudioStreams[i], file);
+                        if (progress != null)
+                        {
+                            progress.SetMessage("Decoding " + AudioIds[i]);
+                        }
+                        int audioSize = AudioStreams[i].GetSize();
+                        try
+                        {
+                            ExportWav(AudioStreams[i], file, progress == null ? null : new SubProgressReport(progress, bytesWrote, audioSize));
+                        }
+                        catch (OperationCanceledException e)
+                        {
+                            file.Close();
+                            // Delete uncompleted file
+                            File.Delete(baseName + "." + AudioIds[i] + ".wav");
+                            throw e;
+                        }
+                        bytesWrote += audioSize;
                     }
                 }
             }
@@ -144,11 +208,11 @@ namespace LibertyV.Rage.Audio.AWC
             Stream.Dispose();
         }
 
-        public static void ExportWav(IAudio audio, Stream output)
+        private static void ExportWav(IAudio audio, Stream output, IProgressReport writingProgress = null)
         {
             using (Stream input = audio.GetPCMStream())
             {
-                WAVFile.WAVFromPCM(input, output, (short)audio.GetChannels(), audio.GetSamplesPerSecond(), audio.GetBits(), (int)audio.GetSamplesCount());
+                WAVFile.WAVFromPCM(input, output, (short)audio.GetChannels(), audio.GetSamplesPerSecond(), audio.GetBits(), (int)audio.GetSamplesCount(), writingProgress);
             }
         }
     }
