@@ -385,12 +385,17 @@ namespace LibertyV
                 CloseRPF(false);
                 System.IO.File.Delete(CurrentFilePath);
                 System.IO.File.Move(tempFilePath, CurrentFilePath);
+                
+                // Now load the file
                 file = System.IO.File.Open(CurrentFilePath, FileMode.Open);
+                LoadRPF(new RPF7File(file, originalFilename), true);
             }
-
-            // Now open this file
-            file.Seek(0, SeekOrigin.Begin);
-            LoadRPF(new RPF7File(file, originalFilename), true);
+            else
+            {
+                // Notice: We are not going to use the file that we just wrote, because if we are going to write it again, we will read and write from the same file
+                // We waste little bit resources right now (because we doesn't release the old resource because we aren't using the new one), but it isn't so bad
+                file.Close();
+            }
         }
 
         private void saveAsButton_Click(object sender, EventArgs e)
