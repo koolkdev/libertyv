@@ -52,6 +52,7 @@
     <Compile Include="GlobalOptions.cs" />
     <Compile Include="Operations\AWCOperations.cs" />
     <Compile Include="Operations\Helper.cs" />
+    <Compile Include="Operations\IMenuItem.cs" />
     <Compile Include="Operations\ImportingWindow.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -59,6 +60,7 @@
       <DependentUpon>ImportingWindow.cs</DependentUpon>
     </Compile>
     <Compile Include="Operations\New.cs" />
+    <Compile Include="Operations\OperationMenuItem.cs" />
     <Compile Include="Operations\ResourceProperties.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -66,7 +68,7 @@
       <DependentUpon>ResourceProperties.cs</DependentUpon>
     </Compile>
     <Compile Include="Operations\Import.cs" />
-    <Compile Include="Operations\OperationsList.cs" />
+    <Compile Include="Operations\MenuItemsList.cs" />
     <Compile Include="Operations\Delete.cs" />
     <Compile Include="Operations\FileProporties.cs" />
     <Compile Include="Operations\RegularFileProperties.cs">
@@ -76,6 +78,8 @@
       <DependentUpon>RegularFileProperties.cs</DependentUpon>
     </Compile>
     <Compile Include="Operations\Rename.cs" />
+    <Compile Include="Operations\SeperatorMenuItem.cs" />
+    <Compile Include="Operations\SubMenuItem.cs" />
     <Compile Include="Platform.cs" />
     <Compile Include="PlatformSelection.cs">
       <SubType>Form</SubType>

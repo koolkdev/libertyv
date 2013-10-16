@@ -129,6 +129,14 @@ namespace LibertyV.Rage.RPF.V7.Entries
             // Dispose entry
             entry.Dispose();
         }
+
+        public void RenameEntry(Entry entry, string name)
+        {
+            Entries.Remove(entry.Name);
+            entry.Name = name;
+            Entries.Add(name, entry);
+        }
+
         public bool IsRoot()
         {
             return Parent == null;

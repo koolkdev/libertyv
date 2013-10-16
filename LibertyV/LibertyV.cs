@@ -490,7 +490,7 @@ namespace LibertyV
             this.filesTreeContextMenuStrip.Items.Clear();
             if (filesTree.SelectedNode != null)
             {
-                Operations.Operations.PopulateContextMenu(Operations.Operations.FolderOperations, this.filesTreeContextMenuStrip, (filesTree.SelectedNode as EntryTreeNode).Entry);
+                this.filesTreeContextMenuStrip.Items.AddRange(Operations.Operations.FolderOperations.GetContextMenuItems((filesTree.SelectedNode as EntryTreeNode).Entry));
                 e.Cancel = false;
             }
             else
@@ -529,7 +529,7 @@ namespace LibertyV
             }
             else
             {
-                entryItem.Entry.Name = e.Label;
+                entryItem.Entry.Parent.RenameEntry(entryItem.Entry, e.Label);
             }
             if (!e.CancelEdit)
             {
@@ -559,11 +559,11 @@ namespace LibertyV
                     e.Cancel = true;
                     return;
                 }
-                Operations.Operations.PopulateContextMenu(Operations.Operations.FilesListOperations, this.filesListContextMenuStrip, (filesTree.SelectedNode as EntryTreeNode).Entry);
+                this.filesListContextMenuStrip.Items.AddRange(Operations.Operations.FilesListOperations.GetContextMenuItems((filesTree.SelectedNode as EntryTreeNode).Entry));
             }
             else if (filesList.SelectedItems.Count == 1)
             {
-                Operations.Operations.PopulateContextMenu(Operations.Operations.FileOperations, this.filesListContextMenuStrip, (filesList.SelectedItems[0] as EntryListViewItem).Entry);
+                this.filesListContextMenuStrip.Items.AddRange(Operations.Operations.FileOperations.GetContextMenuItems((filesList.SelectedItems[0] as EntryListViewItem).Entry));
             }
             else
             {
@@ -572,7 +572,7 @@ namespace LibertyV
                 {
                     entries.Add(entry.Entry);
                 }
-                Operations.Operations.PopulateContextMenu(Operations.Operations.MultipleFilesOperations, this.filesListContextMenuStrip, entries);
+                this.filesListContextMenuStrip.Items.AddRange(Operations.Operations.MultipleFilesOperations.GetContextMenuItems(entries));
             }
             e.Cancel = false;
         }
@@ -643,7 +643,7 @@ namespace LibertyV
             }
             else
             {
-                entryItem.Entry.Name = e.Label;
+                entryItem.Entry.Parent.RenameEntry(entryItem.Entry, e.Label);
             }
             if (!e.CancelEdit)
             {

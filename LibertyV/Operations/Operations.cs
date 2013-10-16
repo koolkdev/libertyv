@@ -29,97 +29,77 @@ namespace LibertyV.Operations
 {
     static class Operations
     {
+        public class SeperatorClass {};
+        static SeperatorClass Seperator = new SeperatorClass();
 
-        public static OperationsList<FileEntry> FileOperations = new OperationsList<FileEntry>(){
+        public static MenuItemsList<FileEntry> FileOperations = new MenuItemsList<FileEntry>(){
             {"Open RPF", RPFOperations.OpenRPF, Keys.None, true, RPFOperations.IsRPF},
             {"Export to wav...", AWCOperations.ExportAWC, Keys.None, false, AWCOperations.IsAWC},
             {"Export file...", Export.ExportFile},
+            Seperator,
             {"Rename", Rename.RenameFile, Keys.F2},
             {"Delete", Delete.AskDeleteFile, Keys.Delete},
             {"Properties", FileProperties.ShowFileProperties}
         };
 
-        public static OperationsList<FileEntry> ShortcutsFileOperations = new OperationsList<FileEntry>(){
+        public static MenuItemsList<FileEntry> ShortcutsFileOperations = new MenuItemsList<FileEntry>(){
             {"Force Delete", Delete.ForceDeleteFile, Keys.Shift | Keys.Delete},
             {"Select All", Helper.SelectAll, Keys.Control | Keys.A}
         };
 
-        public static OperationsList<List<FileEntry>> MultipleFilesOperations = new OperationsList<List<FileEntry>>(){
+        public static MenuItemsList<List<FileEntry>> MultipleFilesOperations = new MenuItemsList<List<FileEntry>>(){
             {"Export to wav...", AWCOperations.ExportAWCs, Keys.None, false, AWCOperations.IsAWCs},
             {"Export files..", Export.ExportFiles},
-            {"Delete", Delete.AskDeleteFiles, Keys.Delete}
+            Seperator,
+            {"Delete", Delete.AskDeleteFiles, Keys.Delete},
         };
 
-        public static OperationsList<List<FileEntry>> ShortcutsMultipleFilesOperations = new OperationsList<List<FileEntry>>(){
+        public static MenuItemsList<List<FileEntry>> ShortcutsMultipleFilesOperations = new MenuItemsList<List<FileEntry>>(){
             {"Force Delete", Delete.ForceDeleteFiles, Keys.Shift | Keys.Delete},
             {"Select All", Helper.SelectAll, Keys.Control | Keys.A}
         };
 
-        public static OperationsList<DirectoryEntry> FolderOperations = new OperationsList<DirectoryEntry>(){
+        public static MenuItemsList<DirectoryEntry> FolderOperations = new MenuItemsList<DirectoryEntry>(){
             {"Export folder...", Export.ExportFolder},
+            Seperator,
             {"New Folder", New.NewFolder },
             {"Delete", Delete.AskDeleteFolder, Keys.Delete, false, delegate(DirectoryEntry entry) { return !entry.IsRoot(); }},
             {"Rename", Rename.RenameFolder, Keys.F2, false, delegate(DirectoryEntry entry) { return !entry.IsRoot(); }},
         };
 
-        public static OperationsList<DirectoryEntry> ShortcutsFolderOperations = new OperationsList<DirectoryEntry>(){
+        public static MenuItemsList<DirectoryEntry> ShortcutsFolderOperations = new MenuItemsList<DirectoryEntry>(){
             {"Force Delete", Delete.ForceDeleteFolder, Keys.Shift | Keys.Delete, false, delegate(DirectoryEntry entry) { return !entry.IsRoot(); }},
         };
 
-        public static OperationsList<DirectoryEntry> FilesListOperations = new OperationsList<DirectoryEntry>(){
+        public static MenuItemsList<DirectoryEntry> FilesListOperations = new MenuItemsList<DirectoryEntry>(){
             {"Import files...", Import.ImportFiles }
         };
 
-        public static OperationsList<DirectoryEntry> ShortcutsFilesListOperations = new OperationsList<DirectoryEntry>()
+        public static MenuItemsList<DirectoryEntry> ShortcutsFilesListOperations = new MenuItemsList<DirectoryEntry>()
         {
             {"Select All", Helper.SelectAll, Keys.Control | Keys.A}
         };
-
-        public static void PerformDefaultAction<T>(OperationsList<T> operations, T obj)
+        public static void PerformDefaultAction<T>(MenuItemsList<T> operations, T obj)
         {
-            foreach (var operation in operations)
+            Action<T> action = operations.GetDefaultAction(obj);
+            if (action != null)
             {
-                if (operation.CheckCondition(obj) && operation.IsDefault)
-                {
-                    operation.Operation(obj);
-                    return;
-                }
+                action(obj);
             }
         }
 
-        public static void PopulateContextMenu<T>(OperationsList<T> operations, ContextMenuStrip contextMenu, T obj)
+        public static void PerformActionByKey<T>(MenuItemsList<T> operations, MenuItemsList<T> shortcutOperations, Keys key, T obj)
         {
-            foreach (var operation in operations)
+            Action<T> action = operations.GetActionByKey(key, obj);
+            if (action != null)
             {
-                if (operation.CheckCondition(obj))
-                {
-                    var currentOperation = operation;
-                    ToolStripMenuItem item = new ToolStripMenuItem(currentOperation.Text, null, new EventHandler(delegate(Object o, EventArgs a)
-                    {
-                        currentOperation.Operation(obj);
-                    }), operation.KeyboardShortcut);
-                    contextMenu.Items.Add(item);
-                }
+                action(obj);
+                return;
             }
-        }
-
-        public static void PerformActionByKey<T>(OperationsList<T> operations, OperationsList<T> shortcutOperations, Keys key, T obj)
-        {
-            foreach (var operation in operations)
+            action = shortcutOperations.GetActionByKey(key, obj);
+            if (action != null)
             {
-                if (operation.CheckCondition(obj) && operation.KeyboardShortcut != Keys.None && operation.KeyboardShortcut == key)
-                {
-                    operation.Operation(obj);
-                    return;
-                }
-            }
-            foreach (var operation in shortcutOperations)
-            {
-                if (operation.CheckCondition(obj) && operation.KeyboardShortcut == key)
-                {
-                    operation.Operation(obj);
-                    return;
-                }
+                action(obj);
             }
         }
     }
