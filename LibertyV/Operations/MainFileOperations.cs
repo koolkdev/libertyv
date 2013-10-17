@@ -51,20 +51,24 @@ namespace LibertyV.Operations
             {
                 RPF7File file = null;
                 window.CurrentFilePath = openFileDialog.FileName;
-                Stream stream = openFileDialog.OpenFile();
+                Stream stream = null;
                 try
                 {
                     new ProgressWindow("Open", progress =>
                     {
                         progress.SetMessage("Loading..");
                         progress.SetProgress(-1);
+                        stream = openFileDialog.OpenFile();
                         file = new RPF7File(stream, Path.GetFileName(openFileDialog.FileName));
                     }).Run();
                 }
                 catch (RPFParsingException ex)
                 {
                     MessageBox.Show(ex.Message, "Failed to load RPF", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    stream.Close();
+                    if (stream != null)
+                    {
+                        stream.Close();
+                    }
                     return;
                 }
                 window.LoadRPF(file);

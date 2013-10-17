@@ -27,7 +27,7 @@ namespace LibertyV
 {
     static class GlobalOptions
     {
-        static public Platform.PlatformType Platform = 0;
+        static public Platform.PlatformType Platform = global::LibertyV.Platform.PlatformType.NONE;
 
         public static int AudioBits = 16;
     }

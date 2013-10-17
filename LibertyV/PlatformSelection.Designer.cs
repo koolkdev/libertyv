@@ -48,6 +48,7 @@ namespace LibertyV
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PlatformSelection));
             this.xboxSelect = new System.Windows.Forms.Button();
             this.playstationSelect = new System.Windows.Forms.Button();
             this.closeButton = new System.Windows.Forms.Button();
@@ -107,6 +108,7 @@ namespace LibertyV
             this.Controls.Add(this.playstationSelect);
             this.Controls.Add(this.xboxSelect);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "PlatformSelection";
