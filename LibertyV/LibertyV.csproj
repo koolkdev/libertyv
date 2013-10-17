@@ -59,6 +59,7 @@
     <Compile Include="Operations\ImportingWindow.Designer.cs">
       <DependentUpon>ImportingWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="Operations\MainFileOperations.cs" />
     <Compile Include="Operations\New.cs" />
     <Compile Include="Operations\OperationMenuItem.cs" />
     <Compile Include="Operations\ResourceProperties.cs">

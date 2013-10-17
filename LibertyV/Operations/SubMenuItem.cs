@@ -24,7 +24,6 @@ namespace LibertyV.Operations
             return new ToolStripItem[] { item };
         }
 
-
         public Action<T> GetDefaultAction(T obj)
         {
             return List.GetDefaultAction(obj);
@@ -33,6 +32,17 @@ namespace LibertyV.Operations
         public Action<T> GetActionByKey(Keys key, T obj)
         {
             return List.GetActionByKey(key, obj);
+        }
+
+        public ToolStripItem GetContextMenuItemUpdatedOnOpening(T obj)
+        {
+            ToolStripMenuItem item = new ToolStripMenuItem(Text);
+            item.DropDownOpening += (o, e) =>
+            {
+                item.DropDownItems.Clear();
+                item.DropDownItems.AddRange(List.GetContextMenuItems(obj));
+            };
+            return item;
         }
     }
 }

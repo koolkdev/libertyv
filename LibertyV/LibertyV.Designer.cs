@@ -63,6 +63,7 @@ namespace LibertyV
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.filesTree = new System.Windows.Forms.TreeView();
             this.filesList = new System.Windows.Forms.ListView();
+            this.menuStrip = new System.Windows.Forms.MenuStrip();
             this.toolbar.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -95,7 +96,7 @@ namespace LibertyV
             this.toolStripSeparator1,
             this.exportAllButton,
             this.exportSelectedButton});
-            this.toolbar.Location = new System.Drawing.Point(0, 0);
+            this.toolbar.Location = new System.Drawing.Point(0, 24);
             this.toolbar.Name = "toolbar";
             this.toolbar.Size = new System.Drawing.Size(776, 54);
             this.toolbar.TabIndex = 2;
@@ -173,7 +174,7 @@ namespace LibertyV
             // splitContainer1
             // 
             this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer1.Location = new System.Drawing.Point(0, 54);
+            this.splitContainer1.Location = new System.Drawing.Point(0, 78);
             this.splitContainer1.Name = "splitContainer1";
             // 
             // splitContainer1.Panel1
@@ -183,8 +184,8 @@ namespace LibertyV
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.filesList);
-            this.splitContainer1.Size = new System.Drawing.Size(776, 437);
-            this.splitContainer1.SplitterDistance = 200;
+            this.splitContainer1.Size = new System.Drawing.Size(776, 413);
+            this.splitContainer1.SplitterDistance = 199;
             this.splitContainer1.TabIndex = 6;
             // 
             // filesTree
@@ -193,7 +194,7 @@ namespace LibertyV
             this.filesTree.Dock = System.Windows.Forms.DockStyle.Fill;
             this.filesTree.Location = new System.Drawing.Point(0, 0);
             this.filesTree.Name = "filesTree";
-            this.filesTree.Size = new System.Drawing.Size(200, 437);
+            this.filesTree.Size = new System.Drawing.Size(199, 413);
             this.filesTree.TabIndex = 1;
             this.filesTree.AfterLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.filesTree_AfterLabelEdit);
             this.filesTree.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.filesTree_AfterSelect);
@@ -208,7 +209,7 @@ namespace LibertyV
             this.filesList.Dock = System.Windows.Forms.DockStyle.Fill;
             this.filesList.Location = new System.Drawing.Point(0, 0);
             this.filesList.Name = "filesList";
-            this.filesList.Size = new System.Drawing.Size(572, 437);
+            this.filesList.Size = new System.Drawing.Size(573, 413);
             this.filesList.Sorting = System.Windows.Forms.SortOrder.Ascending;
             this.filesList.TabIndex = 2;
             this.filesList.UseCompatibleStateImageBehavior = false;
@@ -218,6 +219,14 @@ namespace LibertyV
             this.filesList.KeyDown += new System.Windows.Forms.KeyEventHandler(this.filesList_KeyDown);
             this.filesList.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.filesList_DoubleClick);
             // 
+            // menuStrip
+            // 
+            this.menuStrip.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip.Name = "menuStrip";
+            this.menuStrip.Size = new System.Drawing.Size(776, 24);
+            this.menuStrip.TabIndex = 7;
+            this.menuStrip.Text = "menuStrip1";
+            // 
             // LibertyV
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -225,7 +234,9 @@ namespace LibertyV
             this.ClientSize = new System.Drawing.Size(776, 491);
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.toolbar);
+            this.Controls.Add(this.menuStrip);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MainMenuStrip = this.menuStrip;
             this.Name = "LibertyV";
             this.Text = "LibertyV - Grand Theft Auto V RPF Explorer";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.LibertyV_FormClosed);
@@ -255,6 +266,7 @@ namespace LibertyV
         private System.Windows.Forms.ToolStripButton saveButton;
         private System.Windows.Forms.ToolStripButton saveAsButton;
         private System.Windows.Forms.ToolStripButton settingsButton;
+        private System.Windows.Forms.MenuStrip menuStrip;
     }
 }
 

@@ -28,13 +28,13 @@ namespace LibertyV.Operations
 {
     class MenuItemsList<T> : List<IMenuItem<T>>, IMenuItem<T>
     {
-        public void Add(string text, Action<T> operationFunction, Keys keyboardShortcut = Keys.None, bool isDefault = false, Func<T, bool> conditionFunction = null)
+        public void Add(string text, Action<T> operationFunction, Keys keyboardShortcut = Keys.None, bool isDefault = false, Func<T, bool> conditionFunction = null, bool hideIfDisabled = true)
         {
             if (conditionFunction == null)
             {
                 conditionFunction = delegate(T obj) { return true; };
             }
-            Add(new OperationMenuItem<T>(text, operationFunction, keyboardShortcut, isDefault, conditionFunction));
+            Add(new OperationMenuItem<T>(text, operationFunction, keyboardShortcut, isDefault, conditionFunction, hideIfDisabled));
         }
 
         public void Add(string name, MenuItemsList<T> submenu)

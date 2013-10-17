@@ -32,6 +32,18 @@ namespace LibertyV.Operations
         public class SeperatorClass {};
         static SeperatorClass Seperator = new SeperatorClass();
 
+        public static MenuItemsList<LibertyV> MenuStrip = new MenuItemsList<LibertyV>()
+        {
+            {"File", new MenuItemsList<LibertyV>() {
+                {"Open", MainFileOperations.Open, Keys.Control | Keys.O, false, MainFileOperations.CanOpen, false},
+                {"Save", MainFileOperations.Save, Keys.Control | Keys.S, false, MainFileOperations.CanSave, false},
+                {"Save As...", MainFileOperations.SaveAs, Keys.None, false, MainFileOperations.CanSave, false},
+                {"Close", MainFileOperations.Close, Keys.None, false, MainFileOperations.CanSave, false},
+                Seperator,
+                {"Exit", MainFileOperations.Exit, Keys.Alt | Keys.F4}
+            }}
+        };
+
         public static MenuItemsList<FileEntry> FileOperations = new MenuItemsList<FileEntry>(){
             {"Open RPF", RPFOperations.OpenRPF, Keys.None, true, RPFOperations.IsRPF},
             {"Export to wav...", AWCOperations.ExportAWC, Keys.None, false, AWCOperations.IsAWC},
@@ -88,19 +100,21 @@ namespace LibertyV.Operations
             }
         }
 
-        public static void PerformActionByKey<T>(MenuItemsList<T> operations, MenuItemsList<T> shortcutOperations, Keys key, T obj)
+        public static bool PerformActionByKey<T>(MenuItemsList<T> operations, MenuItemsList<T> shortcutOperations, Keys key, T obj)
         {
             Action<T> action = operations.GetActionByKey(key, obj);
             if (action != null)
             {
                 action(obj);
-                return;
+                return true;
             }
             action = shortcutOperations.GetActionByKey(key, obj);
             if (action != null)
             {
                 action(obj);
+                return true;
             }
+            return false;
         }
     }
 }
