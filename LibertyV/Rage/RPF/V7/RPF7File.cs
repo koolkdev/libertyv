@@ -301,10 +301,10 @@ namespace LibertyV.Rage.RPF.V7
         {
             if (progressReport != null)
             {
-                progressReport = new SubProgressReport(progressReport, entries.Sum(entry => entry is FileEntry ? ((FileEntry)entry).Data.GetSize() : 0));
+                progressReport = new SubProgressReport(progressReport, entries.Sum(entry => (entry is FileEntry ? ((FileEntry)entry).Data.GetSize() : 0L)));
             }
 
-            int passed = 0;
+            long passed = 0;
             // Write data and fill entry info
             foreach (Entry entry in entries)
             {
