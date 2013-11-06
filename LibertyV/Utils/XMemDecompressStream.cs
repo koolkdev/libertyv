@@ -149,6 +149,10 @@ namespace LibertyV.Utils
                     }
                     outputSize = 0x8000;
                 }
+                if (inputSize > tempBuffer.Length)
+                {
+                    tempBuffer = new byte[inputSize];
+                }
                 if (outputSize == -1 || inputSize == -1)
                 {
                     throw new Exception("Unexpected EOF");
