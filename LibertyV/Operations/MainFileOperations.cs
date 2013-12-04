@@ -42,6 +42,32 @@ namespace LibertyV.Operations
             return window.TempOutputFile == null;
         }
 
+        public static void Open(LibertyV window, string filename)
+        {
+            RPF7File file = null;
+            Stream stream = null;
+            try
+            {
+                new ProgressWindow("Open", progress =>
+                {
+                    progress.SetMessage("Loading..");
+                    progress.SetProgress(-1);
+                    stream = File.OpenRead(filename);
+                    file = new RPF7File(stream, Path.GetFileName(filename), filename);
+                }).Run();
+            }
+            catch (RPFParsingException ex)
+            {
+                MessageBox.Show(ex.Message, "Failed to load RPF", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                if (stream != null)
+                {
+                    stream.Close();
+                }
+                return;
+            }
+            window.LoadRPF(file);
+        }
+
         public static void Open(LibertyV window)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -49,29 +75,7 @@ namespace LibertyV.Operations
             openFileDialog.Title = "Select a file";
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                RPF7File file = null;
-                window.CurrentFilePath = openFileDialog.FileName;
-                Stream stream = null;
-                try
-                {
-                    new ProgressWindow("Open", progress =>
-                    {
-                        progress.SetMessage("Loading..");
-                        progress.SetProgress(-1);
-                        stream = openFileDialog.OpenFile();
-                        file = new RPF7File(stream, Path.GetFileName(openFileDialog.FileName));
-                    }).Run();
-                }
-                catch (RPFParsingException ex)
-                {
-                    MessageBox.Show(ex.Message, "Failed to load RPF", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    if (stream != null)
-                    {
-                        stream.Close();
-                    }
-                    return;
-                }
-                window.LoadRPF(file);
+                Open(window, openFileDialog.FileName);
             }
         }
 
@@ -83,13 +87,14 @@ namespace LibertyV.Operations
                 return;
             }
             string originalFilename = window.File.Filename;
+            String filePath = window.File.FilePath;
 
             // Write to temporary file
             string tempFilePath = null;
             FileStream file = null;
-            if (window.CurrentFilePath != null)
+            if (filePath != null)
             {
-                tempFilePath = window.CurrentFilePath + "." + Path.GetRandomFileName();
+                tempFilePath = filePath + "." + Path.GetRandomFileName();
                 file = System.IO.File.Create(tempFilePath);
             }
             else
@@ -107,7 +112,7 @@ namespace LibertyV.Operations
             catch (OperationCanceledException)
             {
                 // This operation cancelled    
-                if (window.CurrentFilePath != null)
+                if (filePath != null)
                 {
                     // delete the file
                     file.Close();
@@ -125,17 +130,17 @@ namespace LibertyV.Operations
 
             file.SetLength(file.Position);
 
-            if (window.CurrentFilePath != null)
+            if (filePath != null)
             {
                 // Update the file and reopen it
                 file.Close();
                 window.CloseRPF(false);
-                System.IO.File.Delete(window.CurrentFilePath);
-                System.IO.File.Move(tempFilePath, window.CurrentFilePath);
+                System.IO.File.Delete(filePath);
+                System.IO.File.Move(tempFilePath, filePath);
 
                 // Now load the file
-                file = System.IO.File.Open(window.CurrentFilePath, FileMode.Open);
-                window.LoadRPF(new RPF7File(file, originalFilename), true);
+                file = System.IO.File.Open(filePath, FileMode.Open);
+                window.LoadRPF(new RPF7File(file, originalFilename, filePath), true);
             }
             else
             {
@@ -179,8 +184,7 @@ namespace LibertyV.Operations
 
             // Now open this file
             file.Seek(0, SeekOrigin.Begin);
-            window.CurrentFilePath = result;
-            window.LoadRPF(new RPF7File(file, Path.GetFileName(result)), true);
+            window.LoadRPF(new RPF7File(file, Path.GetFileName(result), result), true);
         }
 
         public static void Close(LibertyV window)

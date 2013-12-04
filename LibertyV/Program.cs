@@ -24,6 +24,7 @@ using System.Linq;
 using System.Windows.Forms;
 using System.IO;
 using LibertyV.Utils;
+using LibertyV.Rage.RPF.V7;
 
 namespace LibertyV
 {
@@ -33,14 +34,14 @@ namespace LibertyV
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main()
+        static void Main(string[] args)
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
             // Set the configuration by the validity of the keys
-            Properties.Settings.Default.Xbox360KeyFileEnabled = Settings.Settings.CheckXbox360Key(Properties.Settings.Default.Xbox360KeyFile);
-            Properties.Settings.Default.PS3KeyFileEnabled = Settings.Settings.CheckPS3Key(Properties.Settings.Default.PS3KeyFile);
+            Properties.Settings.Default.Xbox360KeyFileEnabled = Settings.Settings.CheckXbox360Key(Path.Combine(GetApplicationDirectory(), Properties.Settings.Default.Xbox360KeyFile));
+            Properties.Settings.Default.PS3KeyFileEnabled = Settings.Settings.CheckPS3Key(Path.Combine(GetApplicationDirectory(), Properties.Settings.Default.PS3KeyFile));
 
             new PlatformSelection().ShowDialog();
 
@@ -49,7 +50,30 @@ namespace LibertyV
                 return;
             }
 
-            Application.Run(new LibertyV());
+            string filename = null;
+            foreach (string s in args)
+            {
+                // For future command-line support, right now ignore them
+                if (!s.StartsWith("-"))
+                {
+                    filename = s;
+                    break;
+                }
+            }
+
+            if (filename != null)
+            {
+                Application.Run(new LibertyV(filename));
+            }
+            else
+            {
+                Application.Run(new LibertyV());
+            }
+        }
+
+        public static string GetApplicationDirectory()
+        {
+            return System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
         }
     }
 }

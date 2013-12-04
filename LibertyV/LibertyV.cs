@@ -45,8 +45,8 @@ namespace LibertyV
         }
 
         public RPF7File File = null;
+        // Should I move this to RPF7File too?
         public string TempOutputFile = null;
-        public string CurrentFilePath = null;
 
         public LibertyV(RPF7File rpf = null, string tempOutputFile = null)
         {
@@ -80,6 +80,18 @@ namespace LibertyV
                 {
                     menuStrip.Items.Add((item as Operations.SubMenuItem<LibertyV>).GetContextMenuItemUpdatedOnOpening(this));
                 }
+            }
+        }
+
+        public LibertyV(string filename) : this()
+        {
+            if (!System.IO.File.Exists(filename) || Path.GetExtension(filename) != ".rpf")
+            {
+                MessageBox.Show("Not a RPF file.", "Failed to load RPF", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else
+            {
+                Operations.MainFileOperations.Open(this, filename);
             }
         }
 

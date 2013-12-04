@@ -48,14 +48,14 @@ namespace LibertyV
         private void xboxSelect_Click(object sender, EventArgs e)
         {
             GlobalOptions.Platform = Platform.PlatformType.XBOX360;
-            AES.Key = File.ReadAllBytes(Properties.Settings.Default.Xbox360KeyFile);
+            AES.Key = File.ReadAllBytes(Path.Combine(Program.GetApplicationDirectory(), Properties.Settings.Default.Xbox360KeyFile));
             Close();
         }
 
         private void playstationSelect_Click(object sender, EventArgs e)
         {
             GlobalOptions.Platform = Platform.PlatformType.PLAYSTATION3;
-            AES.Key = File.ReadAllBytes(Properties.Settings.Default.PS3KeyFile);
+            AES.Key = File.ReadAllBytes(Path.Combine(Program.GetApplicationDirectory(), Properties.Settings.Default.PS3KeyFile));
             Close();
         }
 

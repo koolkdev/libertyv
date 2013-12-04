@@ -38,14 +38,17 @@ namespace LibertyV.Rage.RPF.V7
 
         public DirectoryEntry Root;
         public String Filename;
+        // The optional path of this file, will be used when we will save this rpf.
+        public String FilePath = null;
 
-        public RPF7File(Stream inputStream, String filname = "")
+        public RPF7File(Stream inputStream, String filname = "", String filePath = null)
         {
             if (!inputStream.CanRead)
             {
                 throw new RPFParsingException("Stream isn't readable");
             }
             this.Filename = filname;
+            this.FilePath = filePath;
             Stream = inputStream;
 
             try
