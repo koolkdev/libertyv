@@ -46,6 +46,7 @@ namespace LibertyV.Operations
 
         public static MenuItemsList<FileEntry> FileOperations = new MenuItemsList<FileEntry>(){
             {"Open RPF", RPFOperations.OpenRPF, Keys.None, true, RPFOperations.IsRPF},
+            {"Resource Viewer", ResourceViewer.ViewResource, Keys.None, true, ResourceViewer.IsSupportedResource},
             {"Export to wav...", AWCOperations.ExportAWC, Keys.None, false, AWCOperations.IsAWC},
             {"Export file...", Export.ExportFile},
             Seperator,

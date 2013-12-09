@@ -24,6 +24,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using LibertyV.Utils;
+using LibertyV.Rage.Resources;
 
 namespace LibertyV.Rage.RPF.V7.Entries
 {
@@ -191,6 +192,16 @@ namespace LibertyV.Rage.RPF.V7.Entries
                         }
                         break;
                     }
+            }
+        }
+
+        public ResourceReader GetResrouceReader()
+        {
+            using (Stream stream = this.Data.GetStream()) {
+                MemoryStream mstream = new MemoryStream(this.SystemSize);
+                stream.CopyToCount(mstream, this.SystemSize);
+                mstream.Seek(0, SeekOrigin.Begin);
+                return new ResourceReader(mstream);
             }
         }
 

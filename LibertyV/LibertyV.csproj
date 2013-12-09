@@ -11,7 +11,8 @@
     <RootNamespace>LibertyV</RootNamespace>
     <AssemblyName>LibertyV</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -39,6 +40,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Design" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -50,6 +52,45 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GlobalOptions.cs" />
+    <Compile Include="Operations\ResourceViewer.cs" />
+    <Compile Include="Rage\Resources\Types\Basic\CString.cs" />
+    <Compile Include="Rage\Resources\Types\Basic\MemoryInfo.cs" />
+    <Compile Include="Rage\Resources\Types\Game\D3DBaseTexture.cs" />
+    <Compile Include="Rage\Resources\Types\Game\rage\grcTexture.cs" />
+    <Compile Include="Rage\Resources\Types\Game\rage\grcTextureGCM.cs" />
+    <Compile Include="Rage\Resources\Types\Game\rage\grcTextureXenon.cs" />
+    <Compile Include="Rage\Resources\Types\Game\rage\pgBase.cs" />
+    <Compile Include="Rage\Resources\Types\Game\rage\pgDictionary.cs" />
+    <Compile Include="Rage\Resources\Types\Basic\List.cs" />
+    <Compile Include="Rage\Resources\Types\ClassObject.cs" />
+    <Compile Include="Rage\Resources\Types\Basic\VoidPointer.cs" />
+    <Compile Include="Rage\Resources\Types\InheritanceClassTypeInfo.cs" />
+    <Compile Include="Rage\Resources\Types\TemplateClassTypeInfo.cs" />
+    <Compile Include="Rage\Resources\Types\Basic\UInteger16.cs" />
+    <Compile Include="Rage\Resources\Types\Pointer.cs" />
+    <Compile Include="Rage\Resources\Types\PointerTypeInfo.cs" />
+    <Compile Include="Rage\Resources\Types\PrimitiveObject.cs" />
+    <Compile Include="Rage\Resources\Types\ResourceObject.cs" />
+    <Compile Include="Rage\Resources\Types\ClassTypeInfo.cs" />
+    <Compile Include="Rage\Resources\Types\PrimitiveTypeInfo.cs" />
+    <Compile Include="Rage\Resources\Types\Basic\UInteger32.cs" />
+    <Compile Include="Rage\Resources\Types\ResourceTypes.cs" />
+    <Compile Include="Utils\TreeView\ContainerListView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Utils\TreeView\Helpers\StringTools.cs" />
+    <Compile Include="Utils\TreeView\HelperTools.cs" />
+    <Compile Include="Utils\TreeView\IParentChildList.cs" />
+    <Compile Include="Utils\TreeView\TreeListView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Utils\TreeView\uxTheme\Wrapper.cs" />
+    <Compile Include="Windows\ResourceViewer\ResourceViewerWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\ResourceViewer\ResourceViewerWindow.Designer.cs">
+      <DependentUpon>ResourceViewerWindow.cs</DependentUpon>
+    </Compile>
     <Compile Include="Operations\AWCOperations.cs" />
     <Compile Include="Operations\Helper.cs" />
     <Compile Include="Operations\IMenuItem.cs" />
@@ -111,6 +152,9 @@
     <Compile Include="Rage\Audio\AWC\SplittedAudioPCMStream.cs" />
     <Compile Include="Rage\Audio\Codecs\XMA\XMA2DecoderStream.cs" />
     <Compile Include="Rage\Exceptions.cs" />
+    <Compile Include="Rage\Resources\IResource.cs" />
+    <Compile Include="Rage\Resources\Types\TypeInfo.cs" />
+    <Compile Include="Rage\Resources\ResourceReader.cs" />
     <Compile Include="Utils\IProgressReport.cs" />
     <Compile Include="Utils\Range.cs" />
     <Compile Include="Utils\SplittedStream.cs" />
@@ -154,6 +198,15 @@
     <Compile Include="Utils\GUI.cs" />
     <Compile Include="Utils\Reflector.cs" />
     <Compile Include="Utils\XMemDecompressStream.cs" />
+    <EmbeddedResource Include="Utils\TreeView\ContainerListView.resx">
+      <DependentUpon>ContainerListView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Utils\TreeView\TreeListView.resx">
+      <DependentUpon>TreeListView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\ResourceViewer\ResourceViewerWindow.resx">
+      <DependentUpon>ResourceViewerWindow.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Operations\ImportingWindow.resx">
       <DependentUpon>ImportingWindow.cs</DependentUpon>
     </EmbeddedResource>
@@ -210,6 +263,8 @@
     <None Include="Resources\save.bmp" />
     <None Include="Resources\saveas.bmp" />
     <None Include="Resources\preferences.png" />
+    <EmbeddedResource Include="Utils\TreeView\Resources\tv_minus.bmp" />
+    <EmbeddedResource Include="Utils\TreeView\Resources\tv_plus.bmp" />
     <Content Include="xcompress.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
