@@ -75,6 +75,7 @@
     <Compile Include="Rage\Resources\Types\PrimitiveTypeInfo.cs" />
     <Compile Include="Rage\Resources\Types\Basic\UInteger32.cs" />
     <Compile Include="Rage\Resources\Types\ResourceTypes.cs" />
+    <Compile Include="Rage\Resources\Types\TypesCache.cs" />
     <Compile Include="Utils\TreeView\ContainerListView.cs">
       <SubType>Component</SubType>
     </Compile>

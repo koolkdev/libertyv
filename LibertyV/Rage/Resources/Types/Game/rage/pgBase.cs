@@ -32,8 +32,8 @@ namespace LibertyV.Rage.Resources.Types.Game.rage
         protected pgBase()
             : base("rage::pgBase")
         {
-            base.AddMember("vtable", Basic.UInteger32.TypeInfo);
-            base.AddMember("Memory", PointerTypeInfo.GetPointerTypeInfo(Basic.MemoryInfo.TypeInfo));
+            base.AddMember("vtable", "UInteger32");
+            base.AddMember("Memory", "MemoryInfo*");
         }
     }
 }

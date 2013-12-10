@@ -29,7 +29,7 @@ namespace LibertyV.Rage.Resources.Types.Game.rage
     {
         public static grcTexture TypeInfo = new grcTexture();
         protected grcTexture()
-            : base("rage::grcTexture", rage.pgBase.TypeInfo)
+            : base("rage::grcTexture", "rage::pgBase")
         {
         }
     }

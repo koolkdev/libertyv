@@ -29,23 +29,23 @@ namespace LibertyV.Rage.Resources.Types.Game.rage
     {
         public static grcTextureXenon TypeInfo = new grcTextureXenon();
         protected grcTextureXenon()
-            : base("rage::grcTextureXenon", rage.grcTexture.TypeInfo)
+            : base("rage::grcTextureXenon", "rage::grcTexture")
         {
-            AddMember("Unknown1", Basic.UInteger32.TypeInfo);
-            AddMember("Unknown2", Basic.UInteger32.TypeInfo);
-            AddMember("Unknown3", Basic.UInteger32.TypeInfo);
-            AddMember("Unknown4", Basic.UInteger32.TypeInfo);
-            AddMember("Unknown5", Basic.UInteger32.TypeInfo);
-            AddMember("Unknonw6", Basic.UInteger32.TypeInfo);
-            AddMember("Name", PointerTypeInfo.GetPointerTypeInfo(Basic.CString.TypeInfo));
-            AddMember("Unknonw7", Basic.UInteger32.TypeInfo);
-            AddMember("Unknonw8", Basic.UInteger32.TypeInfo);
-            AddMember("Unknonw9", Basic.UInteger32.TypeInfo);
-            AddMember("Unknonw10", Basic.UInteger32.TypeInfo);
-            AddMember("TextureInfo", PointerTypeInfo.GetPointerTypeInfo(Game.D3DBaseTexture.TypeInfo));
-            AddMember("Width", Basic.UInteger16.TypeInfo);
-            AddMember("Height", Basic.UInteger16.TypeInfo);
-            AddMember("Unknonw13", Basic.UInteger32.TypeInfo);
+            AddMember("Unknown1", "UInteger32");
+            AddMember("Unknown2", "UInteger32");
+            AddMember("Unknown3", "UInteger32");
+            AddMember("Unknown4", "UInteger32");
+            AddMember("Unknown5", "UInteger32");
+            AddMember("Unknonw6", "UInteger32");
+            AddMember("Name", "CString*");
+            AddMember("Unknonw7", "UInteger32");
+            AddMember("Unknonw8", "UInteger32");
+            AddMember("Unknonw9", "UInteger32");
+            AddMember("Unknonw10", "UInteger32");
+            AddMember("TextureInfo", "D3DBaseTexture");
+            AddMember("Width", "UInteger16");
+            AddMember("Height", "UInteger16");
+            AddMember("Unknonw13", "UInteger32");
         }
     }
 }

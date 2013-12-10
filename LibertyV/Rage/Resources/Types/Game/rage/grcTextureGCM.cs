@@ -30,20 +30,20 @@ namespace LibertyV.Rage.Resources.Types.Game.rage
         // TODO
         public static grcTextureGCM TypeInfo = new grcTextureGCM();
         protected grcTextureGCM()
-            : base("rage::grcTextureGCM", rage.grcTexture.TypeInfo)
+            : base("rage::grcTextureGCM", "rage::grcTexture")
         {
-            AddMember("Unknown1", Basic.UInteger32.TypeInfo);
-            AddMember("Unknown2", Basic.UInteger32.TypeInfo);
-            AddMember("Width", Basic.UInteger16.TypeInfo);
-            AddMember("Height", Basic.UInteger16.TypeInfo);
-            AddMember("Unknown3", Basic.UInteger32.TypeInfo);
-            AddMember("Unknonw4", Basic.UInteger32.TypeInfo);
-            AddMember("DataOffset", Basic.UInteger32.TypeInfo);
-            AddMember("Name", PointerTypeInfo.GetPointerTypeInfo(Basic.CString.TypeInfo));
-            AddMember("Unknown5", Basic.UInteger32.TypeInfo);
-            AddMember("PointerToUnknown1", Basic.VoidPointer.TypeInfo);
-            AddMember("Unknown6", Basic.UInteger32.TypeInfo);
-            AddMember("Unknown7", Basic.UInteger32.TypeInfo);
+            AddMember("Unknown1", "UInteger32");
+            AddMember("Unknown2", "UInteger32");
+            AddMember("Width", "UInteger16");
+            AddMember("Height", "UInteger16");
+            AddMember("Unknown3", "UInteger32");
+            AddMember("Unknonw4", "UInteger32");
+            AddMember("DataOffset", "UInteger32");
+            AddMember("Name", "CString*");
+            AddMember("Unknown5", "UInteger32");
+            AddMember("PointerToUnknown1", "void*");
+            AddMember("Unknown6", "UInteger32");
+            AddMember("Unknown7", "UInteger32");
             // TODO: Figure out this object
             AddMember("UnknownObject", PointerTypeInfo.GetPointerTypeInfo(UnknownObject.TypeInfo));
         }

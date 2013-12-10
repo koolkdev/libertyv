@@ -32,19 +32,19 @@ namespace LibertyV.Rage.Resources.Types.Game
             : base("D3DBaseTexture")
         {
             // TODO: Bitfields and enums. Fuck me.
-            AddMember("Unknown1", Basic.UInteger32.TypeInfo);
-            AddMember("Unknown2", Basic.UInteger32.TypeInfo);
-            AddMember("Unknown3", Basic.UInteger32.TypeInfo);
-            AddMember("Unknown4", Basic.UInteger32.TypeInfo);
-            AddMember("Unknown5", Basic.UInteger32.TypeInfo);
-            AddMember("Unknown6", Basic.UInteger32.TypeInfo);
-            AddMember("Unknown7", Basic.UInteger32.TypeInfo);
-            AddMember("Unknown8", Basic.UInteger32.TypeInfo);
-            AddMember("Unknown9", Basic.UInteger32.TypeInfo);
-            AddMember("Unknown10", Basic.UInteger32.TypeInfo);
-            AddMember("Unknown11", Basic.UInteger32.TypeInfo);
-            AddMember("Unknown12", Basic.UInteger32.TypeInfo);
-            AddMember("Unknown13", Basic.UInteger32.TypeInfo);
+            AddMember("Unknown1", "UInteger32");
+            AddMember("Unknown2", "UInteger32");
+            AddMember("Unknown3", "UInteger32");
+            AddMember("Unknown4", "UInteger32");
+            AddMember("Unknown5", "UInteger32");
+            AddMember("Unknown6", "UInteger32");
+            AddMember("Unknown7", "UInteger32");
+            AddMember("Unknown8", "UInteger32");
+            AddMember("Unknown9", "UInteger32");
+            AddMember("Unknown10", "UInteger32");
+            AddMember("Unknown11", "UInteger32");
+            AddMember("Unknown12", "UInteger32");
+            AddMember("Unknown13", "UInteger32");
         }
     }
 }

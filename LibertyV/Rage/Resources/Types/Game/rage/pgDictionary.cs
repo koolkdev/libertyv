@@ -31,10 +31,10 @@ namespace LibertyV.Rage.Resources.Types.Game.rage
         protected pgDictionary(TypeInfo templateItem)
             : base("rage::pgDictionary", templateItem)
         {
-            base.AddMember("base", Game.rage.pgBase.TypeInfo);
-            base.AddMember("UnknownZero", Basic.UInteger32.TypeInfo);
-            base.AddMember("UseCount", Basic.UInteger32.TypeInfo);
-            base.AddMember("NameHashes", Basic.List.GetTemplateClassTypeInfo<Basic.List>(Basic.UInteger32.TypeInfo));
+            base.AddMember("base", "rage::pgBase");
+            base.AddMember("UnknownZero", "UInteger32");
+            base.AddMember("UseCount", "UInteger32");
+            base.AddMember("NameHashes", "List<UInteger32>");
             base.AddMember("Entries", Basic.List.GetTemplateClassTypeInfo<Basic.List>(templateItem));
         }
     }

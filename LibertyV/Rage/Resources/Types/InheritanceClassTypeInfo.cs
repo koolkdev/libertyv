@@ -28,10 +28,15 @@ namespace LibertyV.Rage.Resources.Types
     class InheritanceClassTypeInfo : ClassTypeInfo
     {
         // TODO: Support multiplie class inheritances.
-        protected InheritanceClassTypeInfo(string name, ClassTypeInfo mother)
+        protected InheritanceClassTypeInfo(string name, ClassTypeInfo parent)
             : base(name)
         {
-            base.AddMember("base", mother);
+            base.AddMember("base", parent);
+        }
+        protected InheritanceClassTypeInfo(string name, string parentName)
+            : base(name)
+        {
+            base.AddMember("base", parentName);
         }
     }
 }

@@ -39,6 +39,16 @@ namespace LibertyV.Rage.Resources.Types
             this.Members.Add(Tuple.Create(name, type));
         }
 
+        protected void AddMember(string name, string type)
+        {
+            TypeInfo typeinfo = TypesCache.GetTypeInfoByName(type);
+            if (typeinfo == null)
+            {
+                throw new ArgumentException(String.Format("Couldn't find the type {0}", type));
+            }
+            this.Members.Add(Tuple.Create(name, typeinfo));
+        }
+
         public override ResourceObject Create()
         {
             Dictionary<string, ResourceObject> values = new Dictionary<string, ResourceObject>();

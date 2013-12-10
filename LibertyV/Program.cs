@@ -25,6 +25,7 @@ using System.Windows.Forms;
 using System.IO;
 using LibertyV.Utils;
 using LibertyV.Rage.RPF.V7;
+using LibertyV.Rage.Resources.Types;
 
 namespace LibertyV
 {
@@ -60,6 +61,9 @@ namespace LibertyV
                     break;
                 }
             }
+
+            // Initialize resources
+            TypesCache.Initialize();
 
             if (filename != null)
             {
