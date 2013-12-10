@@ -35,7 +35,7 @@ namespace LibertyV.Rage.Resources.Types.Game.rage
             base.AddMember("UnknownZero", "UInteger32");
             base.AddMember("UseCount", "UInteger32");
             base.AddMember("NameHashes", "List<UInteger32>");
-            base.AddMember("Entries", Basic.List.GetTemplateClassTypeInfo<Basic.List>(templateItem));
+            base.AddMember("Entries", Basic.List.GetTemplateClassTypeInfo<Basic.List>(PointerTypeInfo.GetPointerTypeInfo(templateItem)));
         }
     }
 }

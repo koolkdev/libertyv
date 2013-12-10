@@ -29,8 +29,8 @@ namespace LibertyV.Rage.Resources.Types
     {
         public static Dictionary<string, TypeInfo> Types = new Dictionary<string, TypeInfo>()
         {
-            {".xtd", TypesCache.GetTypeInfoByName("rage::pgDictionary<rage::grcTextureXenon*>")},
-            {".ctd", TypesCache.GetTypeInfoByName("rage::pgDictionary<rage::grcTextureGCM*>")},
+            {".xtd", TypesCache.GetTypeInfoByName("rage::pgDictionary<rage::grcTextureXenon>")},
+            {".ctd", TypesCache.GetTypeInfoByName("rage::pgDictionary<rage::grcTextureGCM>")},
         };
     }
 }
