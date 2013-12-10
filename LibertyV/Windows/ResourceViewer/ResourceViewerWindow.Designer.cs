@@ -115,7 +115,9 @@ namespace LibertyV.Windows.ResourceViewer
             this.ClientSize = new System.Drawing.Size(910, 390);
             this.Controls.Add(this.resourcesView);
             this.Name = "ResourceTypeViewer";
-            this.Text = "ResourceTypeViewer";
+            this.ShowIcon = false;
+            this.ShowInTaskbar = false;
+            this.Text = "Resource Viewer";
             this.ResumeLayout(false);
 
         }
