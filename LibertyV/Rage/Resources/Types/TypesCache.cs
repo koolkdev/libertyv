@@ -79,7 +79,7 @@ namespace LibertyV.Rage.Resources.Types
                     }
                     return PointerTypeInfo.GetPointerTypeInfo(type);
                 }
-                else if (name.IndexOf("<") != -1)
+                else if (name.EndsWith(">"))
                 {
                     // Is a template
                     string templateName = name.Substring(0, name.IndexOf("<"));
@@ -87,7 +87,7 @@ namespace LibertyV.Rage.Resources.Types
                     {
                         return null;
                     }
-                    string typename = name.Substring(name.IndexOf("<") + 1, name.LastIndexOf(">") - templateName.Length - 1);
+                    string typename = name.Substring(name.IndexOf("<") + 1, name.Length - templateName.Length - 2);
                     type = GetTypeInfoByName(typename);
                     if (type == null)
                     {
