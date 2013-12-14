@@ -27,94 +27,12 @@ namespace LibertyV.Rage.Resources.Types.Basic
 {
     class List : TemplateClassTypeInfo
     {
-        private class ListItems : ResourceObject
-        {
-            private ResourceObject[] Items = null;
-
-            private ResourceReader Reader = null;
-
-            private TypeInfo ItemsType;
-
-            public ListItems(TypeInfo type, ResourceReader reader)
-            {
-                Type = ListItemsTypeInfo.GetTemplateClassTypeInfo<ListItemsTypeInfo>(type);
-                ItemsType = type;
-                Reader = reader;
-            }
-
-            public void InitializeWithReader(int count, int size)
-            {
-                // Reader should not be null
-                Items = new ResourceObject[size];
-                int i = 0;
-                for (; i < count; ++i)
-                {
-                    Items[i] = ItemsType.Create(Reader);
-                }
-                for (;  i < size; ++i)
-                {
-                    Items[i] = ItemsType.Create();
-                }
-            }
-
-            public override ResourceObject this[object key]
-            {
-                get
-                {
-                    if (!(key is int))
-                    {
-                        throw new ArgumentException();
-                    }
-                    // This operation will throw the appropiate exception if needed
-                    return Items[(int)key];
-                }
-
-                set
-                {
-                    if (!(key is int))
-                    {
-                        throw new ArgumentException();
-                    }
-                    // TODO: Check object
-                    Items[(int)key] = value;
-                }
-            }
-
-            public override object Value
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            public override Tuple<string, ResourceObject>[] GetChilds()
-            {
-                return Items.Select((item, index) => Tuple.Create(String.Format("[{0}]", index), item)).ToArray();
-            }
-        }
-
-        private class ListItemsTypeInfo : TemplateClassTypeInfo
-        {
-            // TODO: I would like that the name will be T**
-            protected ListItemsTypeInfo(TypeInfo typeInfo)
-                : base("ListItems", typeInfo)
-            {
-            }
-
-            public override ResourceObject Create()
-            {
-                throw new NotImplementedException();
-            }
-
-            public override ResourceObject Create(ResourceReader reader)
-            {
-                return new ListItems(base.TemplateItem, reader.Clone());
-            }
-        }
         protected List(TypeInfo templateItem)
             : base("List", templateItem)
         {
-            base.AddMember("Items", PointerTypeInfo.GetPointerTypeInfo(ListItemsTypeInfo.GetTemplateClassTypeInfo<ListItemsTypeInfo>(base.TemplateItem)));
-            base.AddMember("Count", Basic.UInteger16.TypeInfo);
-            base.AddMember("Size", Basic.UInteger16.TypeInfo);
+            base.AddMember("Items", "PointerReader");
+            base.AddMember("Count", "Word");
+            base.AddMember("Size", "Word");
         }
 
         public override ResourceObject Create()
@@ -130,10 +48,9 @@ namespace LibertyV.Rage.Resources.Types.Basic
 
         public override ResourceObject Create(ResourceReader reader)
         {
-            ResourceObject obj = base.Create(reader);
-            // Load the items list
-            ((ListItems)obj["Items"].Value).InitializeWithReader((int)(UInt16)obj["Count"].Value, (int)(UInt16)obj["Size"].Value);
-            return obj;
+            ResourceObject res = base.Create(reader);
+            res["Items"] = new Pointer(Basic.Array.GetArrayTypeInfo(base.TemplateItem, res["Count"].IntegerValue).Create(res["Items"].Value as ResourceReader));
+            return res;
         }
     }
 }

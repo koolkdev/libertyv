@@ -59,6 +59,11 @@ namespace LibertyV.Rage.Resources.Types
                 {
                     return obj;
                 }
+                // Try to get the property from the base class
+                if (MembersValues.TryGetValue("base", out obj))
+                {
+                    return obj[key];
+                }
                 throw new KeyNotFoundException(String.Format("{0} doesn't have the field {1}", this.Info.Name, key.ToString()));
             }
             set
@@ -68,7 +73,15 @@ namespace LibertyV.Rage.Resources.Types
                     // TODO: Check if member is valid
                     MembersValues[key.ToString()] = value;
                 }
-                throw new KeyNotFoundException(String.Format("{0} doesn't have the field {1}", this.Info.Name, key.ToString()));
+                // Try to get the property from the base class
+                else if (MembersValues.ContainsKey("base"))
+                {
+                    MembersValues["base"][key] = value;
+                }
+                else
+                {
+                    throw new KeyNotFoundException(String.Format("{0} doesn't have the field {1}", this.Info.Name, key.ToString()));
+                }
             }
         }
 
@@ -78,6 +91,11 @@ namespace LibertyV.Rage.Resources.Types
             {
                 throw new InvalidOperationException("Class doesn't have value");
             }
+        }
+
+        public override string ToString()
+        {
+            return String.Format("{{{0}}}", this.Type.Name);
         }
 
         public override Tuple<string, ResourceObject>[] GetChilds()

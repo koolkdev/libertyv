@@ -25,42 +25,14 @@ using System.Text;
 
 namespace LibertyV.Rage.Resources.Types.Basic
 {
-    class UInteger32 : PrimitiveObject
+    class Byte : NumberPrimitive<System.Byte>
     {
-        private UInt32 value;
+        public static PrimitiveTypeInfo TypeInfo;
+        public static void Initialize() { TypeInfo = new NumberPrimitiveInfo<Byte>("Byte", x => x.ReadByte()); }
 
-        private class UInteger32Info : PrimitiveTypeInfo
+        public Byte(System.Byte value = 0)
+            : base(value, TypeInfo)
         {
-            public UInteger32Info()
-                : base("UInteger32")
-            {
-            }
-
-            public override ResourceObject Create()
-            {
-                return new UInteger32(0);
-            }
-
-            public override ResourceObject Create(ResourceReader reader)
-            {
-                return new UInteger32(reader.ReadUInt32());
-            }
-        }
-
-        public static PrimitiveTypeInfo TypeInfo = new UInteger32Info();
-
-        public UInteger32(UInt32 value = 0)
-        {
-            this.value = value;
-            this.Type = UInteger32.TypeInfo;
-        }
-
-        public override object Value
-        {
-            get
-            {
-                return value;
-            }
         }
     }
 }

@@ -30,16 +30,33 @@ namespace LibertyV.Rage.Resources.Types
         // TODO: Should be readonly?
         public TypeInfo Type = null;
 
-        abstract public ResourceObject this[object key]
+        public virtual ResourceObject this[object key]
         {
-            get;
-            set;
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+        public virtual object Value
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
         }
 
-        abstract public object Value
-        {
-            get;
-        }
+        public virtual int IntegerValue { get { throw new NotImplementedException(); } }
+        public virtual uint DwordValue { get { throw new NotImplementedException(); } }
+        public virtual int ShortValue { get { throw new NotImplementedException(); } }
+        public virtual ushort WordValue { get { throw new NotImplementedException(); } }
+        public virtual char CharValue { get { throw new NotImplementedException(); } }
+        public virtual int ByteValue { get { throw new NotImplementedException(); } }
+        public virtual float FloatValue { get { throw new NotImplementedException(); } }
+        public virtual double DoubleValue { get { throw new NotImplementedException(); } }
 
         public override string ToString()
         {

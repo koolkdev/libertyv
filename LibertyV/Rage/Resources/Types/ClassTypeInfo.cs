@@ -59,7 +59,7 @@ namespace LibertyV.Rage.Resources.Types
             return new ClassObject(this, values);
         }
 
-        public override ResourceObject Create(ResourceReader reader)
+        virtual public ResourceObject CreateClass(ResourceReader reader)
         {
             Dictionary<string, ResourceObject> values = new Dictionary<string, ResourceObject>();
             foreach (var member in this.Members)
@@ -67,6 +67,11 @@ namespace LibertyV.Rage.Resources.Types
                 values[member.Item1] = member.Item2.Create(reader);
             }
             return new ClassObject(this, values);
+        }
+
+        public override ResourceObject Create(ResourceReader reader)
+        {
+            return this.CreateClass(reader);
         }
     }
 }

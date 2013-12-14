@@ -23,44 +23,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace LibertyV.Rage.Resources.Types.Basic
+namespace LibertyV.Rage.Resources.Types.Game.rage
 {
-    class UInteger16 : PrimitiveObject
+    class grcTextureReference : InheritanceClassTypeInfo
     {
-        private UInt16 value;
-
-        private class UInteger16Info : PrimitiveTypeInfo
+        public static grcTextureReference TypeInfo;
+        public static void Initialize() { TypeInfo = new grcTextureReference(); }
+        protected grcTextureReference()
+            : base("rage::grcTextureReference", "rage::grcTextureReferenceBase")
         {
-            public UInteger16Info()
-                : base("UInteger16")
-            {
-            }
-
-            public override ResourceObject Create()
-            {
-                return new UInteger16();
-            }
-
-            public override ResourceObject Create(ResourceReader reader)
-            {
-                return new UInteger16(reader.ReadUInt16());
-            }
-        }
-
-        public static PrimitiveTypeInfo TypeInfo = new UInteger16Info();
-
-        public UInteger16(UInt16 value = 0)
-        {
-            this.value = value;
-            this.Type = UInteger16.TypeInfo;
-        }
-
-        public override object Value
-        {
-            get
-            {
-                return value;
-            }
+            AddMember("TexturePtr?", "void*"); // TODO: I am not sure about that..
+            // Are there anymore members? Anyway, as long we will align this structure to 0x10, we should be okay...
         }
     }
 }

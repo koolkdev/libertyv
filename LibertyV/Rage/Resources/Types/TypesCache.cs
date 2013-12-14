@@ -27,13 +27,7 @@ namespace LibertyV.Rage.Resources.Types
 {
     class TypesCache
     {
-        private static Dictionary<string, TypeInfo> Cache = new Dictionary<string, TypeInfo>();
         private static Dictionary<string, Func<TypeInfo, TypeInfo>> Templates = new Dictionary<string, Func<TypeInfo, TypeInfo>>();
-
-        private static void AddToCache(TypeInfo type)
-        {
-            Cache[type.Name] = type;
-        }
 
         private static void RegisterTemplate(string name, Func<TypeInfo, TypeInfo> func)
         {
@@ -48,26 +42,43 @@ namespace LibertyV.Rage.Resources.Types
 
             // Make sure that all the types are initialized in the right order
 
+            PointerReader.Initialize();
+
             // Basic not independent blocks first
-            AddToCache(Basic.UInteger16.TypeInfo);
-            AddToCache(Basic.UInteger32.TypeInfo);
-            AddToCache(Basic.CString.TypeInfo);
-            AddToCache(Basic.VoidPointer.TypeInfo);
+            Basic.None.Initialize();
+            Basic.Byte.Initialize();
+            Basic.Word.Initialize();
+            Basic.Dword.Initialize();
+            Basic.Float.Initialize();
+            Basic.CString.Initialize();
+            Basic.VoidPointer.Initialize();
 
             // 
-            AddToCache(Basic.MemoryInfo.TypeInfo);
-            AddToCache(Game.rage.pgBase.TypeInfo);
-            AddToCache(Game.rage.grcTexture.TypeInfo);
-            AddToCache(Game.D3DBaseTexture.TypeInfo);
-            AddToCache(Game.rage.grcTextureXenon.TypeInfo);
-            AddToCache(Game.rage.grcTextureGCM.TypeInfo);
+            Basic.Vector3.Initialize();
+            Basic.Vector4.Initialize();
+            Basic.MemoryInfo.Initialize();
+            Game.rage.datBase.Initialize();
+            Game.rage.pgBase.Initialize();
+            Game.rage.grcTexture.Initialize();
+            Game.rage.grcTextureReferenceBase.Initialize();
+            Game.rage.grcTextureReference.Initialize();
+            Game.D3DBaseTexture.Initialize();
+            Game.rage.grcTextureXenon.Initialize();
+            Game.rage.grcTextureGCM.Initialize();
+
+            Game.rage.grmShaderParameter.Initialize();
+            Game.rage.grmShaderTextureParameter.Initialize();
+            Game.rage.grmShaderCoordinatesParameter.Initialize();
+            Game.rage.grmShader.Initialize();
+            Game.rage.grmShaderGroup.Initialize();
+            Game.rage.rmcDrawableBase.Initialize();
+            Game.rage.rmcDrawable.Initialize();
         }
 
         public static TypeInfo GetTypeInfoByName(string name)
         {
             TypeInfo type;
-            // Some of the members wlil be only registered in TypeInfo
-            if (!Cache.TryGetValue(name, out type) && !TypeInfo.TypesInfo.TryGetValue(name, out type))
+            if (!TypeInfo.TypesInfo.TryGetValue(name, out type))
             {
                 if (name.EndsWith("*"))
                 {
@@ -77,10 +88,14 @@ namespace LibertyV.Rage.Resources.Types
                     {
                         return null;
                     }
-                    return PointerTypeInfo.GetPointerTypeInfo(type);
+                    return Pointer.GetPointerTypeInfo(type);
                 }
                 else if (name.EndsWith(">"))
                 {
+                    if (name.IndexOf("<") == -1)
+                    {
+                        return null;
+                    }
                     // Is a template
                     string templateName = name.Substring(0, name.IndexOf("<"));
                     if (!Templates.ContainsKey(templateName))
@@ -94,6 +109,25 @@ namespace LibertyV.Rage.Resources.Types
                         return null;
                     }
                     return Templates[templateName](type);
+                }
+                else if (name.EndsWith("]"))
+                {
+                    if (name.IndexOf("[") == -1)
+                    {
+                        return null;
+                    }
+                    string objectType = name.Substring(0, name.IndexOf("["));
+                    type = GetTypeInfoByName(objectType);
+                    if (type == null)
+                    {
+                        return null;
+                    }
+                    int count;
+                    if (!int.TryParse(name.Substring(name.IndexOf("[") + 1, name.Length - objectType.Length - 2), out count))
+                    {
+                        return null;
+                    }
+                    return Basic.Array.GetArrayTypeInfo(type, count);
                 }
                 return null;
             }

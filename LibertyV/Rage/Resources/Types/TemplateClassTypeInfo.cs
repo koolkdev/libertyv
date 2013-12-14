@@ -31,8 +31,8 @@ namespace LibertyV.Rage.Resources.Types
         protected TypeInfo TemplateItem;
 
         // TODO: Support more than one template item
-        protected TemplateClassTypeInfo(string name, TypeInfo templateItem)
-            : base(name + "<" + templateItem.Name + ">")
+        protected TemplateClassTypeInfo(string name, TypeInfo templateItem, bool overrideName = false)
+            : base(overrideName ? name : (name + "<" + templateItem.Name + ">"))
         {
             this.TemplateItem = templateItem;
         }

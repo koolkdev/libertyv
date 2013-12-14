@@ -25,14 +25,14 @@ using System.Text;
 
 namespace LibertyV.Rage.Resources.Types.Game.rage
 {
-    class pgBase : ClassTypeInfo
+    class pgBase : InheritanceClassTypeInfo
     {
-        public static pgBase TypeInfo = new pgBase();
+        public static pgBase TypeInfo;
+        public static void Initialize() { TypeInfo = new pgBase(); }
 
         protected pgBase()
-            : base("rage::pgBase")
+            : base("rage::pgBase", "rage::datBase") // Is it right?
         {
-            base.AddMember("vtable", "UInteger32");
             base.AddMember("Memory", "MemoryInfo*");
         }
     }

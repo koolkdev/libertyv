@@ -27,13 +27,14 @@ namespace LibertyV.Rage.Resources.Types.Basic
 {
     class MemoryInfo : ClassTypeInfo
     {
-        public static MemoryInfo TypeInfo = new MemoryInfo();
+        public static MemoryInfo TypeInfo;
+        public static void Initialize() { TypeInfo = new MemoryInfo(); }
 
         protected MemoryInfo()
             : base("MemoryInfo")
         {
-            base.AddMember("Unknown1", Basic.UInteger32.TypeInfo);
-            base.AddMember("Unknown2", Basic.UInteger32.TypeInfo);
+            base.AddMember("Unknown1", Basic.Dword.TypeInfo);
+            base.AddMember("Unknown2", Basic.Dword.TypeInfo);
         }
     }
 }

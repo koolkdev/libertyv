@@ -137,5 +137,11 @@ namespace LibertyV.Rage.Resources
             }
             this.Stream = null;
         }
+
+        public void Skip(int count)
+        {
+            // TODO: Check boundries?
+            this._offset += count;
+        }
     }
 }

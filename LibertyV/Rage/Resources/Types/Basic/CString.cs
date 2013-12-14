@@ -27,6 +27,7 @@ namespace LibertyV.Rage.Resources.Types.Basic
 {
     class CString : PrimitiveObject
     {
+        // TODO: Short like Dowrd, Word,..
         private string value;
 
         private class CStringInfo : PrimitiveTypeInfo
@@ -53,7 +54,8 @@ namespace LibertyV.Rage.Resources.Types.Basic
             }
         }
 
-        public static PrimitiveTypeInfo TypeInfo = new CStringInfo();
+        public static PrimitiveTypeInfo TypeInfo;
+        public static void Initialize() { TypeInfo = new CStringInfo(); }
 
         public CString(string value = "")
         {

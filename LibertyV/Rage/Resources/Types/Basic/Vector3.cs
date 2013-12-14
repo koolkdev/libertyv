@@ -23,29 +23,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace LibertyV.Rage.Resources.Types.Game
+namespace LibertyV.Rage.Resources.Types.Basic
 {
-    class D3DBaseTexture : ClassTypeInfo
+    class Vector3 : ClassTypeInfo
     {
-        public static D3DBaseTexture TypeInfo;
-        public static void Initialize() { TypeInfo = new D3DBaseTexture(); }
-        protected D3DBaseTexture()
-            : base("D3DBaseTexture")
+        // TODO String representation
+        public static Vector3 TypeInfo;
+        public static void Initialize() { TypeInfo = new Vector3(); }
+
+        protected Vector3()
+            : base("Vector3")
         {
-            // TODO: Bitfields and enums. Fuck me.
-            AddMember("Unknown1", "Dword");
-            AddMember("Unknown2", "Dword");
-            AddMember("Unknown3", "Dword");
-            AddMember("Unknown4", "Dword");
-            AddMember("Unknown5", "Dword");
-            AddMember("Unknown6", "Dword");
-            AddMember("Unknown7", "Dword");
-            AddMember("Unknown8", "Dword");
-            AddMember("Unknown9", "Dword");
-            AddMember("Unknown10", "Dword");
-            AddMember("Unknown11", "Dword");
-            AddMember("Unknown12", "Dword");
-            AddMember("Unknown13", "Dword");
+            base.AddMember("x", "Float");
+            base.AddMember("y", "Float");
+            base.AddMember("z", "Float");
         }
     }
 }

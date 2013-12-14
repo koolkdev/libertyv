@@ -25,41 +25,43 @@ using System.Text;
 
 namespace LibertyV.Rage.Resources.Types
 {
-    class PointerTypeInfo : TypeInfo
+    class PointerReader : ResourceObject
     {
-        private TypeInfo PointedInfo;
-        private static Dictionary<TypeInfo, PointerTypeInfo> PointerTypesCache = new Dictionary<TypeInfo, PointerTypeInfo>();
-
-        protected PointerTypeInfo(TypeInfo poinetedInfo)
-            : base(poinetedInfo.Name + "*")
+        private class PointerReaderTypeInfo : TypeInfo
         {
-            PointedInfo = poinetedInfo;
-        }
-
-        override public ResourceObject Create()
-        {
-            return new Pointer(null, PointedInfo);
-        }
-
-        override public ResourceObject Create(ResourceReader reader)
-        {
-            reader = reader.DereferencePointer();
-            if (reader == null)
+            public PointerReaderTypeInfo()
+                : base("PointerReader")
             {
-                return new Pointer(null, PointedInfo);
             }
-            return new Pointer(PointedInfo.Create(reader), PointedInfo);
+
+            public override ResourceObject Create()
+            {
+                throw new NotImplementedException();
+            }
+
+            public override ResourceObject Create(ResourceReader reader)
+            {
+                return new PointerReader(reader.DereferencePointer());
+            }
         }
 
-        public static PointerTypeInfo GetPointerTypeInfo(TypeInfo type)
+        private ResourceReader Reader = null;
+
+        public static TypeInfo TypeInfo;
+        public static void Initialize() { PointerReader.TypeInfo = new PointerReaderTypeInfo(); }
+
+        public PointerReader(ResourceReader reader)
         {
-            PointerTypeInfo res;
-            if (!PointerTypesCache.TryGetValue(type, out res))
+            Type = PointerReader.TypeInfo;
+            Reader = reader;
+        }
+
+        public override object Value
+        {
+            get
             {
-                res = new PointerTypeInfo(type);
-                PointerTypesCache[type] = res;
+                return Reader;
             }
-            return res;
         }
     }
 }

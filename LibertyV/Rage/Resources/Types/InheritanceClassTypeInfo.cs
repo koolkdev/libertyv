@@ -38,5 +38,15 @@ namespace LibertyV.Rage.Resources.Types
         {
             base.AddMember("base", parentName);
         }
+
+        public override ResourceObject CreateClass(ResourceReader reader)
+        {
+            Dictionary<string, ResourceObject> values = new Dictionary<string, ResourceObject>();
+            foreach (var member in this.Members)
+            {
+                values[member.Item1] =  (member.Item1 == "base") ? (member.Item2 as ClassTypeInfo).CreateClass(reader) : member.Item2.Create(reader);
+            }
+            return new ClassObject(this, values);
+        }
     }
 }

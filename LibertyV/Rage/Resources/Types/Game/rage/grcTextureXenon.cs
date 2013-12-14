@@ -27,25 +27,15 @@ namespace LibertyV.Rage.Resources.Types.Game.rage
 {
     class grcTextureXenon : InheritanceClassTypeInfo
     {
-        public static grcTextureXenon TypeInfo = new grcTextureXenon();
+        public static grcTextureXenon TypeInfo;
+        public static void Initialize() { TypeInfo = new grcTextureXenon(); }
         protected grcTextureXenon()
             : base("rage::grcTextureXenon", "rage::grcTexture")
         {
-            AddMember("Unknown1", "UInteger32");
-            AddMember("Unknown2", "UInteger32");
-            AddMember("Unknown3", "UInteger32");
-            AddMember("Unknown4", "UInteger32");
-            AddMember("Unknown5", "UInteger32");
-            AddMember("Unknonw6", "UInteger32");
-            AddMember("Name", "CString*");
-            AddMember("Unknonw7", "UInteger32");
-            AddMember("Unknonw8", "UInteger32");
-            AddMember("Unknonw9", "UInteger32");
-            AddMember("Unknonw10", "UInteger32");
-            AddMember("TextureInfo", "D3DBaseTexture");
-            AddMember("Width", "UInteger16");
-            AddMember("Height", "UInteger16");
-            AddMember("Unknonw13", "UInteger32");
+            AddMember("TextureInfo", "D3DBaseTexture*");
+            AddMember("Width", "Word");
+            AddMember("Height", "Word");
+            AddMember("Unknonw13", "Dword");
         }
     }
 }

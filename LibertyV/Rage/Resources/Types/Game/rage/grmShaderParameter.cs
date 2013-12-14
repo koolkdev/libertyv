@@ -23,44 +23,32 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace LibertyV.Rage.Resources.Types.Basic
+namespace LibertyV.Rage.Resources.Types.Game.rage
 {
-    class VoidPointer : PrimitiveObject
+    class grmShaderParameter : ClassTypeInfo // Made up name
     {
-        private UInt32 value;
+        public static grmShaderParameter TypeInfo;
+        public static void Initialize() { TypeInfo = new grmShaderParameter(); }
 
-        private class VoidPointerInfo : PrimitiveTypeInfo
+        protected grmShaderParameter()
+            : base("rage::grmShaderParameter")
         {
-            public VoidPointerInfo()
-                : base("void*")
-            {
-            }
-
-            public override ResourceObject Create()
-            {
-                return new VoidPointer(0);
-            }
-
-            public override ResourceObject Create(ResourceReader reader)
-            {
-                return new VoidPointer(reader.ReadUInt32() & 0xFFFFFF);
-            }
+            base.AddMember("Count", "Byte");
+            base.AddMember("Unknown1", "Byte"); // Register Index?
+            base.AddMember("Unknown2", "Byte"); // padding?
+            base.AddMember("Unknown3", "Byte");
         }
 
-        public static PrimitiveTypeInfo TypeInfo;
-        public static void Initialize() { TypeInfo = new VoidPointerInfo(); }
-
-        public VoidPointer(UInt32 value = 0)
+        public override ResourceObject Create(ResourceReader reader)
         {
-            this.value = value;
-            this.Type = VoidPointer.TypeInfo;
-        }
-
-        public override object Value
-        {
-            get
+            ResourceObject obj = base.Create(reader.Clone());
+            if (obj["Count"].IntegerValue == 0)
             {
-                return value;
+                return Game.rage.grmShaderTextureParameter.TypeInfo.Create(reader);
+            }
+            else
+            {
+                return Game.rage.grmShaderCoordinatesParameter.TypeInfo.Create(reader);
             }
         }
     }

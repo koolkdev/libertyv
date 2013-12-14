@@ -27,12 +27,55 @@ namespace LibertyV.Rage.Resources.Types
 {
     class Pointer : ResourceObject
     {
+        private class PointerTypeInfo : TypeInfo
+        {
+            private TypeInfo PointedInfo;
+
+            public PointerTypeInfo(TypeInfo poinetedInfo)
+                : base(poinetedInfo.Name + "*")
+            {
+                PointedInfo = poinetedInfo;
+            }
+
+            override public ResourceObject Create()
+            {
+                return new Pointer(null, PointedInfo);
+            }
+
+            override public ResourceObject Create(ResourceReader reader)
+            {
+                reader = reader.DereferencePointer();
+                if (reader == null)
+                {
+                    return new Pointer(null, PointedInfo);
+                }
+                return new Pointer(PointedInfo.Create(reader), PointedInfo);
+            }
+        }
+
+        private static Dictionary<TypeInfo, PointerTypeInfo> PointerTypesCache = new Dictionary<TypeInfo, PointerTypeInfo>();
+
+        public static TypeInfo GetPointerTypeInfo(TypeInfo type)
+        {
+            PointerTypeInfo res;
+            if (!PointerTypesCache.TryGetValue(type, out res))
+            {
+                res = new PointerTypeInfo(type);
+                PointerTypesCache[type] = res;
+            }
+            return res;
+        }
+
         private ResourceObject PointedObject;
 
-        public Pointer(ResourceObject obj, TypeInfo objectType)
+        public Pointer(ResourceObject obj, TypeInfo objectType = null)
         {
             this.PointedObject = obj;
-            this.Type = PointerTypeInfo.GetPointerTypeInfo(objectType);
+            if (objectType == null)
+            {
+                objectType = obj.Type;
+            }
+            this.Type = GetPointerTypeInfo(objectType);
         }
 
         public Pointer(TypeInfo objectType)
